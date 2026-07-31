@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": false,
+  "packages": {
+    ".": {
+      "package-name": "ariestools-skills",
+      "changelog-path": "CHANGELOG.md",
+      "versioning": "always-bump-patch",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "scripts/marketplace-sync/metadata.json",
+          "jsonpath": "$.version"
+        },
+        "skills/xy-development/SKILL.md",
+        "skills/xy-toolchain/SKILL.md"
+      ]
+    }
+  }
+}

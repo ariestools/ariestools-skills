@@ -1,0 +1,19 @@
+{
+  "name": "ariestools-skills-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "validate:skills": "node scripts/validate-skills.mjs skills",
+    "sync:claude": "node scripts/marketplace-sync/build-claude.mjs",
+    "sync:codex": "node scripts/marketplace-sync/build-codex.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "volta": {
+    "node": "24.15.0",
+    "pnpm": "10.33.2"
+  }
+}

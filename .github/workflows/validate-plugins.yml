@@ -1,0 +1,62 @@
+name: Validate Plugins
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-renderers:
+    name: Render & validate marketplace manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+
+      - name: Render Claude marketplace tree
+        run: node scripts/marketplace-sync/build-claude.mjs --out /tmp/render/claude
+
+      - name: Render Codex marketplace tree
+        run: node scripts/marketplace-sync/build-codex.mjs --out /tmp/render/codex
+
+      - name: Validate Claude marketplace manifest
+        run: |
+          set -euo pipefail
+          jq empty /tmp/render/claude/.claude-plugin/marketplace.json
+          jq empty /tmp/render/claude/.claude-plugin/plugin.json
+          jq -e '.name and .owner.name and (.plugins | type == "array")' /tmp/render/claude/.claude-plugin/marketplace.json > /dev/null
+          jq -e '.name and .version' /tmp/render/claude/.claude-plugin/plugin.json > /dev/null
+          echo "✓ Claude manifests valid"
+
+      - name: Validate Codex marketplace manifest
+        run: |
+          set -euo pipefail
+          jq empty /tmp/render/codex/.agents/plugins/marketplace.json
+          jq empty /tmp/render/codex/plugins/ariestools-skills/.codex-plugin/plugin.json
+          jq -e '.name and (.plugins | type == "array") and (.plugins[] | select(.name == "ariestools-skills") | .source.source == "local" and .source.path == "./plugins/ariestools-skills" and .policy.installation and .policy.authentication and .category)' /tmp/render/codex/.agents/plugins/marketplace.json > /dev/null
+          for field in name version description author.name skills interface.displayName interface.shortDescription interface.longDescription interface.developerName interface.category interface.defaultPrompt; do
+            jq -e ".$field" /tmp/render/codex/plugins/ariestools-skills/.codex-plugin/plugin.json > /dev/null || { echo "✗ Missing Codex plugin field: $field"; exit 1; }
+          done
+          echo "✓ Codex manifests valid"
+
+      - name: Validate rendered tree shape
+        run: |
+          set -euo pipefail
+          for path in skills assets LICENSE; do
+            test -e "/tmp/render/claude/$path" || { echo "✗ claude missing $path"; exit 1; }
+          done
+          test -e /tmp/render/codex/LICENSE || { echo "✗ codex missing LICENSE"; exit 1; }
+          for path in skills assets; do
+            test -e "/tmp/render/codex/plugins/ariestools-skills/$path" || { echo "✗ codex missing plugins/ariestools-skills/$path"; exit 1; }
+          done
+          test -d /tmp/render/claude/skills/xy-development
+          test -d /tmp/render/claude/skills/xy-toolchain
+          echo "✓ Rendered trees include expected static content"
+
+      - name: Validate skill frontmatter
+        run: node scripts/validate-skills.mjs skills
