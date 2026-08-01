@@ -4,10 +4,11 @@ Agent skills for Aries Tools TypeScript development. The same skill content is p
 
 ## What's Included
 
-Two skill layers:
+Three skill layers:
 
 | Layer | Skill | Covers |
 |-------|-------|--------|
+| 3 | `ariestools-sdk` | `@ariestools/sdk` umbrella modules, specialist packages (`express`, `storage-adapters`, `threads`, `testing`, `telemetry`, …), fetch/HTTP patterns, import conventions |
 | 2 | `xy-toolchain` | `@ariestools/toolchain` (`xy` CLI), project profiles, ESLint flat configs, TypeScript configs, `@ariestools/vitest-config`, `@ariestools/lib-neutral`, deplint, repository policy |
 | 1 | `xy-development` | TypeScript conventions, Git workflow, testing principles, definition of done |
 

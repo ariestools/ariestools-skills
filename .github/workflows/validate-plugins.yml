@@ -56,6 +56,7 @@ jobs:
           done
           test -d /tmp/render/claude/skills/xy-development
           test -d /tmp/render/claude/skills/xy-toolchain
+          test -d /tmp/render/claude/skills/ariestools-sdk
           echo "✓ Rendered trees include expected static content"
 
       - name: Validate skill frontmatter

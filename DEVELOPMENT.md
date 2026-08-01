@@ -53,7 +53,10 @@ skills/
 ├── xy-development/
 │   ├── SKILL.md
 │   └── …
-└── xy-toolchain/
+├── xy-toolchain/
+│   ├── SKILL.md
+│   └── …
+└── ariestools-sdk/
     ├── SKILL.md
     └── …
 ```
