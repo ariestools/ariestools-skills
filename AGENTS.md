@@ -2,6 +2,6 @@
 
 Same guidance as [CLAUDE.md](./CLAUDE.md). Prefer that file for the full distribution and release model.
 
-**This repo owns:** `xy-development` and `xy-toolchain` skills for Aries Tools / `@ariestools/*` work.
+**This repo owns:** `xy-development`, `xy-toolchain`, and `ariestools-sdk` skills for Aries Tools / `@ariestools/*` work.
 
 **Not in this repo:** XL1/XYO product skills — use [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
