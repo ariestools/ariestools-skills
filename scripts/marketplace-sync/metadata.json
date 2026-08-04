@@ -1,6 +1,6 @@
 {
   "name": "ariestools-skills",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "displayName": "Aries Tools Skills",
   "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, and the @ariestools/sdk utility libraries.",
   "shortDescription": "Aries Tools TypeScript toolchain, development, and SDK skills.",
