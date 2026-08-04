@@ -2,13 +2,14 @@
   "name": "ariestools-skills",
   "version": "0.1.1",
   "displayName": "Aries Tools Skills",
-  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, and dependency policy.",
-  "shortDescription": "Aries Tools TypeScript toolchain and development skills.",
-  "longDescription": "A two-layer skill stack for working in Aries Tools repositories: foundational TypeScript/Git/testing/workflow standards (xy-development) and the @ariestools/* toolchain surface — xy CLI, project profiles, ESLint flat configs, tsconfig variants, vitest-config, lib-neutral, deplint, and repository policy (xy-toolchain).",
+  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, and the @ariestools/sdk utility libraries.",
+  "shortDescription": "Aries Tools TypeScript toolchain, development, and SDK skills.",
+  "longDescription": "A layered skill stack for Aries Tools repositories: TypeScript/Git/testing standards (xy-development), the @ariestools/* toolchain surface — xy CLI, configs, vitest-config, deplint (xy-toolchain) — and the @ariestools/sdk utility libraries plus specialist packages (ariestools-sdk).",
   "keywords": [
     "ariestools",
     "typescript",
     "toolchain",
+    "sdk",
     "eslint",
     "vitest",
     "pnpm"
@@ -34,6 +35,7 @@
   "icon": "./assets/ariestools-icon.svg",
   "defaultPrompts": [
     "Set up an @ariestools/toolchain monorepo",
+    "Use @ariestools/sdk fetchJson with a custom fetcher",
     "Fix xy deplint findings for a private service",
     "Configure Vitest with @ariestools/vitest-config"
   ],

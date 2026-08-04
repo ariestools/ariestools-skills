@@ -17,7 +17,8 @@
           "jsonpath": "$.version"
         },
         "skills/xy-development/SKILL.md",
-        "skills/xy-toolchain/SKILL.md"
+        "skills/xy-toolchain/SKILL.md",
+        "skills/ariestools-sdk/SKILL.md"
       ]
     }
   }

@@ -43,6 +43,7 @@ Read when selecting `@ariestools/tsconfig`, `-dom`, or `-react`, configuring Nod
 
 Read when configuring Vitest (including `@ariestools/vitest-config`), choosing spec locations and node/browser routing, running a workspace or path, clearing the test cache, or distinguishing test failures from build failures.
 
-## Product scaffolds
+## Related skills
 
-This pack covers the shared toolchain only. Domain scaffolds (for example XL1 apps in the separate [xyo-skills](https://github.com/XYOracleNetwork/xyo-skills) pack) should still depend on the active `@ariestools/*` packages described here.
+- **[ariestools-sdk](../ariestools-sdk/SKILL.md)** — `@ariestools/sdk` utilities and specialist packages from `sdk-js`.
+- Domain scaffolds (for example XL1 apps in the separate [xyo-skills](https://github.com/XYOracleNetwork/xyo-skills) pack) should still depend on the active `@ariestools/*` toolchain packages described here.

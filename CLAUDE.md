@@ -27,6 +27,7 @@ pnpm sync:codex  --out .preview/codex
 ## Skill layers
 
 ```
+Layer 3: ariestools-sdk/   — @ariestools/sdk umbrella + specialist packages
 Layer 2: xy-toolchain/     — @ariestools/toolchain, configs, Vitest, deplint, policy
 Layer 1: xy-development/   — TypeScript, Git, testing principles, workflow
 ```
