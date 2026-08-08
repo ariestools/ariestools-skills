@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/ariestools/ariestools-skills/compare/v0.1.2...v0.1.3) (2026-08-08)
+
+
+### Bug Fixes
+
+* correct @xyo-network/sdk barrel import example ([b6837a0](https://github.com/ariestools/ariestools-skills/commit/b6837a0885e2bbadb6255d15c81429b2e56709fa))
+
 ## [0.1.2](https://github.com/ariestools/ariestools-skills/compare/v0.1.1...v0.1.2) (2026-08-04)
 
 
