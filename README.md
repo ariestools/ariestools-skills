@@ -16,6 +16,8 @@ Skills use progressive loading — each `SKILL.md` is a lightweight router that 
 
 For XL1 / XYO protocol product skills (chain, patterns, scaffold, etc.), use the sibling stack at [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills). Those skills depend on this toolchain layer.
 
+**`xy-development` and `xy-toolchain` are owned only here.** Do not expand the redirect stubs that may still ship inside `xyo-skills` — change this repo, release, and let `xy skills` / Skills.sh pull the update.
+
 ## How These Work in Multiple Places
 
 Agent skills are Markdown files with YAML frontmatter (`name`, `description`). This repo is the source of truth; marketplace install URLs point at rendered mirrors:

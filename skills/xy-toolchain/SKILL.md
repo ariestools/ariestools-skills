@@ -7,6 +7,8 @@ metadata:
 
 # XY Toolchain
 
+**Authority.** This skill is maintained only in [`ariestools/ariestools-skills`](https://github.com/ariestools/ariestools-skills). Copies under `XYOracleNetwork/xyo-skills` are redirect stubs — edit here, never there.
+
 Use the active [`@ariestools/toolchain`](https://github.com/ariestools/toolchain) packages. Do not install the retired `@xylabs/*` compatibility names in new work.
 
 Inspect the repository's `package.json`, lockfile, `xy.config.ts`, ESLint config, TypeScript configs, and test config before choosing commands. Prefer existing repository scripts; use the `xy` CLI directly when the repository exposes no narrower wrapper.

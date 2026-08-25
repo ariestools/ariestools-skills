@@ -7,6 +7,8 @@ metadata:
 
 # Development Standards
 
+**Authority.** This skill is maintained only in [`ariestools/ariestools-skills`](https://github.com/ariestools/ariestools-skills). Copies under `XYOracleNetwork/xyo-skills` are redirect stubs — edit here, never there.
+
 This skill defines foundational development practices. Load the relevant sub-topic based on your current task:
 
 **Skill identity.** This skill's version is exposed in this file's frontmatter under `metadata.version`. When reporting which skills informed your work, format as `<skill-name> v<version>` (e.g. `xy-development v1.1.19`). When multiple skills from this plugin are active, each may be listed.
