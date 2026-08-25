@@ -46,6 +46,12 @@ pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugi
 pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json
 ```
 
+## Ownership
+
+- **`xy-development` / `xy-toolchain` / `ariestools-sdk`** — edit only in this repo.
+- **`xyo-knowledge` / `xl1-*`** — edit in [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
+- Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs only.
+
 ## Skill layout
 
 ```

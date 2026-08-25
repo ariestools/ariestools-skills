@@ -32,6 +32,8 @@ Layer 2: xy-toolchain/     — @ariestools/toolchain, configs, Vitest, deplint, 
 Layer 1: xy-development/   — TypeScript, Git, testing principles, workflow
 ```
 
+This repo is the **only** editable source for those three skills. `XYOracleNetwork/xyo-skills` may keep redirect stubs under the base skill names — do not restore full docs there.
+
 ## Development
 
 - **Package manager:** pnpm (Node >= 24; Volta pins in `package.json`)
