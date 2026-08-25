@@ -2,7 +2,7 @@
 name: xy-development
 description: Core development standards for TypeScript, Git workflow, testing principles, and development workflow. Activates when writing code, running builds, performing git operations, or completing features.
 metadata:
-  version: 0.1.3 # x-release-please-version
+  version: 0.1.4 # x-release-please-version
 ---
 
 # Development Standards

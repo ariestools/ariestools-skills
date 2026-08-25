@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/ariestools/ariestools-skills/compare/v0.1.3...v0.1.4) (2026-08-25)
+
+
+### Features
+
+* claim base-skill ownership and document xy secure dependabot ([ef591ce](https://github.com/ariestools/ariestools-skills/commit/ef591ce5110ba33d0167d68dd6f623fe913cf6fb))
+* **xy-toolchain:** document secure dependabot and claim base-skill ownership ([#10](https://github.com/ariestools/ariestools-skills/issues/10)) ([23fa5a3](https://github.com/ariestools/ariestools-skills/commit/23fa5a3b0c89a12e8e0ffa180b3666c919bf6b80))
+
 ## [0.1.3](https://github.com/ariestools/ariestools-skills/compare/v0.1.2...v0.1.3) (2026-08-08)
 
 
