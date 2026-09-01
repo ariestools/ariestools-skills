@@ -2,7 +2,7 @@
 name: xy-agent
 description: Repository documentation conventions for AI agents — the AGENTS.md entry point, per-tool adapter files (CLAUDE.md, copilot-instructions), the docs/ lifecycle tree, and papers/ normative baselines in a monorepo. Covers required AGENTS.md sections, the size budget, YAML front matter and document states, supersession and archiving, decision records, dated evidence documents, the generated docs index, and how to audit all of it for rot and turn findings into xy work items. Use when orienting in an unfamiliar repository, writing or reorganizing AGENTS.md / docs / papers, adding a decision or evidence record, archiving a superseded document, or auditing repository documentation.
 metadata:
-  version: 0.1.4 # x-release-please-version
+  version: 0.1.5 # x-release-please-version
 ---
 
 # Agent Documentation Conventions
