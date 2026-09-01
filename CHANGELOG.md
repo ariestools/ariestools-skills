@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5](https://github.com/ariestools/ariestools-skills/compare/v0.1.4...v0.1.5) (2026-09-01)
+
+
+### Features
+
+* add xy-agent documentation conventions skill ([8e39f9e](https://github.com/ariestools/ariestools-skills/commit/8e39f9e5333dfc1da6347422e8a34a55138be552))
+* **skills:** add xy-agent documentation conventions skill ([#14](https://github.com/ariestools/ariestools-skills/issues/14)) ([2d8f995](https://github.com/ariestools/ariestools-skills/commit/2d8f9957794dd10702684a0f651ec4db5c94b35b))
+
 ## [0.1.4](https://github.com/ariestools/ariestools-skills/compare/v0.1.3...v0.1.4) (2026-08-25)
 
 
