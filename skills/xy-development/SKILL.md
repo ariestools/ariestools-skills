@@ -26,3 +26,8 @@ Read when writing tests, discussing test strategy, or evaluating coverage. Cover
 
 ### [Development Workflow](workflow.md)
 Read before running any build, lint, or test command, and before declaring any task complete. Covers native toolchain discovery (use the repo's commands, not ad-hoc one-offs) and the definition of done checklist.
+
+## Related skills
+
+- **[xy-toolchain](../xy-toolchain/SKILL.md)** — the `xy` CLI, build/lint/test commands, and the tooling these principles run on.
+- **[xy-agent](../xy-agent/SKILL.md)** — *recommended, not required.* Repository documentation conventions: the `AGENTS.md` entry point, per-tool adapters, and the `docs/` and `papers/` lifecycle. Read it when writing or reorganizing a repository's agent-facing documents, or when a repository already follows the pattern. A repository that does not follow it is not defective — use whatever convention that repository already has.
