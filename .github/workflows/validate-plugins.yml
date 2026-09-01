@@ -54,6 +54,7 @@ jobs:
           for path in skills assets; do
             test -e "/tmp/render/codex/plugins/ariestools-skills/$path" || { echo "✗ codex missing plugins/ariestools-skills/$path"; exit 1; }
           done
+          test -d /tmp/render/claude/skills/xy-agent
           test -d /tmp/render/claude/skills/xy-development
           test -d /tmp/render/claude/skills/xy-toolchain
           test -d /tmp/render/claude/skills/ariestools-sdk

@@ -16,6 +16,7 @@
           "path": "scripts/marketplace-sync/metadata.json",
           "jsonpath": "$.version"
         },
+        "skills/xy-agent/SKILL.md",
         "skills/xy-development/SKILL.md",
         "skills/xy-toolchain/SKILL.md",
         "skills/ariestools-sdk/SKILL.md"
