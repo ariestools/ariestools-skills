@@ -14,17 +14,17 @@ pnpm xy agent audit           the lifecycle subset: live state, evidence, orphan
 pnpm xy agent init            create missing files only: placeholder AGENTS.md, CLAUDE.md import,
                               docs/ tier folders, index. Absorbs nothing, never overwrites
 pnpm xy agent index           regenerate docs/README.md from front matter
-pnpm xy agent archive <path>  move to docs/archive/<basename>, set state: archived, write a generic
-                              banner, refresh the index
+pnpm xy agent archive <path>  move under docs/archive/, keeping the path below docs/; set state: retired
+                              unless superseded; write a dated banner; refresh the index
 ```
 
-`xy check` runs `xy agent lint` in every repository, so an error-level finding fails the gate. A repository tunes levels through `commands.agentLint.rules` in `xy.config.ts`; the thresholds are fixed. `xy agent archive` flattens the path and writes a generic banner, not the one the [archive procedure](lifecycle.md) asks for — reconcile the result afterwards. No rule covers document–code drift; that review stays manual.
+Since 10.1.2, `xy check` runs `xy agent lint` only where a root `AGENTS.md` exists or the xy config declares `commands.agentLint`, and only `agents.file-present` and `agents.links-resolve` are errors by default. Every other finding warns, and fails the gate only under `--strict` or `XY_STRICT=1`. (10.1.1 runs it in every repository, with four more rules at error.) A repository tunes levels through `commands.agentLint.rules` in `xy.config.ts` — declaring that key also opts `xy check` in — and the thresholds are fixed. The banner `xy agent archive` writes names the successor or says "Retired"; add the reason for a retirement by hand, as the [archive procedure](lifecycle.md#archiving) shows. No rule covers document–code drift; that review stays manual.
 
-**Check `pnpm xy --help` before assuming the command exists.** On older toolchains `xy agent` prints "Command not found [agent]" and exits 0, which reads like a pass. Run the checks by hand there.
+**Check `pnpm xy --help` before assuming the command exists.** Before 10.1.1, `xy agent` prints "Command not found [agent]" and exits 0, which reads like a pass. Run the checks by hand there.
 
-**Only structural fixers are safe:** index regeneration, archiving, and inserting missing front matter, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix`) regenerates `docs/README.md` and prepends `kind: doc` front matter to files that have none, and `xy agent index` and `xy agent archive` do the rest. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
+**Only structural fixers are safe:** index regeneration, archiving, and inserting missing front matter, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix` wherever `xy check` runs agent lint) regenerates `docs/README.md` and gives a file with no front matter a `kind` inferred from its folder, and `xy agent index` and `xy agent archive` do the rest. Since 10.1.2 the inferred kind is `decision`, `evidence`, `runbook` or `plan` under the matching `docs/` folder, `paper` under `papers/`, and `spec` under `specs/`; any other file keeps its `docs.front-matter` warning. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
 
-An audit runs `xy agent lint` and `xy check` without `--fix` and proposes fixes to the owner first. After a front-matter fix, replace each `kind: doc` with the real kind and run `pnpm xy agent index` before the verifying run — the fixer renders the index from the front matter it started with, so the next lint fails `docs.index-current`.
+An audit runs `xy agent lint` and `xy check` without `--fix` and proposes fixes to the owner first. After a front-matter fix, check each inferred `kind` and add the rest of the front matter by hand; the same run builds the index from the new front matter. On 10.1.1 the fixer writes `kind: doc` and builds the index from the old front matter, so replace each `kind: doc` and run `pnpm xy agent index` before the verifying run.
 
 **Related linters.** Stable `xy repo lint`, also part of `xy check`, requires a consumer `README.md` in each workspace package. Experimental `pnpm xyex plan lint` is not part of `xy check` and is not authoritative here: its layout (fixed paper names, `docs/ROADMAP.md`, `notes/`) conflicts with this catalog in places. Never run `xyex plan lint --fix` during an audit — it scaffolds files, prepends `@AGENTS.md` to an existing `CLAUDE.md`, and moves non-canonical `papers/` files into `notes/`. If a repository's `.xy/plan.json` sets `metadata.source: manifest`, lifecycle metadata lives in the manifest: expect `docs.front-matter` warnings and lower that rule rather than running `--fix`.
 
@@ -37,41 +37,40 @@ Each check is objectively decidable. Levels are defaults; a repository may tune 
 | Check | Rule | Level | What it means |
 |---|---|---|---|
 | `AGENTS.md` exists at the repository root | `agents.file-present` | error | Nothing else in this convention applies without it |
-| Adapters are thin | `agents.adapter-thin` | error | `CLAUDE.md` is absent, a symlink to `AGENTS.md`, or a file whose only content is `@AGENTS.md` (an HTML comment is allowed) — never a copy, and nothing added below the import. Same for `.github/copilot-instructions.md` and `GEMINI.md` |
+| Adapters are thin | `agents.adapter-thin` | warn | `CLAUDE.md` and `GEMINI.md` are absent, a symlink to `AGENTS.md`, or a file whose first visible line is `@AGENTS.md` (an HTML comment may sit above it). Tool-specific notes may follow the import, but never a copy or restatement of `AGENTS.md`. `.github/copilot-instructions.md` is absent, a symlink, or links to `AGENTS.md` |
 | H1 names the product, not the filename | `agents.h1-not-filename` | warn | `# AGENTS.md` is what forces a maintainer to keep two copies |
-| Required sections present | `agents.required-sections` | error | Orient, authority, repository map, commands, failures. Headings are matched by keyword: `orient` or `overview`, `authority` (not "authoritative"), `repository map`, `layout` or `packages`, `command`, `fail` or `troubleshoot` |
+| Required sections present | `agents.required-sections` | warn | Orient, authority, repository map, commands, failures. Headings are matched by keyword: `orient` or `overview`, `authorit` (authority; authoritative since 10.1.2), `repository map`, `layout` or `packages`, `command`, and `fail` or `troubleshoot` (since 10.1.2 also `what not to do` or `pitfall`) |
 | Within the size budget | `agents.size-budget` | warn | Under 200 lines: a file `wc -l` counts at 200 already warns |
 | Every link resolves | `agents.links-resolve` | error | The single highest-value check — it catches renames, deletions, and moved packages |
-| No absolute machine paths | `agents.no-absolute-paths` | error | No `/Users/...` or `/home/...` in `AGENTS.md`, an adapter, a `packages/*/AGENTS.md`, or any Markdown under `docs/`, `papers/`, or `specs/` — example paths and pasted output included. Write `~/`, `$HOME/`, or `<repo>/`, and redact output before committing an evidence document: it cannot be cleaned up later without `amends` |
+| No absolute machine paths | `agents.no-absolute-paths` | warn | No `/Users/...` or `/home/...` in `AGENTS.md`, an adapter, a `packages/*/AGENTS.md`, or any Markdown under `docs/`, `papers/`, or `specs/` — example paths and pasted output included. Write `~/`, `$HOME/`, or `<repo>/`, and redact output before committing an evidence document: it cannot be cleaned up later without `amends` |
 | No live state | `agents.no-live-state` | warn | Task assignments, branch names, claim state, in-flight status |
 | Nested files are delta-only | `agents.nested-delta-only` | warn | A `packages/*/AGENTS.md` that restates the root |
-| Authority rows resolve | `agents.authority-rows-resolve` | warn | Each row points at a file that exists, whose `kind` matches the claim |
+| Authority rows resolve | `agents.authority-rows-resolve` | warn | Each row points at a file that exists, whose `kind` matches the table's Kind column where it has one |
 
 ### Documents
 
 | Check | Rule | Level | What it means |
 |---|---|---|---|
 | Front matter present and valid | `docs.front-matter` | warn | Error under `--strict` once a repository has migrated |
-| Index is current | `docs.index-current` | error | `docs/README.md` matches what `pnpm xy agent index` generates from front matter |
-| Superseded documents are archived | `docs.superseded-archived` | warn | `state: superseded` ⇒ `supersededBy` resolves ⇒ file is under `archive/` |
+| Index is current | `docs.index-current` | warn | `docs/README.md` matches what `pnpm xy agent index` generates from front matter |
+| Superseded documents are archived | `docs.superseded-archived` | warn | `state: superseded` or `retired` ⇒ file is under `docs/archive/`; `superseded` ⇒ `supersededBy` resolves, relative to the file or from the repository root |
 | Evidence documents are immutable | `docs.evidence-immutable` | warn | More than one content commit on a `docs/evidence/` file. Escape hatch: an `amends:` field |
-| Nothing is stale | `docs.stale` | warn | `reviewed` (or `date`) older than 180 days; runbooks 90. Applies to documents edited in place — runbooks, handoffs, other active documents. `evidence/`, `decisions/`, and `archive/` are exempt, and a stale plan is a prompt to supersede it, not a defect |
+| Nothing is stale | `docs.stale` | warn | `reviewed` (or `date`) older than 180 days; runbooks 90. Applies to documents edited in place — runbooks, handoffs, other active documents. `evidence/`, `decisions/`, `archive/`, and any `superseded` or `retired` document are exempt, and a stale plan is a prompt to supersede it, not a defect |
 | No orphans | `docs.orphan` | warn | Not linked from `AGENTS.md` or another hand-written document. A row in the generated index does not count |
 | Decision naming is consistent | `decisions.naming` | warn | One scheme; ids unique and contiguous; each carries a state |
 | Paper headers are consistent | `papers.header` | warn | Version, status, date present, and matching any visible header block |
 
 ### Where the shipped rules differ
 
-Read 10.1.1 findings with these gaps in mind:
+Read 10.1.2 findings with these gaps in mind:
 
 - `agents.links-resolve` checks only Markdown links (`[text](path)`), relative to `AGENTS.md`. Write repository paths as links; a code-span path is never checked.
-- `agents.authority-rows-resolve` runs only under a `##` heading that starts with "Authority". It reads the kind from column 2 and treats the last word of column 1 as a path whenever that word contains `/` or ends in `.md`. It resolves only a bare path there: a link or code span in column 1 is reported missing, and so is a task class that ends in such a word ("Build and CI/CD", "Editing README.md"). A task-first row whose last word is plain is never checked.
+- `agents.authority-rows-resolve` reads the first `##` section whose heading contains "authorit". It takes each row's path from the column headed Authority, Document or Path (column 1 when no column is), preferring a Markdown link's target, and otherwise from the first cell that holds a path. Only a word that contains `/` or ends in `.md` counts as a path, link targets included, so with `[package.json](package.json)` the rule reads another cell, often the task class; write `./package.json`. It compares `kind` with the column headed Kind; when no header cell names Authority, Document, Path or Kind, it treats every row as data and reads column 2 as the kind.
 - `agents.no-live-state` matches "claimed by", "assigned to", "in-flight" and "in flight" even inside a prohibition, and any `feature/`, `fix/`, or `hotfix/` followed by a name. Write branch conventions as `feature/<name>`, and phrase prohibitions without the trigger words.
 - `docs.front-matter` checks only that front matter and `kind` exist, and skips `README.md` files. Values and per-kind fields are not validated.
-- `docs.stale` exempts nothing, so old evidence, decision and archived records warn. Accept the warning. Never add `reviewed:` to one to silence it — that edits an immutable record — and do not turn the rule off, which silences stale runbooks too.
-- `docs.superseded-archived` resolves `supersededBy` relative to the document, then checks the successor's path for `archive/`, so it prints the same "is not under archive/" warning for a correctly archived document and for one still in place. Read the path the message names first: ignore the warning only when that path is under `docs/archive/`, and archive the document otherwise.
-- `docs.orphan` counts a mention in `docs/README.md` as a link, so it cannot fire while the index is current. Use the hand check below.
-- `decisions.naming` parses only `0001-` and `ADR-0001-` ids. Other schemes are not checked for uniqueness or gaps.
+- `docs.stale` does not skip `README.md` files, so a dated `papers/README.md`, such as the one `xy repo init` writes, warns 180 days after its `date`. Re-read it and add or update `reviewed`.
+- `decisions.naming` parses `<PREFIX>-D<n>` (such as `CC-D021`), `ADR-<n>` and `<n>-` ids, and treats a `YYYYMMDD-` prefix as a dated scheme. Dated names and other schemes, such as `D-004-…`, are not checked for uniqueness or gaps.
+- The walker also lints Markdown under `docs/`, `papers/` and `specs/` that `.gitignore` excludes, such as a generated dump ([Where docs/ is not called docs/](structure.md#where-docs-is-not-called-docs)).
 
 ## Running the checks
 
@@ -100,16 +99,23 @@ grep -oE '`[a-zA-Z0-9._/-]+\.(md|json|ts|tsx|mjs|astro)`' AGENTS.md \
 git ls-files AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md 'packages/*/AGENTS.md' \
   ':(glob)docs/**/*.md' ':(glob)papers/**/*.md' ':(glob)specs/**/*.md' | xargs grep -nE '/(Users|home)/'
 
-# adapters: absent, a symlink to AGENTS.md, or nothing but the @AGENTS.md import
-for f in CLAUDE.md GEMINI.md .github/copilot-instructions.md; do
+# adapters: absent, a symlink to AGENTS.md, or leading with the @AGENTS.md import.
+# Then read any notes below the import: they must not restate AGENTS.md
+for f in CLAUDE.md GEMINI.md; do
   if [ -L "$f" ]; then echo "$f -> $(readlink "$f")"
   elif [ -f "$f" ]; then
-    case "$(sed 's/<!--.*-->//g' "$f" | grep -v '^[[:space:]]*$')" in
+    case "$(sed 's/<!--.*-->//g' "$f" | grep -v '^[[:space:]]*$' | head -n 1 | tr -d '[:space:]')" in
       '@AGENTS.md'|'@./AGENTS.md') ;;
-      *) echo "NOT THIN $f" ;;
+      *) echo "NO LEADING IMPORT $f" ;;
     esac
   fi
 done
+# Copilot: absent, a symlink, or a link to ../AGENTS.md
+f=.github/copilot-instructions.md
+if [ -L "$f" ]; then echo "$f -> $(readlink "$f")"
+elif [ -f "$f" ]; then
+  grep -qE '\]\(\.\./AGENTS\.md[)#]|^[[:space:]]*@(\.\./|\./)?AGENTS\.md[[:space:]]*$' "$f" || echo "NO AGENTS.md LINK $f"
+fi
 
 # evidence documents edited after creation (amends: is the escape hatch)
 for f in $(git ls-files ':(glob)docs/evidence/**/*.md'); do
@@ -180,4 +186,4 @@ Then act on what the owner confirms. Archiving, index regeneration, and front-ma
 - Every path you referenced resolves.
 - `AGENTS.md` still within budget, and its authority table updated if you added an authority.
 - New evidence documents name a commit and state which tiers they do *not* establish.
-- `pnpm xy agent lint` reports no new errors (toolchain 10.1.1 and later).
+- `pnpm xy agent lint` (toolchain 10.1.1 and later) reports no new errors and no new warnings, apart from an expected `docs.orphan` on an archived record that nothing else names (since 10.1.2). Since 10.1.2 most rules only warn, so a clean error count is not enough.
