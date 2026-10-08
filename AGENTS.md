@@ -18,7 +18,7 @@ Then read only the authority for the task in hand, from the table below. Do not 
 | When the task touches | Authority | Status of that authority |
 | --- | --- | --- |
 | Skill content, triggers or frontmatter | [skills/](skills/), one `SKILL.md` router plus sub-files per skill | Source of truth. The only editable copy of the four skills |
-| Facts about the `xy` CLI or the SDK | The `ariestools/toolchain` and `ariestools/sdk-js` source, at the version the skill names | Ground truth. A skill that disagrees with the source is the defect |
+| Facts about the `xy` CLI or the SDK | The source of the `toolchain` and `sdk-js` repositories in the `ariestools` GitHub organization, at the version the skill names | Ground truth. A skill that disagrees with the source is the defect |
 | Marketplace listing text and manifests | [metadata.json](scripts/marketplace-sync/metadata.json) and the renderers beside it | Source of truth for both mirrors. Its `version` belongs to release-please |
 | What CI rejects in a skill | [validate-skills.mjs](scripts/validate-skills.mjs) | Normative. CI runs it on pull requests and on pushes to `main` and `develop` |
 | Install instructions and the human overview | [README.md](README.md) | Reference, not policy. This file wins where they differ |
@@ -49,7 +49,7 @@ Then read only the authority for the task in hand, from the table below. Do not 
 | 1 | [xy-development](skills/xy-development/SKILL.md) | TypeScript, Git, testing principles, workflow, Definition of Done |
 | — | [xy-agent](skills/xy-agent/SKILL.md) | Cross-cutting: AGENTS.md entry point, tool adapters, `docs/` and `papers/` lifecycle, documentation audits |
 
-Each skill builds on the layers below it. A link up a layer (a Related skills entry, or xy-development pointing to xy-toolchain for an `xy` command) is navigation only: the lower skill must stay correct when the higher one is not installed. `xy-agent` builds on `xy-development` and links to `xy-toolchain` for the `xy agent` and `xy work` commands; `xy check` enforces its convention through `xy agent lint` from toolchain 10.1.1. Inside skill text, name skills ("the xy-toolchain skill") instead of layer numbers. The "Layer 1/2/3" tiers of the Definition of Done in `xy-development/workflow.md` are a different scheme that xyo-skills depends on; keep their names.
+Each skill builds on the layers below it. A link up a layer (a Related skills entry, or xy-development pointing to xy-toolchain for an `xy` command) is navigation only: the lower skill must stay correct when the higher one is not installed. `xy-agent` builds on `xy-development` and links to `xy-toolchain` for the `xy agent` and `xy work` commands; `xy agent lint` enforces its convention from toolchain 10.1.1, and from 10.1.2 `xy check` runs it only where a root `AGENTS.md` exists or `commands.agentLint` is declared. Inside skill text, name skills ("the xy-toolchain skill") instead of layer numbers. The "Layer 1/2/3" tiers of the Definition of Done in `xy-development/workflow.md` are a different scheme that xyo-skills depends on; keep their names.
 
 ## Commands you will actually need
 
@@ -59,7 +59,7 @@ Each skill builds on the layers below it. A link up a layer (a Related skills en
 | `pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugin/*.json` | Render the Claude marketplace tree and check its JSON parses |
 | `pnpm sync:codex --out .preview/codex && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json` | Render the Codex tree and check its JSON parses |
 | `claude --plugin-dir .preview/claude` | Load the rendered plugin in a local Claude Code session |
-| `npx -p @ariestools/toolchain@10.1.1 xy agent lint` | Check this file, `CLAUDE.md` and `docs/` against the xy-agent convention. This repo has no toolchain dependency, so nothing runs it automatically |
+| `npx -p @ariestools/toolchain@10.1.2 xy agent lint` | Check this file, `CLAUDE.md` and `docs/` against the xy-agent convention. This repo has no toolchain dependency, so nothing runs it automatically |
 
 The scripts are plain Node with no dependencies, so there is nothing to install. Three traps bite repeatedly:
 
