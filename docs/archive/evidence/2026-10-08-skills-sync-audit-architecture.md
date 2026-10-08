@@ -1,14 +1,19 @@
 ---
 title: "Skills sync audit 2026-10-08 — architecture"
 kind: evidence
-state: active
+state: superseded
 date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of skill-pack architecture and cross-repo distribution at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 23 merged items, 6 verified by two lenses, 17 unverified because the run was paused."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
+supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-architecture.md
 ---
 
 # Skills sync audit — architecture
+
+> **Archived 2026-10-08.** Superseded by [`docs/evidence/2026-10-08-skills-sync-audit-complete-architecture.md`](../../evidence/2026-10-08-skills-sync-audit-complete-architecture.md).
+> Original path: `docs/evidence/2026-10-08-skills-sync-audit-architecture.md`. Retained as a record of the partial audit (verification paused,
+> toolchain 10.1.0) that was current until the complete audit replaced it; do not follow it.
 
 An auditor checked every item below against the named source commits. Items marked `verified` were also confirmed by two independent verifiers, one reading the code and one reading the skill text. Items marked `unverified` were checked only by the auditor, because the run was paused before verification. Treat them as leads, not facts. None of these changes has been applied to the skills. This is an evidence record, not a remediation plan. Back to the [Audit index](2026-10-08-skills-sync-audit.md).
 

@@ -1,14 +1,19 @@
 ---
 title: "Skills sync audit 2026-10-08 — xy-development"
 kind: evidence
-state: active
+state: superseded
 date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of the xy-development skill at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 42 merged items, 41 verified by two lenses, 1 unverified because the run was paused."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
+supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-xy-development.md
 ---
 
 # Skills sync audit — xy-development
+
+> **Archived 2026-10-08.** Superseded by [`docs/evidence/2026-10-08-skills-sync-audit-complete-xy-development.md`](../../evidence/2026-10-08-skills-sync-audit-complete-xy-development.md).
+> Original path: `docs/evidence/2026-10-08-skills-sync-audit-xy-development.md`. Retained as a record of the partial audit (verification paused,
+> toolchain 10.1.0) that was current until the complete audit replaced it; do not follow it.
 
 This document records claims about `skills/xy-development/` at ariestools-skills `7e78933a8`. An auditor checked each claim against source at @ariestools/toolchain 10.1.0 (main `7eb43c3c2`), @ariestools/sdk 9.0.1 (`298fbb5bb`) and the workspace repos named in each item. Items marked `verified` were also confirmed by two independent verifiers, one checking the code and one checking the skill text. A merged item takes the strongest status among its member findings. Where a detail comes only from an unverified member, the item says so inline. The document does not show that `unverified` items are correct, because the verification run was paused before it reached them. Nothing here has been applied to the skills yet. This is evidence for a later remediation plan, not the plan itself. Back to the [Audit index](2026-10-08-skills-sync-audit.md).
 

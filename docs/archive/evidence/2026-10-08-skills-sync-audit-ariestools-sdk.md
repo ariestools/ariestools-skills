@@ -1,14 +1,19 @@
 ---
 title: "Skills sync audit 2026-10-08 — ariestools-sdk"
 kind: evidence
-state: active
+state: superseded
 date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of the ariestools-sdk skill at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 39 merged items, 27 verified by two lenses, 12 unverified because the run was paused."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
+supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-ariestools-sdk.md
 ---
 
 # Skills sync audit — ariestools-sdk
+
+> **Archived 2026-10-08.** Superseded by [`docs/evidence/2026-10-08-skills-sync-audit-complete-ariestools-sdk.md`](../../evidence/2026-10-08-skills-sync-audit-complete-ariestools-sdk.md).
+> Original path: `docs/evidence/2026-10-08-skills-sync-audit-ariestools-sdk.md`. Retained as a record of the partial audit (verification paused,
+> toolchain 10.1.0) that was current until the complete audit replaced it; do not follow it.
 
 This document records claims about `skills/ariestools-sdk/` that auditors checked against named sources: ariestools-skills 7e78933a8, `@ariestools/toolchain` 10.1.0 (main 7eb43c3c2), ariestools/sdk-js at `@ariestools/sdk` 9.0.1 (298fbb5bb), and npm registry metadata. Items marked `verified` were also confirmed by two independent verifiers, one checking the code and one checking the skill text, and their adjustments are folded in. Items marked `unverified` were checked against source by an auditor only; no independent verifier has confirmed them. Nothing here has been applied to the skills, and this is not a remediation plan. Duplicate findings from the per-file, coverage and architecture auditors are merged, and each merged item takes the strongest status among its members. Back to the [Audit index](2026-10-08-skills-sync-audit.md).
 
@@ -71,7 +76,7 @@ Status: 27 verified · 0 partially verified · 12 unverified. These merge 99 raw
 - ⚪ **Monolith maintainer notes use the stale `sdkModules` name, point to a stale README, and cover only `@ariestools/sdk`** · `verified`
   - **Now:** conventions.md:39 has "pnpm sync-sdk-layout   # after editing sdkModules / monolith layout". :42 says "Do not hand-edit generated monolith shims under `packages/sdk/src/*.ts`…". :46 says "…so imports, shims, and exports stay consistent. See the package README 'Monolithic layout' section."
   - **Actual:** `sdkModules` and `scripts/sync-sdk-layout.mjs` were removed on 2026-07-06 (0cfffd89f). Modules are now declared under `compile.monolith.modules` in packages/sdk/xy.config.ts, with the flags `model`, `barrel`, `export` and `internal`, alongside `conditionalImports`, `platformEntries` and `aliasImports`. `pnpm sync-sdk-layout` runs the toolchain bin `package-sync-layout`, a `sync-sdk-layout:check` variant exists, and `xy compile` re-syncs automatically. The sync writes package.json `imports`, tsconfig `paths`, src/index.ts, src/model.ts and the per-module shims. It does not write package.json `exports`; `xy publint --fix` checks and fixes those. `@ariestools/storage-adapters` and `@ariestools/testing` are also monolith packages, and their generated files carry the same "do not edit by hand" header. The README section the skill points to still describes `sdkModules`.
-  - **Fix:** Change the comment at :39 to "# after editing compile.monolith in packages/sdk/xy.config.ts", and add `pnpm --filter @ariestools/sdk sync-sdk-layout:check`. At :42 and :46, say: "`@ariestools/sdk`, `@ariestools/storage-adapters` and `@ariestools/testing` use `compile.mode: 'monolith'`; do not hand-edit their generated `src/*.ts` shims; `xy compile` re-syncs them. Sync regenerates `imports`, tsconfig paths and shims; new subpath `exports` are checked and fixed by `xy publint --fix`." Link to [xy-toolchain compilation.md#monolith-mode](../../skills/xy-toolchain/compilation.md#monolith-mode) instead of the README section.
+  - **Fix:** Change the comment at :39 to "# after editing compile.monolith in packages/sdk/xy.config.ts", and add `pnpm --filter @ariestools/sdk sync-sdk-layout:check`. At :42 and :46, say: "`@ariestools/sdk`, `@ariestools/storage-adapters` and `@ariestools/testing` use `compile.mode: 'monolith'`; do not hand-edit their generated `src/*.ts` shims; `xy compile` re-syncs them. Sync regenerates `imports`, tsconfig paths and shims; new subpath `exports` are checked and fixed by `xy publint --fix`." Link to [xy-toolchain compilation.md#monolith-mode](../../../skills/xy-toolchain/compilation.md#monolith-mode) instead of the README section.
   - **Evidence:** ariestools/sdk-js/packages/sdk/xy.config.ts:8-13, :71-81; packages/sdk/package.json:381-382; packages/sdk/src/index.ts:1 (generated header); packages/{storage-adapters,testing}/xy.config.ts (`mode: 'monolith'`); packages/sdk/README.md:221-228; ariestools/toolchain/packages/toolchain/src/actions/package/compile/monolithCompileLayout.ts:308-311 (only `pkg.imports` is assigned; file unchanged since v10.1.0), compile/packageCompileMonolith.ts:157, actions/package/exportMapPublint.ts:35.
   - <sub>ids: skills/ariestools-sdk/modules.md#11, skills/ariestools-sdk/conventions.md#10, skills/ariestools-sdk/conventions.md#11, cov-sdk-umbrella#11, cov-sdk-specialist#17 · contradictory claim: modules.md#11 said the sync regenerates package.json `exports`, but monolithCompileLayout.ts:308-311 assigns only `imports`, so conventions.md#10's version is kept. modules.md#11 was also retargeted from modules.md to conventions.md by its verifiers.</sub>
 

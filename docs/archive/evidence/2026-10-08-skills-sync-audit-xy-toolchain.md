@@ -1,14 +1,19 @@
 ---
 title: "Skills sync audit 2026-10-08 — xy-toolchain"
 kind: evidence
-state: active
+state: superseded
 date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of the xy-toolchain skill at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 79 merged items, 58 verified by two lenses, 7 partially verified, 14 unverified because the run was paused"
 audience: "ariestools-skills maintainers and agents updating the skill pack"
+supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-xy-toolchain.md
 ---
 
 # Skills sync audit — xy-toolchain
+
+> **Archived 2026-10-08.** Superseded by [`docs/evidence/2026-10-08-skills-sync-audit-complete-xy-toolchain.md`](../../evidence/2026-10-08-skills-sync-audit-complete-xy-toolchain.md).
+> Original path: `docs/evidence/2026-10-08-skills-sync-audit-xy-toolchain.md`. Retained as a record of the partial audit (verification paused,
+> toolchain 10.1.0) that was current until the complete audit replaced it; do not follow it.
 
 This is an evidence record. Each item is a claim about the `skills/xy-toolchain/` text at ariestools-skills 7e78933a8 that an auditor checked against named source: @ariestools/toolchain 10.1.0 (main 7eb43c3c2, deploy 3320116a4) and @ariestools/sdk 9.0.1 (298fbb5bb). Items marked `verified` were also confirmed by two independent verifiers (a code-truth lens and a skill-text lens), and their corrections are folded in. `partially verified` items had only the code lens run. The record does not establish that `unverified` items are correct: the run was paused before anyone independently checked them. Nothing here has been applied to the skills, and it is not a remediation plan or a priority order. Commands written as `xy.mjs …` / `xyex.mjs …` were run against the 10.1.0 build in `ariestools/toolchain/packages/toolchain/dist/bin/`. Member ids refer to the raw findings in [2026-10-08-skills-sync-audit-findings.json](2026-10-08-skills-sync-audit-findings.json). Back to the [Audit index](2026-10-08-skills-sync-audit.md).
 

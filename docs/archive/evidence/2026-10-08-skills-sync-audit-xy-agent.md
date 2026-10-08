@@ -1,14 +1,19 @@
 ---
 title: "Skills sync audit 2026-10-08 — xy-agent"
 kind: evidence
-state: active
+state: superseded
 date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of the xy-agent skill at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 43 merged items, 0 verified by two lenses, 43 unverified because the run was paused."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
+supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-xy-agent.md
 ---
 
 # Skills sync audit — xy-agent
+
+> **Archived 2026-10-08.** Superseded by [`docs/evidence/2026-10-08-skills-sync-audit-complete-xy-agent.md`](../../evidence/2026-10-08-skills-sync-audit-complete-xy-agent.md).
+> Original path: `docs/evidence/2026-10-08-skills-sync-audit-xy-agent.md`. Retained as a record of the partial audit (verification paused,
+> toolchain 10.1.0) that was current until the complete audit replaced it; do not follow it.
 
 This document records what auditors found when they checked the claims in `skills/xy-agent/` (ariestools-skills `7e78933a8`) against `@ariestools/toolchain` 10.1.0 (main `7eb43c3c2`), `@ariestools/sdk` 9.0.1 (`298fbb5bb`), the workspace repositories, and vendor documentation for Claude Code, Codex, Copilot and Gemini CLI. In this audit, a `verified` item is one that two independent verifiers confirmed, one for code truth and one for skill text. The verification pass was paused before it reached this skill, so every item below is `unverified`. Each was checked against source by one auditor and has not been independently confirmed. 107 raw findings from overlapping auditors were merged into 43 items. Nothing here has been applied to the skills, and this is not a remediation plan. The fixes are the auditors' recommendations. Back to the [Audit index](2026-10-08-skills-sync-audit.md).
 
