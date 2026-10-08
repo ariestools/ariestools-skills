@@ -12,7 +12,7 @@ This repo is the **source of truth** for the skills (`skills/`) and marketplace 
 | Claude Code marketplace | `ariestools/ariestools-claude-plugin` |
 | Codex marketplace | `ariestools/ariestools-codex-plugin` |
 
-Render scripts live under `scripts/marketplace-sync/`. See [CLAUDE.md](./CLAUDE.md) for the full picture.
+Render scripts live under `scripts/marketplace-sync/`. See [AGENTS.md](./AGENTS.md) for the full picture: authority, repository map, public anchors and what not to do.
 
 ## Developing Skills Locally
 
@@ -46,26 +46,34 @@ pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugi
 pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json
 ```
 
+`pnpm validate:skills` runs `scripts/validate-skills.mjs`, the same zero-dependency check CI runs. It checks skill directory names, rejects symlinks, and validates frontmatter (`name` matches the directory; `description` fails above 1024 characters and warns above 900). It also resolves every relative Markdown link and `#anchor` under `skills/` using GitHub's heading slugs, ignoring code blocks, inline code and HTML comments. Finally it checks the public anchors in `PUBLIC_ANCHORS`, which other skill packs deep-link; keep those headings and file names stable.
+
 ## Ownership
 
-- **`xy-development` / `xy-toolchain` / `ariestools-sdk`** — edit only in this repo.
+- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `xy-agent`** — edit only in this repo.
 - **`xyo-knowledge` / `xl1-*`** — edit in [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
-- Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs only.
+- Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs for `xy-development` and `xy-toolchain` only.
+- Adding a skill also means adding its `SKILL.md` to `extra-files` in `release-please-config.json`, a `test -d` line in `.github/workflows/validate-plugins.yml`, and an entry in the layer tables (README.md, AGENTS.md) and `scripts/marketplace-sync/metadata.json`.
 
 ## Skill layout
 
 ```
 skills/
-├── xy-development/
+├── xy-development/     Layer 1 — TypeScript, Git, testing, workflow
 │   ├── SKILL.md
 │   └── …
-├── xy-toolchain/
+├── xy-toolchain/       Layer 2 — @ariestools/toolchain (xy CLI), configs, policy
 │   ├── SKILL.md
 │   └── …
-└── ariestools-sdk/
+├── ariestools-sdk/     Layer 3 — @ariestools/sdk
+│   ├── SKILL.md
+│   └── …
+└── xy-agent/           cross-cutting — AGENTS.md, adapters, docs/ and papers/
     ├── SKILL.md
     └── …
 ```
+
+Each `SKILL.md` is a router; detail lives in its sibling sub-files. Relative links may cross skills (`../xy-toolchain/commands.md#clean`) but never leave `skills/`, because installed copies cannot resolve anything outside it.
 
 ## Releases
 
