@@ -2,9 +2,9 @@
   "name": "ariestools-skills",
   "version": "0.1.5",
   "displayName": "Aries Tools Skills",
-  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, and the @ariestools/sdk utility libraries.",
-  "shortDescription": "Aries Tools TypeScript toolchain, development, and SDK skills.",
-  "longDescription": "A layered skill stack for Aries Tools repositories: TypeScript/Git/testing standards (xy-development), the @ariestools/* toolchain surface — xy CLI, configs, vitest-config, deplint (xy-toolchain) — and the @ariestools/sdk utility libraries plus specialist packages (ariestools-sdk).",
+  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, the @ariestools/sdk utility libraries, and repository documentation conventions for agents (AGENTS.md, docs/papers lifecycle, xy agent lint).",
+  "shortDescription": "Aries Tools TypeScript toolchain, development, SDK, and agent documentation (AGENTS.md) skills.",
+  "longDescription": "A layered skill stack for Aries Tools repositories: TypeScript/Git/testing standards (xy-development), the @ariestools/* toolchain surface — xy CLI, configs, vitest-config, deplint (xy-toolchain) — and the @ariestools/sdk utility libraries plus specialist packages (ariestools-sdk). A cross-cutting companion covers repository documentation conventions for agents — the AGENTS.md entry point, per-tool adapters, the docs/ and papers/ lifecycle, and xy agent lint (xy-agent).",
   "keywords": [
     "ariestools",
     "typescript",
@@ -12,7 +12,9 @@
     "sdk",
     "eslint",
     "vitest",
-    "pnpm"
+    "pnpm",
+    "agents-md",
+    "documentation"
   ],
   "category": {
     "slug": "developer-tools",
@@ -36,6 +38,7 @@
   "defaultPrompts": [
     "Set up an @ariestools/toolchain monorepo",
     "Use @ariestools/sdk fetchJson with a custom fetcher",
+    "Fix xy agent lint findings in this repo's AGENTS.md and docs/",
     "Fix xy deplint findings for a private service",
     "Configure Vitest with @ariestools/vitest-config"
   ],
