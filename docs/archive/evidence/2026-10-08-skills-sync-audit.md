@@ -6,7 +6,7 @@ date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit (verification paused) of all four skills and the pack architecture at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 494 raw findings merged to 226 items, 132 verified by two lenses, 7 by one, 87 unverified, 1 refuted."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
-supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete.md
+supersededBy: ../../evidence/2026-10-08-skills-sync-audit-complete.md
 ---
 
 # Skills sync audit — index

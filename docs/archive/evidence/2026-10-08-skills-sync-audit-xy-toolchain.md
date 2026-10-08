@@ -6,7 +6,7 @@ date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of the xy-toolchain skill at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 79 merged items, 58 verified by two lenses, 7 partially verified, 14 unverified because the run was paused"
 audience: "ariestools-skills maintainers and agents updating the skill pack"
-supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-xy-toolchain.md
+supersededBy: ../../evidence/2026-10-08-skills-sync-audit-complete-xy-toolchain.md
 ---
 
 # Skills sync audit — xy-toolchain

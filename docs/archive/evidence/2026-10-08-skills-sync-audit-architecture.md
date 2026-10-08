@@ -6,7 +6,7 @@ date: "2026-10-08"
 commit: "7e78933a8"
 status: "Partial audit of skill-pack architecture and cross-repo distribution at ariestools-skills 7e78933a8 against @ariestools/toolchain 10.1.0 (main 7eb43c3c2) and @ariestools/sdk 9.0.1 (298fbb5bb); 23 merged items, 6 verified by two lenses, 17 unverified because the run was paused."
 audience: "ariestools-skills maintainers and agents updating the skill pack"
-supersededBy: docs/evidence/2026-10-08-skills-sync-audit-complete-architecture.md
+supersededBy: ../../evidence/2026-10-08-skills-sync-audit-complete-architecture.md
 ---
 
 # Skills sync audit — architecture
