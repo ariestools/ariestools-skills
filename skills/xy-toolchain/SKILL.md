@@ -4,14 +4,14 @@ description: The Aries Tools TypeScript toolchain (@ariestools/toolchain) behind
 metadata:
   version: 0.1.5 # x-release-please-version
   toolchain: ">=9.0.0"
-  verified-toolchain: 10.1.1
+  verified-toolchain: 10.1.3
 ---
 
 # XY Toolchain
 
-**Authority.** This skill is maintained only in [`ariestools/ariestools-skills`](https://github.com/ariestools/ariestools-skills). Copies under `XYOracleNetwork/xyo-skills` are redirect stubs — edit here, never there. If the repository also has `xylabs-*` skills, `.claude/rules/xylabs-*.md`, or `.claude/commands/xy-*.md`, they are retired output of the removed `xy claude` command; this skill supersedes them ([legacy agent files](toolchain.md#legacy-agent-files-from-xy-claude)).
+**Authority.** This skill is maintained only in [`ariestools/ariestools-skills`](https://github.com/ariestools/ariestools-skills). Copies under `XYOracleNetwork/xyo-skills` are redirect stubs — edit here, never there. If the repository also has `xylabs-*` skills, `.claude/rules/xylabs-*.md`, or `.claude/commands/xy-*.md` and `xylabs-*.md`, they are retired output of the removed `xy claude` command; this skill supersedes them. Since 10.1.2, `xy skills lint` reports them and `--fix` removes most of them ([legacy agent files](toolchain.md#legacy-agent-files-from-xy-claude)).
 
-**Toolchain versions.** This skill is verified against `@ariestools/toolchain` 10.1.1; anything not marked "(since X)" exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0` (`pnpm xy --version` is reliable only from 10.0.6). A top-level command the installed version lacks prints `Command not found` and exits 0, even under `--strict`; a missing subcommand may instead be passed through or rejected, so check the output and the Version notes rather than the exit code. [Version notes](toolchain.md#version-notes) collects the gates.
+**Toolchain versions.** This skill is verified against `@ariestools/toolchain` 10.1.3; anything not marked "(since X)" exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0` (`pnpm xy --version` is reliable only from 10.0.6). A top-level command the installed version lacks prints `Command not found`. From 10.1.2 that exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the Version notes, not only the exit code. [Version notes](toolchain.md#version-notes) collects the gates.
 
 **Skill identity.** When you present a plan, an acknowledgement, or a completion summary, state which skills informed it as `xy-toolchain v<version>`. Read the version from this file's `metadata.version`, never from an example or from `verified-toolchain`.
 
@@ -39,7 +39,7 @@ Read when editing `xy.config.ts` (including which settings cascade from the root
 
 ### [Command and policy catalog](commands.md)
 
-Read when choosing between `xy` and `xyex` commands; running lifecycle or CI gates (`build`, `check`, `fix`, `test`); fixing `deplint` (package roles, `not-public`, placement/presence, `pick`), `api-exposure`, `publint`, `license`, `secure`, or repository-policy findings (including `nodeTrack`); checking AGENTS.md and docs with `xy agent` (since 10.1.1; `xy check` runs its `lint`); managing `xy skills` (tiers, package.json `xy.skills`, per-skill presence, `pick`); tracking work with `xyex work` (GitHub Issues dual-write and sync, multi-folder `--workspace` scope); configuring `clean`; releasing with `deploy` and `publish` (`--tag`, `--defer`); maintaining dependencies (`install`, `reinstall`, `up`, `updo` with `commands.updo.ignoreDeps`); using other experimental `xyex` commands (`dead`, `plan`, `npm-org`, …); or setting rule levels and using `--rules`, `--json`, `--strict`, and automation behavior.
+Read when choosing between `xy` and `xyex` commands; running lifecycle or CI gates (`build`, `check`, `fix`, `test`); fixing `deplint` (package roles, `not-public`, placement/presence, `pick`), `api-exposure`, `publint`, `license`, `secure`, or repository-policy findings (including `nodeTrack`); checking AGENTS.md and docs with `xy agent` (since 10.1.1; `xy check` runs its `lint` when AGENTS.md exists or `commands.agentLint` is declared); managing `xy skills` (tiers, package.json `xy.skills`, per-skill presence, `pick`); tracking work with `xyex work` (GitHub Issues dual-write and sync, multi-folder `--workspace` scope); configuring `clean`; releasing with `deploy` and `publish` (`--tag`, `--defer`); maintaining dependencies (`install`, `reinstall`, `up`, `updo` with `commands.updo.ignoreDeps`); using other experimental `xyex` commands (`dead`, `plan`, `npm-org`, …); or setting rule levels and using `--rules`, `--json`, `--strict`, and automation behavior.
 
 ### [ESLint configuration](eslint.md)
 
@@ -59,5 +59,5 @@ These are navigation links, not dependencies; each skill installs separately.
 
 - **[xy-development](../xy-development/SKILL.md)** — the base skill: TypeScript, Git, testing principles, and the Definition of Done. Install: `npx skills add ariestools/ariestools-skills --skill xy-development`.
 - **[ariestools-sdk](../ariestools-sdk/SKILL.md)** — `@ariestools/sdk` utilities and specialist packages from `sdk-js`; it builds on this skill. Install: `npx skills add ariestools/ariestools-skills --skill ariestools-sdk`.
-- **[xy-agent](../xy-agent/SKILL.md)** — AGENTS.md, `docs/`, and `papers/` conventions, checked by the stable `xy agent lint` (since 10.1.1, also run by `xy check`), with `xy agent init|audit|index|archive` as helpers ([`xy agent`](commands.md#xy-agent)). Install: `npx skills add ariestools/ariestools-skills --skill xy-agent`.
+- **[xy-agent](../xy-agent/SKILL.md)** — AGENTS.md, `docs/`, and `papers/` conventions, checked by the stable `xy agent lint` (since 10.1.1; `xy check` runs it when AGENTS.md exists or `commands.agentLint` is declared), with `xy agent init|audit|index|archive` as helpers ([`xy agent`](commands.md#xy-agent)). Install: `npx skills add ariestools/ariestools-skills --skill xy-agent`, or `pnpm xy skills pick --skill xy-agent` (since 10.1.2), which also records it as required.
 - Domain scaffolds (for example XL1 apps in the separate [xyo-skills](https://github.com/XYOracleNetwork/xyo-skills) pack) should still depend on the active `@ariestools/*` toolchain packages described here.
