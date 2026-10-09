@@ -151,3 +151,5 @@ vite.config.ts.timestamp-*
 
 # Testing Prompts
 Prompts.md
+# xy work: track .xy/work, never the cache
+**/.xy/cache/

@@ -42,15 +42,16 @@ codex plugin add ariestools-skills@ariestools-skills
 
 ```shell
 pnpm validate:skills
+pnpm validate:upstream   # network; also checks verified versions against npm latest
 pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugin/*.json
 pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json
 ```
 
-`pnpm validate:skills` runs `scripts/validate-skills.mjs`, the same zero-dependency check CI runs. It checks skill directory names, rejects symlinks, and validates frontmatter (`name` matches the directory; `description` fails above 1024 characters and warns above 900). It also resolves every relative Markdown link and `#anchor` under `skills/` using GitHub's heading slugs, ignoring code blocks, inline code and HTML comments. Finally it checks the public anchors in `PUBLIC_ANCHORS`, which other skill packs deep-link; keep those headings and file names stable.
+`pnpm validate:skills` runs `scripts/validate-skills.mjs`, the same zero-dependency check CI runs. It checks skill directory names, rejects symlinks, and validates frontmatter (`name` matches the directory; `description` fails above 1024 characters and warns above 900). It also resolves every relative Markdown link and `#anchor` under `skills/` using GitHub's heading slugs, ignoring code blocks, inline code and HTML comments. It checks the public anchors in `PUBLIC_ANCHORS`, which other skill packs deep-link; keep those headings and file names stable. Finally it checks verified versions: `metadata.verified-toolchain` in `skills/xy-toolchain/SKILL.md` is the one place the verified toolchain version is set, and every "verified against `@ariestools/toolchain` X.Y.Z" or `@ariestools/toolchain@X.Y.Z` under `skills/` and in `AGENTS.md` must match it. `pnpm validate:upstream` also requires it to equal npm `latest`; CI runs that on pull requests into `main`, so when the toolchain publishes, the next release waits until the skills are re-verified and the version is bumped everywhere. To pin another package the same way, add its metadata key to `VERIFIED_PACKAGES` in the script.
 
 ## Ownership
 
-- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `ariestools-sdk-react` / `ariestools-actor` / `xy-agent`** — edit only in this repo.
+- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `ariestools-sdk-react` / `ariestools-actor` / `xy-agent` / `xy-product-plan`** — edit only in this repo.
 - **`xyo-knowledge` / `xl1-*`** — edit in [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
 - Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs for `xy-development` and `xy-toolchain` only.
 - Adding a skill also means adding its `SKILL.md` to `extra-files` in `release-please-config.json`, a `test -d` line in `.github/workflows/validate-plugins.yml`, and an entry in the layer tables (README.md, AGENTS.md) and `scripts/marketplace-sync/metadata.json`.
@@ -74,7 +75,10 @@ skills/
 ├── ariestools-actor/      Layer 3, sibling of ariestools-sdk — actor-kit, cli-kit, browser-kit
 │   ├── SKILL.md
 │   └── …
-└── xy-agent/              cross-cutting — AGENTS.md, adapters, docs/ and papers/
+├── xy-agent/              cross-cutting — AGENTS.md, adapters, docs/ and papers/
+│   ├── SKILL.md
+│   └── …
+└── xy-product-plan/       cross-cutting — papers, roadmap MVP line, per-version PRDs
     ├── SKILL.md
     └── …
 ```

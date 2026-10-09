@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Zero-dep validator for Agent Skills.
-// Usage: node scripts/validate-skills.mjs <skills-dir>
+// Usage: node scripts/validate-skills.mjs <skills-dir> [--upstream]
 //
 // Per skill directory:
 //   - directory name, no symlinks, SKILL.md present
@@ -9,7 +9,13 @@
 //   - every relative Markdown link in every .md file resolves to an existing path
 //     inside <skills-dir>, with exact case, and every #anchor resolves to a heading
 //     in the target file (GitHub slug rules)
-// Then every entry in PUBLIC_ANCHORS must still resolve.
+// Then every entry in PUBLIC_ANCHORS must still resolve, and every verified
+// version (VERIFIED_PACKAGES) must agree: each SKILL.md that declares the
+// metadata key, and every "verified against `<package>` X.Y.Z" or
+// `<package>@X.Y.Z` in <skills-dir> and in the AGENTS.md beside it.
+// --upstream also requires each verified version to equal the package's npm
+// `latest` dist-tag (network). CI runs it on pull requests into main, the
+// release path.
 //
 // Links inside fenced code blocks, inline code spans and HTML comments are ignored.
 // Exits non-zero on errors, emitting GitHub-style ::error annotations; warnings
@@ -23,6 +29,15 @@ const SKILL_DIR_NAME_RE = /^[a-z0-9][a-z0-9-]*$/
 const REQUIRED_FIELDS = ['name', 'description']
 const DESCRIPTION_MAX = 1024
 const DESCRIPTION_WARN = 900
+
+// SKILL.md `metadata` keys that record the npm package version a skill's
+// content was verified against. To pin another package, add its key here and
+// declare it in the skill's metadata.
+const VERIFIED_PACKAGES = {
+  'verified-toolchain': '@ariestools/toolchain',
+}
+const SEMVER_RE = /^\d+\.\d+\.\d+$/
+const NPM_DIST_TAGS_URL = 'https://registry.npmjs.org/-/package'
 
 // Paths and anchors that other packs (XYOracleNetwork/xyo-skills) deep-link into
 // this one. Installed copies resolve those links against these files, so renaming
@@ -43,6 +58,9 @@ let errorCount = 0
 let warningCount = 0
 let linkCount = 0
 let markdownCount = 0
+let mentionCount = 0
+// metadata key -> [{ version, file, line }], one entry per SKILL.md declaring it
+const verifiedDeclarations = new Map()
 
 function displayPath(file) {
   const rel = relative(cwd(), file)
@@ -113,8 +131,23 @@ function parseFrontmatter(content, filePath) {
       value = [value, ...continuation.filter(Boolean)].join(' ')
     }
     fields[key] = { value: unquote(value), line }
+    if (value === '') fields[key].children = parseNestedMapping(lines, i + 1, endIdx)
   }
   return fields
+}
+
+// One level of `  key: value` lines under an empty-valued key such as
+// `metadata:`. A trailing ` # comment` after an unquoted value is dropped.
+function parseNestedMapping(lines, start, end) {
+  const children = {}
+  for (let i = start; i < end && (lines[i].trim() === '' || /^\s/.test(lines[i])); i++) {
+    const match = lines[i].match(/^\s+([A-Za-z_][A-Za-z0-9_-]*)\s*:\s*(.*)$/)
+    if (!match) continue
+    const raw = match[2].trim()
+    const quoted = raw.match(/^(["'])(.*?)\1/)
+    children[match[1]] = { value: quoted ? quoted[2] : raw.replace(/\s+#.*$/, ''), line: i + 1 }
+  }
+  return children
 }
 
 function hasSymlinkAnywhere(dir) {
@@ -418,12 +451,103 @@ function validateSkill(skillsDir, name) {
       warn(skillMd, fields.description.line, `frontmatter description is ${length} characters; keep it under ${DESCRIPTION_WARN} to leave room below the ${DESCRIPTION_MAX}-character limit`)
     }
   }
+  for (const [key, { value, line }] of Object.entries(fields.metadata?.children ?? {})) {
+    if (!key.startsWith('verified-')) continue
+    if (!Object.hasOwn(VERIFIED_PACKAGES, key)) {
+      warn(skillMd, line, `metadata.${key} names no package; add it to VERIFIED_PACKAGES in scripts/validate-skills.mjs so its version is checked`)
+      continue
+    }
+    if (!SEMVER_RE.test(value)) {
+      err(skillMd, line, `metadata.${key} must be an exact version such as 1.2.3, not "${value}"`)
+      continue
+    }
+    if (!verifiedDeclarations.has(key)) verifiedDeclarations.set(key, [])
+    verifiedDeclarations.get(key).push({ version: value, file: skillMd, line })
+  }
 }
 
-function main() {
-  const skillsDirArg = argv[2]
-  if (!skillsDirArg) {
-    console.error('usage: node scripts/validate-skills.mjs <skills-dir>')
+// --- Verified versions -----------------------------------------------------
+
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
+}
+
+function compareVersions(left, right) {
+  const a = left.split('.').map(Number)
+  const b = right.split('.').map(Number)
+  return a[0] - b[0] || a[1] - b[1] || a[2] - b[2]
+}
+
+// Returns Map<package, { key, version, file, line }> of the agreed pins.
+function validateVerifiedVersions(skillsDir) {
+  const pins = new Map()
+  for (const [key, [first, ...rest]] of verifiedDeclarations) {
+    for (const other of rest) {
+      if (other.version !== first.version) {
+        err(other.file, other.line, `metadata.${key} is ${other.version}, but ${displayPath(first.file)} declares ${first.version}; every skill that declares it must agree`)
+      }
+    }
+    pins.set(VERIFIED_PACKAGES[key], { key, ...first })
+  }
+  if (pins.size === 0) return pins
+  const patterns = [...pins].flatMap(([pkg, pin]) => [
+    { pin, pkg, re: new RegExp(`verified against \`${escapeRegExp(pkg)}\` (\\d+\\.\\d+\\.\\d+)`, 'gi') },
+    { pin, pkg, re: new RegExp(`${escapeRegExp(pkg)}@(\\d+\\.\\d+\\.\\d+)`, 'g') },
+  ])
+  const files = markdownFiles(skillsDir)
+  const agentsMd = join(dirname(skillsDir), 'AGENTS.md')
+  try {
+    if (statSync(agentsMd).isFile()) files.push(agentsMd)
+  } catch {}
+  for (const file of files) {
+    readFileSync(file, 'utf8').split(/\r?\n/).forEach((text, index) => {
+      for (const { pin, pkg, re } of patterns) {
+        for (const match of text.matchAll(re)) {
+          mentionCount++
+          if (match[1] !== pin.version) {
+            err(file, index + 1, `names ${pkg} ${match[1]}, but metadata.${pin.key} in ${displayPath(pin.file)} is ${pin.version}; a verified version changes everywhere at once`)
+          }
+        }
+      }
+    })
+  }
+  return pins
+}
+
+async function npmLatest(pkg) {
+  const response = await fetch(`${NPM_DIST_TAGS_URL}/${pkg}/dist-tags`, { signal: AbortSignal.timeout(15_000) })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const { latest } = await response.json()
+  if (typeof latest !== 'string') throw new Error('no latest dist-tag')
+  return latest
+}
+
+async function validateUpstream(pins) {
+  for (const [pkg, pin] of pins) {
+    let latest
+    try {
+      latest = await npmLatest(pkg)
+    } catch (error) {
+      err(pin.file, pin.line, `could not read the npm latest version of ${pkg}: ${error.message}`)
+      continue
+    }
+    if (latest === pin.version) {
+      console.log(`${pkg}: metadata.${pin.key} ${pin.version} is npm latest`)
+    } else if (compareVersions(pin.version, latest) > 0) {
+      err(pin.file, pin.line, `metadata.${pin.key} is ${pin.version}, ahead of npm latest ${latest} for ${pkg}; verify against a published version`)
+    } else {
+      err(pin.file, pin.line, `metadata.${pin.key} is ${pin.version}, but npm latest for ${pkg} is ${latest}. Re-verify the skills that describe it against ${latest}, then change metadata.${pin.key} and every mention of ${pin.version} together`)
+    }
+  }
+}
+
+async function main() {
+  const args = argv.slice(2)
+  const isUpstream = args.includes('--upstream')
+  const positional = args.filter((arg) => arg !== '--upstream')
+  const skillsDirArg = positional[0]
+  if (!skillsDirArg || positional.length > 1 || skillsDirArg.startsWith('-')) {
+    console.error('usage: node scripts/validate-skills.mjs <skills-dir> [--upstream]')
     exit(2)
   }
   const skillsDir = resolve(skillsDirArg)
@@ -450,12 +574,15 @@ function main() {
     validateSkill(skillsDir, name)
   }
   validatePublicAnchors(skillsDir)
+  const pins = validateVerifiedVersions(skillsDir)
+  if (isUpstream) await validateUpstream(pins)
   const warnings = warningCount > 0 ? `, ${warningCount} warning(s)` : ''
   if (errorCount > 0) {
     console.error(`\nvalidation failed with ${errorCount} error(s)${warnings}`)
     exit(1)
   }
-  console.log(`validated ${skillDirs.length} skill(s), ${markdownCount} Markdown file(s), ${linkCount} relative link(s) in ${skillsDir}${warnings}`)
+  const versions = pins.size > 0 ? `, ${mentionCount} mention(s) of ${pins.size} verified version(s)` : ''
+  console.log(`validated ${skillDirs.length} skill(s), ${markdownCount} Markdown file(s), ${linkCount} relative link(s)${versions} in ${skillsDir}${warnings}`)
 }
 
-main()
+await main()

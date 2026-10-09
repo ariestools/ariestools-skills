@@ -4,7 +4,7 @@ Agent skills for Aries Tools TypeScript development. The same skill content is p
 
 ## What's Included
 
-Six skills: three layers, with three sibling skills on Layer 3, and one cross-cutting companion.
+Seven skills: three layers, with three sibling skills on Layer 3, and two cross-cutting companions.
 
 | Skill layer | Skill | Covers |
 |-------|-------|--------|
@@ -14,19 +14,20 @@ Six skills: three layers, with three sibling skills on Layer 3, and one cross-cu
 | 2 | `xy-toolchain` | `@ariestools/toolchain` (`xy` CLI and experimental `xyex`), project profiles, ESLint flat configs, TypeScript configs, `@ariestools/vitest-config`, `@ariestools/lib-neutral`, deplint, repository policy, `xy work`, `xy agent` |
 | 1 | `xy-development` | TypeScript conventions, Git workflow, testing principles, definition of done |
 | — | `xy-agent` | `AGENTS.md` entry point, per-tool adapters, `docs/` and `papers/` lifecycle, documentation audits; builds on Layer 1; checked by `xy agent lint` (toolchain ≥ 10.1.1), which `xy check` runs where a root `AGENTS.md` exists or `commands.agentLint` is declared (every repository on 10.1.1) |
+| — | `xy-product-plan` | Product planning from idea to buildable plan: discovery, the White, Yellow, Green, Red and Light papers, version pins and amendments, `docs/ROADMAP.md` with the MVP line, one PRD per major version; builds on Layer 1 and `xy-agent`, with its toolchain support in `xy-toolchain` |
 
-Each layer builds on the ones below it; links up a layer are navigation only. `ariestools-sdk-react` and `ariestools-actor` are siblings of `ariestools-sdk` on Layer 3: each builds on Layers 1 and 2 and on `ariestools-sdk`, and links to the other Layer-3 skills as navigation only. `xy-agent` builds on Layer 1 and points to Layer 2 for the `xy agent` and `xy work` commands.
+Each layer builds on the ones below it; links up a layer are navigation only. `ariestools-sdk-react` and `ariestools-actor` are siblings of `ariestools-sdk` on Layer 3: each builds on Layers 1 and 2 and on `ariestools-sdk`, and links to the other Layer-3 skills as navigation only. `xy-agent` builds on Layer 1 and points to Layer 2 for the `xy agent` and `xy work` commands. `xy-product-plan` builds on Layer 1 and `xy-agent`, and points to Layer 2 for `xy repo init` and the experimental `xyex plan`.
 
 Skills use progressive loading — each `SKILL.md` is a lightweight router that directs the agent to read sub-files on demand.
 
 For XL1 / XYO protocol product skills (chain, patterns, scaffold, etc.), use the sibling stack at [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills). Those skills depend on Layers 1–3 here, so the full stack reads:
 
 ```
-this repo    xy-development (+ xy-agent) → xy-toolchain → ariestools-sdk (+ ariestools-sdk-react, ariestools-actor)
+this repo    xy-development (+ xy-agent, xy-product-plan) → xy-toolchain → ariestools-sdk (+ ariestools-sdk-react, ariestools-actor)
 xyo-skills   → xyo-knowledge → xl1-*
 ```
 
-**All six skills are owned only here.** `xyo-skills` may still ship redirect stubs for `xy-development` and `xy-toolchain`; do not expand them — change this repo, release, and let `xy skills` / Skills.sh pull the update.
+**All seven skills are owned only here.** `xyo-skills` may still ship redirect stubs for `xy-development` and `xy-toolchain`; do not expand them — change this repo, release, and let `xy skills` / Skills.sh pull the update.
 
 ## How These Work in Multiple Places
 
