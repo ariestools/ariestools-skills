@@ -1,0 +1,21 @@
+{
+  "acceptanceCriteria": [],
+  "anchors": [],
+  "createdAt": "2026-10-09T19:54:07Z",
+  "description": "`skills/xy-development/workflow.md` names the three completion stages \"Layer 1 — Generic DoD\", \"Layer 2 — Domain DoD\" and \"Layer 3 — Project-specific criteria\" (see \"Applying the Definition of Done\", ~line 127). xyo-skills numbers its skill stack in layers too (L1 `xy-development` … L9 `xl1-build`), so \"Layer 2\" read two ways. xyo-skills now calls these **Gate 1 / Gate 2 / Gate 3** (its dApp Definition of Done, xl1-build's PRD template and xl1-scaffold's completion gate) and adds a note mapping them to this skill's \"layers\".\n\nProposal: rename the completion stages here to Gate 1/2/3 (keeping the existing headings' anchors stable, or redirecting them), so both packs use one vocabulary and the mapping note can go.",
+  "id": "GH-27",
+  "status": "open",
+  "stores": {
+    "github": {
+      "createdByXyWork": false,
+      "number": 27,
+      "source": "github",
+      "url": "https://github.com/ariestools/ariestools-skills/issues/27"
+    }
+  },
+  "tags": [],
+  "title": "xy-development: call the completion stages Gate 1/2/3 instead of Layer 1/2/3",
+  "type": "todo",
+  "updatedAt": "2026-10-09T20:14:16.307Z",
+  "verification": []
+}
