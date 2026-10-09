@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.8](https://github.com/ariestools/ariestools-skills/compare/v0.1.7...v0.1.8) (2026-10-09)
+
+
+### Features
+
+* add the xy-product-plan skill and its xy-toolchain plan tooling ([#28](https://github.com/ariestools/ariestools-skills/issues/28)) ([53b3f11](https://github.com/ariestools/ariestools-skills/commit/53b3f11a313e9e7648e20b28cb11543f8464380c))
+* add the xy-product-plan skill and verify the skills against toolchain 10.1.5 ([709da44](https://github.com/ariestools/ariestools-skills/commit/709da44c53fe4be531c122523f6674358386fb2c))
+* **skills:** verify against toolchain 10.1.5 and gate releases on npm latest ([#29](https://github.com/ariestools/ariestools-skills/issues/29)) ([e95e7d9](https://github.com/ariestools/ariestools-skills/commit/e95e7d932f91bc21dea8fea4ecf0ff631ddff1cd))
+* **validate:** validate-skills.mjs fails when a verified-version mention disagrees with metadata.verified-toolchain, and --upstream (run on pull requests into main) fails while npm latest is newer. ([e95e7d9](https://github.com/ariestools/ariestools-skills/commit/e95e7d932f91bc21dea8fea4ecf0ff631ddff1cd))
+
 ## [0.1.7](https://github.com/ariestools/ariestools-skills/compare/v0.1.6...v0.1.7) (2026-10-09)
 
 
