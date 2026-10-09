@@ -35,13 +35,13 @@ skills-lock.json           pinned skill sources · managed by pnpm xy skills
 
 Not every repository needs every tier. A single-package library may have `AGENTS.md` with its `CLAUDE.md` import, `README.md`, and `docs/decisions/` and nothing else. Add a tier when it has real content, never as a placeholder — an empty `papers/` directory is a lie about the repository's maturity.
 
-`pnpm xy agent init` (since toolchain 10.1.1) only scaffolds, and its output is placeholders. It creates whichever is missing of an `AGENTS.md` headed `# Project`, the `CLAUDE.md` import, a `.gitkeep` in all five `docs/` tiers, and the generated index. It leaves existing files alone and merges nothing from them. Afterwards, retitle the H1 after the product, replace the one-line stubs and the sample authority row with the repository's real content, and delete each `.gitkeep` tier that has no content. Since 10.1.2 the stub lints clean, so the linter will not remind you. A 10.1.2 `xy repo init` scaffold already has `AGENTS.md`, `CLAUDE.md`, `papers/README.md` and `docs/README.md`; fill in its `AGENTS.md` the same way.
+`pnpm xy agent init` only scaffolds, and its output is placeholders. It creates whichever is missing of an `AGENTS.md` headed `# Project`, the `CLAUDE.md` import, a `.gitkeep` in all five `docs/` tiers, and the generated index. It leaves existing files alone and merges nothing from them. Afterwards, retitle the H1 after the product, replace the one-line stubs and the sample authority row with the repository's real content, and delete each `.gitkeep` tier that has no content. The stub lints clean, so the linter will not remind you. An `xy repo init` scaffold already has `AGENTS.md`, `CLAUDE.md`, `papers/README.md` and `docs/README.md`; fill in its `AGENTS.md` the same way.
 
-**Adapters.** The root and package `CLAUDE.md` files contain only `@AGENTS.md`; the package pair is what makes Claude Code load a package delta. `xy agent lint` also accepts a symlink, no adapter at all, or (since 10.1.2) notes after a leading import, but commit the import file — [Per-tool adapters](agents-md.md#per-tool-adapters) explains why.
+**Adapters.** The root and package `CLAUDE.md` files contain only `@AGENTS.md`; the package pair is what makes Claude Code load a package delta. `xy agent lint` also accepts a symlink, no adapter at all, or notes after a leading import, but commit the import file — [Per-tool adapters](agents-md.md#per-tool-adapters) explains why.
 
 **Two READMEs, two audiences.** The root `README.md` is for maintainers. In a monorepo the root package is private, so install, API and usage live in each `packages/<pkg>/README.md`, which is listed in that package's `files` and published with it. The stable `xy repo lint`, run by `xy check`, errors when a package README is missing or unlisted. A single-package repository keeps install and usage in its root README.
 
-**Tool-managed paths.** Installed skills — the ones pinned in `skills-lock.json` — are managed by `pnpm xy skills` and checked by `xy check`; never hand-edit them. [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking) covers `xy skills` and `xyex work`. In `.claude/rules/`, add only hand-authored rules. Legacy generated `xylabs-*.md` files there come from the retired `xy claude` command: never edit or extend them. Since 10.1.2, `xy skills lint` and `xy check` warn on them (`skills.legacy-generated`), and their `--fix` deletes them with the rest of that command's output; leave running it to the owner.
+**Tool-managed paths.** Installed skills — the ones pinned in `skills-lock.json` — are managed by `pnpm xy skills` and checked by `xy check`; never hand-edit them. [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking) covers `xy skills` and `xyex work`. In `.claude/rules/`, add only hand-authored rules. Legacy generated `xylabs-*.md` files there come from the retired `xy claude` command: never edit or extend them. `xy skills lint` and `xy check` warn on them (`skills.legacy-generated`), and their `--fix` deletes them with the rest of that command's output; leave running it to the owner.
 
 ## Which tier a document belongs to
 
@@ -80,16 +80,16 @@ A paper changes by **amendment**, not by silent edit: bump the version, state wh
 
 ## Toolchain plan layout (experimental `xyex plan lint`)
 
-The stable `xy agent lint`, which `xy check` runs where `AGENTS.md` exists or `commands.agentLint` is declared, accepts the tree above: it checks that papers state a version, status and date, not what they are named. The experimental `pnpm xyex plan lint` (since 9.2.1; its root-document rules since 10.0.5) is not part of `xy check` and enforces a different, fixed layout. A repository that opts into it needs:
+The stable `xy agent lint`, which `xy check` runs where `AGENTS.md` exists or `commands.agentLint` is declared, accepts the tree above: it checks that papers state a version, status and date, not what they are named. The experimental `pnpm xyex plan lint` is not part of `xy check` and enforces a different, fixed layout. A repository that opts into it needs:
 
-- Root `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `CONTRIBUTING.md` and `README.md`, each a regular file, not a symlink. Since 10.1.2 the first visible line of `CLAUDE.md` must be the `@AGENTS.md` import, the same test agent lint applies; earlier plan lint accepted the import anywhere in the file.
+- Root `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `CONTRIBUTING.md` and `README.md`, each a regular file, not a symlink. The first visible line of `CLAUDE.md` must be the `@AGENTS.md` import, the same test agent lint applies.
 - Exactly `papers/README.md`, `papers/WHITE-PAPER.md` and `papers/YELLOW-PAPER.md`, plus an optional `papers/GREEN-PAPER.md`. Nothing else may sit under `papers/`: no product prefix, no Light paper, no PDF.
 - `docs/README.md`, `docs/ROADMAP.md` (the living roadmap) and `notes/README.md`. `notes/` holds non-governing material.
 - Markdown links, not code spans or `@` imports, from the root `README.md` and `AGENTS.md` into `papers/` and `docs/`.
 
 **Never run `pnpm xyex plan lint --fix` on a repository that uses `<PRODUCT>_*_PAPER.md` names without the owner's agreement.** The fix flattens every other file under `papers/` into `notes/` — product-prefixed papers, the Light paper and its PDF, anything in `papers/archive/` — writes "Draft." stub papers, and scaffolds files without front matter. After an agreed fix, give the new papers and `docs/ROADMAP.md` real front matter, then run `pnpm xy agent index` and `pnpm xy agent lint`.
 
-**Plan manifest.** `pnpm xyex plan init` writes a `.xy/plan.json` with `status: bootstrap`. It is not part of the tree above, and a bootstrap manifest is never authority — only a list of candidates for review. A repository that adopts a reviewed manifest alongside `xy agent lint` sets each document's `metadata.source` to `front-matter`, so lifecycle metadata keeps one owner (the front matter in [Document lifecycle](lifecycle.md)), and keeps its AGENTS.md authority table consistent with the manifest. The toolchain's `docs/plan-manifest.md` has the schema and its rules.
+**Plan manifest.** `pnpm xyex plan init` writes a `.xy/plan.json` with `status: bootstrap`. It is not part of the tree above, and a bootstrap manifest is never authority — only a list of candidates for review. A repository that adopts a reviewed manifest alongside `xy agent lint` sets each document's `metadata.source` to `front-matter`, so lifecycle metadata keeps one owner (the front matter in [Document lifecycle](lifecycle.md)), and keeps its AGENTS.md authority table consistent with the manifest. The toolchain's [plan manifest guide](https://github.com/ariestools/toolchain/blob/main/docs/plan-manifest.md) has the schema and its rules.
 
 ## Why lifecycle folders, not topic folders
 
@@ -113,7 +113,7 @@ The folder is the first thing an agent reads about a document. Make it carry inf
 
 ## Generated paths
 
-Anything emitted by a generator is off-limits to hand editing — change the source and regenerate. Common cases: a generated deployment config, an emitted binding, a TypeDoc dump, and — under this convention — `docs/README.md`, which `pnpm xy agent index` regenerates (since toolchain 10.1.1; `xy agent lint --fix` does the same).
+Anything emitted by a generator is off-limits to hand editing — change the source and regenerate. Common cases: a generated deployment config, an emitted binding, a TypeDoc dump, and — under this convention — `docs/README.md`, which `pnpm xy agent index` regenerates (`xy agent lint --fix` does the same).
 
 State the generator command next to the rule. "Never hand-edit" without "run this instead" is an instruction an agent cannot follow.
 
@@ -125,4 +125,4 @@ The toolchain does not follow a renamed root. `xy agent lint` reads only `docs/`
 
 - **Preferred:** move the dump out of `docs/`, to a path under `dist/` or `build/`, and let the prose own `docs/`.
 - **Otherwise:** keep prose in the other directory, apply every convention here to it by hand, and lower the affected rules through `commands.agentLint.rules`.
-- **Never run `xy check --fix` or `xy agent lint --fix` while a dump sits in `docs/`.** The fixers create a `docs/README.md` that indexes the generated files, and write front matter into any of them under `docs/decisions/`, `docs/evidence/`, `docs/runbooks/` or `docs/plans/` (into every one of them on 10.1.1).
+- **Never run `xy check --fix` or `xy agent lint --fix` while a dump sits in `docs/`.** The fixers create a `docs/README.md` that indexes the generated files, and write front matter into any of them under `docs/decisions/`, `docs/evidence/`, `docs/runbooks/` or `docs/plans/`.

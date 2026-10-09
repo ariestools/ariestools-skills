@@ -108,7 +108,7 @@ pnpm add -D @ariestools/testing
 import '@ariestools/testing/extended'
 ```
 
-9.x depends directly on `vitest ~5.0` (not a peer). Keep the consuming repo on Vitest 5.0.x, matching the `vitest ^5.0` peer of `@ariestools/vitest-config`, so there is one Vitest instance and `expect.extend` reaches the `expect` your specs use. Vitest 4 repos need `@ariestools/testing` 8.2.x or older. Prefer with `@ariestools/vitest-config` from [xy-toolchain](../xy-toolchain/testing.md).
+9.x depends directly on `vitest ~5.0.1` (not a peer). Keep the consuming repo on Vitest 5.0.1 or a later 5.0.x, matching the `vitest ^5.0` peer of `@ariestools/vitest-config`, so there is one Vitest instance and `expect.extend` reaches the `expect` your specs use. Vitest 4 repos need `@ariestools/testing` 8.2.x or older. Prefer with `@ariestools/vitest-config` from [xy-toolchain](../xy-toolchain/testing.md).
 
 ## `@ariestools/telemetry`
 

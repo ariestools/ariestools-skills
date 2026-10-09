@@ -44,7 +44,8 @@ await runRenderer({
         category: metadata.category.display,
         capabilities: metadata.capabilities,
         websiteURL: metadata.homepage,
-        defaultPrompt: metadata.defaultPrompts,
+        // Codex reads at most 3 default prompts (MAX_DEFAULT_PROMPT_COUNT in codex-rs core-plugins manifest.rs)
+        defaultPrompt: metadata.defaultPrompts.slice(0, 3),
         brandColor: metadata.brandColor,
         composerIcon: metadata.icon,
         logo: metadata.logo,

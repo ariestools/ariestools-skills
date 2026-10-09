@@ -36,6 +36,7 @@ const PUBLIC_ANCHORS = [
   'xy-toolchain/commands.md#skills-and-work-tracking',
   'xy-toolchain/project-profiles.md#package-roles-and-dependency-policy',
   'xy-toolchain/testing.md',
+  'xy-toolchain/testing.md#full-app-playwright-e2e',
 ]
 
 let errorCount = 0

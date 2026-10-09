@@ -108,6 +108,8 @@ To also gate repository policy, run `pnpm xy check --strict` after the build (pu
 
 Analyze imports against `dependencies`, `devDependencies`, and `peerDependencies`. Detect unlisted, unused, misplaced, redundant, unsatisfied, unrequested, version-mismatched, range-style, and workspace-protocol problems. Use `--fix` for supported changes, then inspect `package.json` and rerun cleanly. Narrow a run with `-d` / `-D` / `-P` (one manifest section) or `-e, --exclude <paths>` (skip source paths). `pnpm xy deplint --rules` lists the catalog; old `deplint.*` rule ids are deprecated aliases of `dep.*`.
 
+The `range-style` rules, which are warnings unless configured, expect full-patch tilde ranges (`~X.Y.Z`) for external `dependencies` and `devDependencies`. For `peerDependencies` they expect the shorthand form instead of a broad comparator range, and the `form` and `bound` options of `dep.peerDependencies.range-style` configure that. Workspace and opaque specs are skipped: `workspace:`, `catalog:`, `npm:`, `file:`, `link:`, `patch:`, `portal:`, and URL, git, or hosted specs. `pnpm add` saves `^X.Y.Z`, so run `pnpm xy deplint --fix` after adding a dependency.
+
 Most deplint rules default to warnings. Since 10.0.3, `dep.dependencies.not-public` and `dep.peerDependencies.not-public` are errors with no auto-fix, so they block `xy build`:
 
 - A package is public when it is not `private` and is either unscoped or sets `publishConfig.access: 'public'`. A scoped package without `access` counts as restricted.
@@ -243,7 +245,7 @@ Use the focused command when diagnosing one policy family:
 |---|---|---|
 | `xy agent lint` | AGENTS.md, tool adapters, and the `docs/` / `papers/` convention (since 10.1.1); see [Documentation conventions](#documentation-conventions) | Yes, first; since 10.1.2 only with a root `AGENTS.md` or a declared `commands.agentLint` |
 | `xy git lint` | Git config (`core.autocrlf` false, `core.eol` lf, `core.ignorecase` false) and a `.gitignore` entry that ignores `.xy/cache` in every package (`git.ignore-toolchain-cache`, since 9.1.1) | Yes |
-| `xy packman lint` | pnpm `minimumReleaseAge`, `minimumReleaseAgeExclude`, and `verifyDepsBeforeRun`, and Yarn `enableScripts: false`; all errors, fixable once `pnpm-workspace.yaml` exists | Yes |
+| `xy packman lint` | pnpm `minimumReleaseAge`, `minimumReleaseAgeExclude`, and `verifyDepsBeforeRun`, and Yarn `enableScripts: false`; all errors, fixable once `pnpm-workspace.yaml` exists. It does not check pnpm `allowBuilds`: add an entry by hand for a dependency that needs install scripts | Yes |
 | `xy repo lint` | Monorepos only: workspace layout (`packages/` folder, glob coverage), versions and internal ranges, engines and Volta, package-manager fields, pnpm release age and overrides, spec layout, a consumer `README.md` per package and its `files` entry (since 10.0.5), and Dependabot enablement | Yes |
 | `xy lint lint` | Local ESLint config package, `.gitignore` parity, redundant rules, and overrides | Yes |
 | `xy skills lint` | Required catalog skills, versions, duplicate global installs, catalog skills that are neither required nor optional for the tier nor `allowed` in config, and leftover `xy claude` output (since 10.1.2); see [`xy skills`](#xy-skills) | Yes |
@@ -306,6 +308,8 @@ Since 9.2.1, `xyex plan init` writes a non-governing `.xy/plan.json` bootstrap, 
 | `xy skills add <source> --skill <name> -y` | Install one skill (passthrough) |
 | `xy skills remove <name> -y` | Remove one skill (passthrough) |
 
+Without `-a`, `xy skills defaults` installs ariestools-skills with Skills.sh `--all` (`--skill '*' --agent '*' -y`), which writes into every agent Skills.sh supports, not only the detected ones. Pass `-a <agent>` (for example `-a claude-code codex`) to limit it; it then uses `--skill '*'`. Only `--all` implies `-y`, and the second, xyo-skills step never adds it, so pass `-y` yourself to run without Skills.sh prompts. Either way it installs every skill in ariestools-skills, including ariestools-sdk-react and ariestools-actor, although `xy skills defaults --help` names only the four catalog skills from it.
+
 `xy skills lint` manages a catalog of eleven skills (ten before 10.1.2, without xy-agent; nine before 9.2.0, without xl1-dapp-kit): xy-development, xy-toolchain, xy-agent, ariestools-sdk, xyo-knowledge, and the xl1-* skills. A skill reaches the required set in four ways:
 
 1. **Tier detection.** The lint detects a repo tier from package.json and toolchain signals (unrelated to the package profiles in [project-profiles.md](project-profiles.md)). It also requires ariestools-sdk when the repo produces or uses sdk-js packages and, since 10.0.8, xl1-dapp-kit when it produces or depends on `@xyo-network/dapp-kit` packages.
@@ -321,6 +325,8 @@ Since 9.2.1, `xyex plan init` writes a non-governing `.xy/plan.json` bootstrap, 
 2. **`commands.skillsLint.additionalSkills`** (since 10.0.5) lists catalog skills to require regardless of tier. Root and workspace lists are unioned, and unknown names are config errors.
 3. **`commands.skillsLint.skills`** (since 10.1.1) sets `{ '<name>': { presence: 'required' | 'allowed' | 'off' } }`. `required` adds the skill. `off` drops a tier requirement; a still-installed skill then warns as `skills.unnecessary`, and `off` never silences `skills.package-recommended`. `allowed` only suppresses `skills.unnecessary`, and the skill is not version-checked.
 4. **package.json `xy.skills`** (since 10.0.8) lists `[{ name, source? }]` on workspace packages and direct dependencies. `source` is needed only for a skill outside the catalog. The config loader reads a package.json `xy` key before any xy.config file and stops there, so the key becomes that directory's entire xy config. It hides a sibling xy.config.ts, and in a package without one it also hides the root config from `xy compile`, which then ignores the root `compile` block (see [Configuration](compilation.md#configuration)). Add `xy.skills` only to a package with no xy.config.ts that needs no root compile settings, or repeat those settings, such as `compile: { node: true }`, inside the same package.json `xy` object.
+
+A published package can recommend a skill to the repositories that use it. Skills lint reads `xy.skills` from the installed `package.json` of each direct dependency (in any workspace's `dependencies`, `devDependencies`, or `peerDependencies`), so `"xy": { "skills": [{ "name": "<skill>", "source": "ariestools/ariestools-skills" }] }` makes `skills.package-recommended` require the skill in every repository that depends on the package directly. A skill outside the catalog needs the `source`; a catalog skill always installs from its catalog source, and a differing `source` only warns. sdk-js packages need no entry, because tier detection already requires ariestools-sdk. In the producer's own repository the key is also that package's entire xy config, so apply the caveat above.
 
 | Rule | Level | Meaning |
 |---|---|---|
@@ -379,7 +385,7 @@ pnpm xyex work lint
 | `work move <id> --to <folder>` | Move an item between multi-root workspace folder repos |
 | `work lint` | Store health (gitignore, GitHub availability, sync drift) |
 
-`add` and `update` take the triage fields `--description`, `--area`, `--tag`, `--acceptance`, `--verify` (the last three repeatable), and `--impact` / `--urgency` / `--effort` / `--risk` / `--confidence` (each 1–5). Only `add` takes the anchor flags `--file`, `--line`, and `--inline`. An open item missing area, priority, acceptance criteria, or verification is under-triaged and shows in `work triage`.
+`add` and `update` take the triage fields `--description`, `--area`, `--tag`, `--acceptance`, `--verify` (the last three repeatable), and `--impact` / `--urgency` / `--effort` / `--risk` / `--confidence` (each 1–5). On `add`, setting any one priority flag gives the item a priority, and each priority field you leave out is stored as 3. Only `add` takes the anchor flags `--file`, `--line`, and `--inline`. An open item missing area, priority, acceptance criteria, or verification is under-triaged and shows in `work triage`.
 
 Choose the type by intent: `bug` (existing behavior is wrong), `todo` (known concrete work), `feature` (new capability), `idea` (speculative, no acceptance criteria yet), `debt` (internal cleanup), `research` (investigation before implementation), `question` (unresolved decision), or `risk` (known risk to track).
 
@@ -552,7 +558,7 @@ const config: XyConfig = {
 export default config
 ```
 
-The default `dep.workspace.protocol` is `workspace:~`. The rule also accepts a `protocol` option (`'workspace:*' | 'workspace:^' | 'workspace:~'`), but a typed `XyConfig` still rejects the `[level, { protocol }]` form in 10.1.2.
+The default `dep.workspace.protocol` is `workspace:~`. The rule also accepts a `protocol` option (`'workspace:*' | 'workspace:^' | 'workspace:~'`), but a typed `XyConfig` rejects the `[level, { protocol }]` form with TS2322 (through 10.1.3), so set only the level.
 
 | Key | Fields (defaults) |
 |---|---|

@@ -6,7 +6,7 @@ Run one when asked, when you notice a document contradicting the code, or before
 
 ## Tooling
 
-From @ariestools/toolchain 10.1.1, the stable `xy agent` command implements this catalog:
+The stable `xy agent` command implements this catalog:
 
 ```text
 pnpm xy agent lint            run the catalog. --rules (ids and levels), --json, --strict, --fix
@@ -15,18 +15,33 @@ pnpm xy agent init            create missing files only: placeholder AGENTS.md, 
                               docs/ tier folders, index. Absorbs nothing, never overwrites
 pnpm xy agent index           regenerate docs/README.md from front matter
 pnpm xy agent archive <path>  move under docs/archive/, keeping the path below docs/; set state: retired
-                              unless superseded; write a dated banner; refresh the index
+                              unless superseded; write a dated banner; refresh the index.
+                              Write <path> as docs/…, never ./docs/… or an absolute path
 ```
 
-Since 10.1.2, `xy check` runs `xy agent lint` only where a root `AGENTS.md` exists or the xy config declares `commands.agentLint`, and only `agents.file-present` and `agents.links-resolve` are errors by default. Every other finding warns, and fails the gate only under `--strict` or `XY_STRICT=1`. (10.1.1 runs it in every repository, with four more rules at error.) A repository tunes levels through `commands.agentLint.rules` in `xy.config.ts` — declaring that key also opts `xy check` in — and the thresholds are fixed. The banner `xy agent archive` writes names the successor or says "Retired"; add the reason for a retirement by hand, as the [archive procedure](lifecycle.md#archiving) shows. No rule covers document–code drift; that review stays manual.
+`xy check` runs `xy agent lint` only where a root `AGENTS.md` exists or the xy config declares `commands.agentLint`, and only `agents.file-present` and `agents.links-resolve` are errors by default. Every other finding warns, and fails the gate only under `--strict` or `XY_STRICT=1`. A repository tunes levels through `commands.agentLint.rules` in `xy.config.ts` — declaring that key also opts `xy check` in — and the thresholds are fixed. The banner `xy agent archive` writes names the successor or says "Retired"; add the reason for a retirement by hand, as the [archive procedure](lifecycle.md#archiving) shows. No rule covers document–code drift; that review stays manual.
 
-**Check `pnpm xy --help` before assuming the command exists.** Before 10.1.1, `xy agent` prints "Command not found [agent]" and exits 0, which reads like a pass. Run the checks by hand there.
+**Check `pnpm xy --help` before assuming the command exists.** A toolchain without it prints `Command not found [agent]` and exits 0, which reads like a pass. Run the checks by hand there, and keep the [template](templates.md) shapes so the upgrade does not break the gate. On 10.1.1, read [Toolchain 10.1.1](#toolchain-1011) before trusting a result or running a fixer.
 
-**Only structural fixers are safe:** index regeneration, archiving, and inserting missing front matter, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix` wherever `xy check` runs agent lint) regenerates `docs/README.md` and gives a file with no front matter a `kind` inferred from its folder, and `xy agent index` and `xy agent archive` do the rest. Since 10.1.2 the inferred kind is `decision`, `evidence`, `runbook` or `plan` under the matching `docs/` folder, `paper` under `papers/`, and `spec` under `specs/`; any other file keeps its `docs.front-matter` warning. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
+**Only structural fixers are safe:** index regeneration, archiving, and inserting missing front matter, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix` wherever `xy check` runs agent lint) regenerates `docs/README.md` and gives a file with no front matter a `kind` inferred from its folder, and `xy agent index` and `xy agent archive` do the rest. The inferred kind is `decision`, `evidence`, `runbook` or `plan` under the matching `docs/` folder, `paper` under `papers/`, and `spec` under `specs/`; any other file keeps its `docs.front-matter` warning. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
 
-An audit runs `xy agent lint` and `xy check` without `--fix` and proposes fixes to the owner first. After a front-matter fix, check each inferred `kind` and add the rest of the front matter by hand; the same run builds the index from the new front matter. On 10.1.1 the fixer writes `kind: doc` and builds the index from the old front matter, so replace each `kind: doc` and run `pnpm xy agent index` before the verifying run.
+An audit runs `xy agent lint` and `xy check` without `--fix` and proposes fixes to the owner first. After a front-matter fix, check each inferred `kind` and add the rest of the front matter by hand; the same run builds the index from the new front matter.
 
 **Related linters.** Stable `xy repo lint`, also part of `xy check`, requires a consumer `README.md` in each workspace package. Experimental `pnpm xyex plan lint` is not part of `xy check` and is not authoritative here: its layout (fixed paper names, `docs/ROADMAP.md`, `notes/`) conflicts with this catalog in places. Never run `xyex plan lint --fix` during an audit — it scaffolds files, prepends `@AGENTS.md` to an existing `CLAUDE.md`, and moves non-canonical `papers/` files into `notes/`. If a repository's `.xy/plan.json` sets `metadata.source: manifest`, lifecycle metadata lives in the manifest: expect `docs.front-matter` warnings and lower that rule rather than running `--fix`.
+
+### Toolchain 10.1.1
+
+This skill describes `xy agent` as it behaves from 10.1.2. On 10.1.1 it differs in ways that fail the gate or damage files:
+
+- `xy check` runs agent lint in every repository, so a repository without `AGENTS.md` fails. Adopt the pattern or, with the owner's agreement, turn the failing rules off in `commands.agentLint.rules`.
+- `agents.adapter-thin`, `agents.required-sections`, `agents.no-absolute-paths` and `docs.index-current` are errors.
+- `agents.required-sections` does not match *authoritative*, *what not to do* or *pitfall*. The [AGENTS.md template](templates.md#agentsmd) headings match on every version.
+- An adapter passes only as a symlink or a lone `@AGENTS.md` line.
+- `supersededBy` resolves only relative to the document, so write it relative to the archived location.
+- `xy agent lint --fix` writes `kind: doc` and builds the index from the old front matter. Replace each `kind: doc` with the real kind, then run `pnpm xy agent index`.
+- `xy agent archive` moves the file flat to `docs/archive/<name>`, sets `state: archived`, writes a generic banner, and strips quotes and block lists from the front matter. Restore the front matter, replace the banner, and set `superseded` or `retired`.
+
+The 10.1.2 row of the xy-toolchain skill's [Version notes](../xy-toolchain/toolchain.md#version-notes) lists every change from 10.1.1.
 
 ## Check catalog
 
@@ -39,7 +54,7 @@ Each check is objectively decidable. Levels are defaults; a repository may tune 
 | `AGENTS.md` exists at the repository root | `agents.file-present` | error | Nothing else in this convention applies without it |
 | Adapters are thin | `agents.adapter-thin` | warn | `CLAUDE.md` and `GEMINI.md` are absent, a symlink to `AGENTS.md`, or a file whose first visible line is `@AGENTS.md` (an HTML comment may sit above it). Tool-specific notes may follow the import, but never a copy or restatement of `AGENTS.md`. `.github/copilot-instructions.md` is absent, a symlink, or links to `AGENTS.md` |
 | H1 names the product, not the filename | `agents.h1-not-filename` | warn | `# AGENTS.md` is what forces a maintainer to keep two copies |
-| Required sections present | `agents.required-sections` | warn | Orient, authority, repository map, commands, failures. Headings are matched by keyword: `orient` or `overview`, `authorit` (authority; authoritative since 10.1.2), `repository map`, `layout` or `packages`, `command`, and `fail` or `troubleshoot` (since 10.1.2 also `what not to do` or `pitfall`) |
+| Required sections present | `agents.required-sections` | warn | Orient, authority, repository map, commands, failures. Headings are matched by keyword: `orient`, `overview`, `what this` or `about this`; `authorit` (authority, authoritative); `repository map`, `repo map`, `layout` or `packages`; `command`; and `fail`, `troubleshoot`, `what not to do` or `pitfall` |
 | Within the size budget | `agents.size-budget` | warn | Under 200 lines: a file `wc -l` counts at 200 already warns |
 | Every link resolves | `agents.links-resolve` | error | The single highest-value check — it catches renames, deletions, and moved packages |
 | No absolute machine paths | `agents.no-absolute-paths` | warn | No `/Users/...` or `/home/...` in `AGENTS.md`, an adapter, a `packages/*/AGENTS.md`, or any Markdown under `docs/`, `papers/`, or `specs/` — example paths and pasted output included. Write `~/`, `$HOME/`, or `<repo>/`, and redact output before committing an evidence document: it cannot be cleaned up later without `amends` |
@@ -62,7 +77,7 @@ Each check is objectively decidable. Levels are defaults; a repository may tune 
 
 ### Where the shipped rules differ
 
-Read 10.1.2 findings with these gaps in mind:
+Read findings with these gaps in mind:
 
 - `agents.links-resolve` checks only Markdown links (`[text](path)`), relative to `AGENTS.md`. Write repository paths as links; a code-span path is never checked.
 - `agents.authority-rows-resolve` reads the first `##` section whose heading contains "authorit". It takes each row's path from the column headed Authority, Document or Path (column 1 when no column is), preferring a Markdown link's target, and otherwise from the first cell that holds a path. Only a word that contains `/` or ends in `.md` counts as a path, link targets included, so with `[package.json](package.json)` the rule reads another cell, often the task class; write `./package.json`. It compares `kind` with the column headed Kind; when no header cell names Authority, Document, Path or Kind, it treats every row as data and reads column 2 as the kind.
@@ -74,7 +89,7 @@ Read 10.1.2 findings with these gaps in mind:
 
 ## Running the checks
 
-From toolchain 10.1.1:
+Run the linter first:
 
 ```bash
 pnpm xy agent lint --json     # the whole catalog
@@ -83,7 +98,7 @@ pnpm xy agent audit --json    # the lifecycle subset
 
 Then run the code-span check below, which the linter does not cover, and the drift review in the next section.
 
-On older toolchains, or to look past the gaps above, run the checks by hand. The scripts read tracked files only; the linter also reads untracked ones.
+Without `xy agent`, or to look past the gaps above, run the checks by hand. The scripts read tracked files only; the linter also reads untracked ones.
 
 ```bash
 # Markdown links in AGENTS.md that no longer resolve
@@ -186,4 +201,4 @@ Then act on what the owner confirms. Archiving, index regeneration, and front-ma
 - Every path you referenced resolves.
 - `AGENTS.md` still within budget, and its authority table updated if you added an authority.
 - New evidence documents name a commit and state which tiers they do *not* establish.
-- `pnpm xy agent lint` (toolchain 10.1.1 and later) reports no new errors and no new warnings, apart from an expected `docs.orphan` on an archived record that nothing else names (since 10.1.2). Since 10.1.2 most rules only warn, so a clean error count is not enough.
+- `pnpm xy agent lint` reports no new errors and no new warnings, apart from an expected `docs.orphan` on an archived record that nothing else names. Most rules only warn, so a clean error count is not enough.
