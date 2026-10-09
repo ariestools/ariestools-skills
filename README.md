@@ -11,7 +11,7 @@ Four skills: three layers and one cross-cutting companion.
 | 3 | `ariestools-sdk` | `@ariestools/sdk` umbrella modules, specialist packages (`express`, `storage-adapters`, `threads`, `testing`, `telemetry`, …), fetch/HTTP patterns, import conventions |
 | 2 | `xy-toolchain` | `@ariestools/toolchain` (`xy` CLI and experimental `xyex`), project profiles, ESLint flat configs, TypeScript configs, `@ariestools/vitest-config`, `@ariestools/lib-neutral`, deplint, repository policy, `xy work`, `xy agent` |
 | 1 | `xy-development` | TypeScript conventions, Git workflow, testing principles, definition of done |
-| — | `xy-agent` | `AGENTS.md` entry point, per-tool adapters, `docs/` and `papers/` lifecycle, documentation audits; builds on Layer 1; checked by `xy agent lint` (run by `xy check`, toolchain ≥ 10.1.1) |
+| — | `xy-agent` | `AGENTS.md` entry point, per-tool adapters, `docs/` and `papers/` lifecycle, documentation audits; builds on Layer 1; checked by `xy agent lint` (toolchain ≥ 10.1.1), which `xy check` runs where a root `AGENTS.md` exists or `commands.agentLint` is declared (every repository on 10.1.1) |
 
 Each layer builds on the ones below it; links up a layer are navigation only. `xy-agent` builds on Layer 1 and points to Layer 2 for the `xy agent` and `xy work` commands.
 

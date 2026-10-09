@@ -65,7 +65,7 @@ React projects also get the stable `xy start` and the experimental `analyze`, `e
 
 A top-level command with no subcommand, including one given a positional such as `xy test <target>`, defers to a same-named root `package.json` script and forwards its arguments. Subcommands such as `xy lint lint` never defer.
 
-Do not infer that a zero exit code means zero warnings unless `--strict` was active. For automation, prefer `--json` over parsing decorated terminal output.
+Do not infer that a zero exit code means zero warnings unless `--strict` was active. For automation, prefer `--json` over parsing decorated terminal output. Since 10.1.2, the `xy check --json` envelope also carries the sub-linters' `errors` and `warnings` diagnostics beside `errorCount` and `warningCount`; a linter that reports only counts adds none, so the arrays can be shorter than the counts.
 
 ## Lifecycle gates
 
@@ -75,7 +75,7 @@ Do not infer that a zero exit code means zero warnings unless `--strict` was act
 | `xy build` | Compile, publint, deplint, ESLint | Tests, `xy check`, license, secure |
 | `xy rebuild` | Clean plus a full non-incremental build | Tests, license, secure |
 | `xy test [target]` | Vitest for a workspace or path | Compile and lint |
-| `xy check` | Agent docs (AGENTS.md and docs convention, since 10.1.1), Git, package-manager, publish, repo-layout, ESLint-config, and skill policy | Compile, source ESLint, deplint, node lint, tests |
+| `xy check` | Agent docs (AGENTS.md and docs convention, since 10.1.1; since 10.1.2 only with a root `AGENTS.md` or a declared `commands.agentLint`), Git, package-manager, publish, repo-layout, ESLint-config, and skill policy | Compile, source ESLint, deplint, node lint, tests |
 | `xy fix [package]` | Git lint, deplint, repo lint, publint, ESLint, and ESLint-config (`lint lint`) fixes | Packman, skills, and agent fixes (use `xy check --fix`), node lint, tests, compile |
 
 Run the gates required by the target repository or CI rather than treating one aggregate command as universal.
@@ -99,8 +99,8 @@ pnpm xy test
 To also gate repository policy, run `pnpm xy check --strict` after the build (publint compares export maps with compiled output):
 
 - First set git config with plain git: `git config core.autocrlf false && git config core.eol lf`, plus `git config core.ignorecase false` on case-insensitive filesystems. A fresh clone has neither of the first two keys, so `git.autocrlf` and `git.eol` warn and fail `--strict`. Do not use `xy git lint --fix` for this; it can also rewrite `.gitignore`.
-- In 10.1.1, `--strict` does not escalate agent-lint or skills-lint warnings inside `xy check`, and the standalone linters ignore `XY_STRICT=1`. When those warnings must block, also run `pnpm xy agent lint --strict` and `pnpm xy skills lint --strict`.
-- `xy check` is not hermetic and has no `--offline`. `skills.required-current` fetches upstream skill versions: offline it passes silently, online a new skill release can fail CI with no repository change. Once agent-lint warnings gate, `docs.stale` depends on today's date and `docs.evidence-immutable` needs full history (`fetch-depth: 0`).
+- Since 10.1.2, `--strict` and `XY_STRICT=1` also escalate agent-lint and skills-lint warnings, both inside `xy check` and in the standalone linters. Before 10.1.2, `xy check --strict` leaves them as warnings and the standalone linters ignore `XY_STRICT=1`, so when those warnings must block on those versions, also run `pnpm xy agent lint --strict` and `pnpm xy skills lint --strict`.
+- `xy check` is not hermetic and has no `--offline`. `skills.required-current` fetches upstream skill versions: offline it passes silently, online a new skill release can fail CI with no repository change. Once agent-lint warnings gate, as they do under `xy check --strict` since 10.1.2, `docs.stale` depends on today's date and `docs.evidence-immutable` needs full history (`fetch-depth: 0`).
 
 ## Dependency and publish analysis
 
@@ -222,7 +222,7 @@ Since 9.0.1, `xy secure` is an overview that runs both security audits and print
 
 `xy secure dependabot` needs `gh` installed and authenticated; the standard `repo` scope suffices. Alerts are enabled per repository, and a repo with the feature off is reported as such, not as a failure. Flags: `--org <name>` (sweep a whole org), `--scope`, `--relationship`, `--state`, `--summary`, `--rules`.
 
-Findings are rule-bearing: `dependabot.critical` / `.high` / `.medium` / `.low`, plus `dependabot.alerts-enabled`. Alerts are overwhelmingly transitive lockfile findings, so nothing fails by default (`critical` and `high` warn; `medium` and `low` are off) — raise levels under `commands.dependabot.rules` to gate. A typed `XyConfig` rejects that key in 10.1.1; use the [untyped command keys](#untyped-command-keys) workaround. Console output caps at 50 alerts and reports how many were held back; `--json` carries every finding.
+Findings are rule-bearing: `dependabot.critical` / `.high` / `.medium` / `.low`, plus `dependabot.alerts-enabled`. Alerts are overwhelmingly transitive lockfile findings, so nothing fails by default (`critical` and `high` warn; `medium` and `low` are off) — raise levels under `commands.dependabot.rules` to gate. A typed `XyConfig` accepts that key since 10.1.2; before that, use the [untyped command keys](#untyped-command-keys) workaround. Console output caps at 50 alerts and reports how many were held back; `--json` carries every finding.
 
 ### `xyex npm-org lint [org]` (experimental)
 
@@ -241,22 +241,22 @@ Use the focused command when diagnosing one policy family:
 
 | Command | Policy | In `xy check` |
 |---|---|---|
-| `xy agent lint` | AGENTS.md, tool adapters, and the `docs/` / `papers/` convention (since 10.1.1); see [Documentation conventions](#documentation-conventions) | Yes, first |
+| `xy agent lint` | AGENTS.md, tool adapters, and the `docs/` / `papers/` convention (since 10.1.1); see [Documentation conventions](#documentation-conventions) | Yes, first; since 10.1.2 only with a root `AGENTS.md` or a declared `commands.agentLint` |
 | `xy git lint` | Git config (`core.autocrlf` false, `core.eol` lf, `core.ignorecase` false) and a `.gitignore` entry that ignores `.xy/cache` in every package (`git.ignore-toolchain-cache`, since 9.1.1) | Yes |
 | `xy packman lint` | pnpm `minimumReleaseAge`, `minimumReleaseAgeExclude`, and `verifyDepsBeforeRun`, and Yarn `enableScripts: false`; all errors, fixable once `pnpm-workspace.yaml` exists | Yes |
 | `xy repo lint` | Monorepos only: workspace layout (`packages/` folder, glob coverage), versions and internal ranges, engines and Volta, package-manager fields, pnpm release age and overrides, spec layout, a consumer `README.md` per package and its `files` entry (since 10.0.5), and Dependabot enablement | Yes |
 | `xy lint lint` | Local ESLint config package, `.gitignore` parity, redundant rules, and overrides | Yes |
-| `xy skills lint` | Required catalog skills, versions, duplicate global installs, and catalog skills that are neither required nor optional for the tier nor `allowed` in config; see [`xy skills`](#xy-skills) | Yes |
+| `xy skills lint` | Required catalog skills, versions, duplicate global installs, catalog skills that are neither required nor optional for the tier nor `allowed` in config, and leftover `xy claude` output (since 10.1.2); see [`xy skills`](#xy-skills) | Yes |
 | `xy node lint` | Root Volta pin and package `engines.node` portability | No; run `xy node lint [--fix]` on its own |
 
-`xy check` also runs publint. `xy check --fix` applies the fixable forms of the families `xy check` runs; `xy fix` covers a different set (see [Lifecycle gates](#lifecycle-gates)). Run it locally, never in CI, review the diff, then rerun without `--fix`. For CI, see [CI gates](#ci-gates).
+`xy check` also runs publint. `xy check --fix` applies the fixable forms of the families `xy check` runs; `xy fix` covers a different set (see [Lifecycle gates](#lifecycle-gates)). Since 10.1.2 that includes deleting leftover `xy claude` output (`skills.legacy-generated`, see [`xy skills`](#xy-skills)). Run it locally, never in CI, review the diff, then rerun without `--fix`. For CI, see [CI gates](#ci-gates).
 
-Since 10.1.1, `xy check --fix` also runs agent lint's fixers. They replace `docs/README.md` with the generated index, discarding a hand-written one, and prepend `kind: doc` front matter to `docs/`, `papers/`, and `specs/` files that lack it. Upgrading to 10.1.1 adds this gate, so after an upgrade:
+Since 10.1.1, `xy check --fix` also runs agent lint's fixers wherever `xy check` runs agent lint. They replace `docs/README.md` with the generated index, discarding a hand-written one, and add front matter to `docs/`, `papers/`, and `specs/` files that have none. Since 10.1.2 the fixer infers `kind` from the folder (`decision`, `evidence`, `runbook`, or `plan` under `docs/decisions/`, `docs/evidence/`, `docs/runbooks/`, or `docs/plans/`; `paper` under `papers/`; `spec` under `specs/`), leaves any other file unmodified and still warning, and regenerates the index from the fixed front matter in the same run. On 10.1.1 it writes `kind: doc` to every such file. Before the first fix in a repository that runs agent lint:
 
 1. Run `pnpm xy agent lint` without `--fix`.
 2. Scaffold missing files with `pnpm xy agent init`, which never overwrites.
 3. In a repo with a hand-maintained docs index, set levels under `commands.agentLint.rules` before fixing.
-4. After a front-matter fix, run `pnpm xy agent index`. One run lints the pre-fix documents, so an immediate rerun still fails `docs.index-current`.
+4. On 10.1.1, run `pnpm xy agent index` after a front-matter fix. That release builds the index from the pre-fix documents, so an immediate rerun still fails `docs.index-current`.
 
 A new workspace package needs a `README.md` or `xy check` fails; `xy repo lint --fix` scaffolds one. List every repo rule with `pnpm xy repo lint --rules`.
 
@@ -277,7 +277,7 @@ const config: XyConfig = {
 
 ### `xy agent`
 
-Since 10.1.1, the stable `xy agent` family checks and maintains the AGENTS.md and `docs/` convention described by the [xy-agent skill](../xy-agent/SKILL.md). `xy check` runs `agent lint` first, with no config entry required.
+Since 10.1.1, the stable `xy agent` family checks and maintains the AGENTS.md and `docs/` convention described by the [xy-agent skill](../xy-agent/SKILL.md). `xy check` runs `agent lint` first. Since 10.1.2 it does so only when the repository has a root `AGENTS.md` (a symlink counts) or declares `commands.agentLint` in the root or workspace config, and otherwise prints `No AGENTS.md — skipping agent lint`; on 10.1.1 it runs in every repository. Declaring the key at all, even only to turn rules off, opts `xy check` in. A direct `xy agent lint` always runs, including the missing-file check. Since 10.1.2, text output lists each finding and each passing rule.
 
 | Command | Behavior |
 |---|---|
@@ -285,36 +285,38 @@ Since 10.1.1, the stable `xy agent` family checks and maintains the AGENTS.md an
 | `xy agent audit [--strict]` | Report stale, orphaned, superseded-but-unarchived, live-state, and edited-evidence documents (a five-rule subset) |
 | `xy agent init` | Scaffold AGENTS.md, a `CLAUDE.md` containing only `@AGENTS.md`, `docs/{decisions,runbooks,plans,evidence,archive}/`, and `docs/README.md`; never overwrites |
 | `xy agent index` | Regenerate `docs/README.md` from document front matter |
-| `xy agent archive <path>` | Move a document under `docs/archive/` and refresh the index |
+| `xy agent archive <path>` | Move a document under `docs/archive/` and refresh the index. Since 10.1.2 it keeps the path under `docs/` (`docs/plans/x.md` becomes `docs/archive/plans/x.md`), sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and adds a dated banner naming the original path. 10.1.1 moves the file flat, sets `state: archived`, writes a generic banner, and rewrites the front matter, dropping quotes and block lists. Neither rewrites links to or from the moved file. Archiving a document that AGENTS.md links to fails `agents.links-resolve` until the link is updated, and a `supersededBy` relative to the document's folder no longer resolves from `docs/archive/`, so `docs.superseded-archived` warns. Before archiving a superseded document, give `supersededBy` as a repository-root path such as `docs/plans/NEW.md` (accepted since 10.1.2) |
 
-The error-level rules are `agents.file-present`, `agents.required-sections` (orient, authority, repository map, commands, and failures sections), `agents.adapter-thin` (a `CLAUDE.md` adapter is only an `@AGENTS.md` import or a symlink to AGENTS.md), `agents.links-resolve`, `agents.no-absolute-paths`, and `docs.index-current`. The rest warn. Only `docs.front-matter` and `docs.index-current` are fixable. `commands.agentLint.rules` changes levels only, and unknown rule ids are errors. List the catalog with `pnpm xy agent lint --rules`.
+Since 10.1.2 only `agents.file-present` and `agents.links-resolve` are errors. `agents.required-sections` (orient, authority, repository map, commands, and failures sections), `agents.adapter-thin`, `agents.no-absolute-paths`, and `docs.index-current` were errors on 10.1.1 and now warn like the rest, so they fail only under `--strict`, `XY_STRICT=1`, or a level raised in `commands.agentLint.rules`. `agents.adapter-thin` accepts no adapter, a symlink to AGENTS.md, or a `CLAUDE.md` / `GEMINI.md` whose first visible line is `@AGENTS.md` or `@./AGENTS.md`. Since 10.1.2 tool-specific notes may follow that import, provided they do not restate AGENTS.md, and `.github/copilot-instructions.md` may instead link to `../AGENTS.md`; on 10.1.1 nothing may follow the import. Only `docs.front-matter` and `docs.index-current` are fixable. `commands.agentLint.rules` sets levels, and unknown rule ids are errors. List the catalog with `pnpm xy agent lint --rules`.
 
 ### `xyex plan` (experimental)
 
-Since 9.2.1, `xyex plan init` writes a non-governing `.xy/plan.json` bootstrap, and `xyex plan lint [--fix]` checks a fixed root / `papers/` / `docs/` / `notes/` layout (its root-document rules since 10.0.5) configured by `commands.planLint.rules` (levels only). Neither runs in `xy check`, and `plan lint` is not authoritative for the xy-agent convention. Its layout differs: it requires `papers/WHITE-PAPER.md`, `papers/YELLOW-PAPER.md`, `notes/README.md`, and templated `docs/README.md` and `docs/ROADMAP.md`, while `docs.index-current` requires `docs/README.md` to equal the generated index. Do not run `plan lint --fix` in a repo that passes `xy agent lint`.
+Since 9.2.1, `xyex plan init` writes a non-governing `.xy/plan.json` bootstrap, and `xyex plan lint [--fix]` checks a fixed root / `papers/` / `docs/` / `notes/` layout (its root-document rules since 10.0.5) configured by `commands.planLint.rules` (levels only). Neither runs in `xy check`, and `plan lint` is not authoritative for the xy-agent convention. Its layout differs: it requires `papers/WHITE-PAPER.md`, `papers/YELLOW-PAPER.md`, `notes/README.md`, and templated `docs/README.md` and `docs/ROADMAP.md`, while `docs.index-current` requires `docs/README.md` to equal the generated index. Since 10.1.2 its `plan.root.claude-imports-agents` uses agent lint's predicate (the first visible line of `CLAUDE.md` is the import, and notes may follow), but plan lint still requires a regular `CLAUDE.md`, so a symlinked adapter fails it. Do not run `plan lint --fix` in a repo that passes `xy agent lint`.
 
 ## Skills and work tracking
 
 ### `xy skills`
 
-`xy skills` wraps the bundled Skills.sh CLI. Only `defaults`, `lint`, and `pick` are XY-specific; `add`, `update`, `list`, `remove`, `find`, and the other subcommands pass through to Skills.sh, so `xy skills --help` prints Skills.sh help. Use `xy skills lint --help` for the XY options.
+`xy skills` wraps the bundled Skills.sh CLI. Only `defaults`, `lint`, and `pick` are XY-specific; `add`, `update`, `list`, `remove`, `find`, and the other subcommands pass through to Skills.sh, so `xy skills --help` prints Skills.sh help. Use `xy skills lint --help`, `xy skills defaults --help`, and (since 10.1.2) `xy skills pick --help` for the XY options.
 
 | Command | Behavior |
 |---|---|
 | `xy skills defaults [-g] [-a <agent>] [--copy]` | Install every ariestools-skills skill plus the xyo-skills XYO/XL1 stack |
-| `xy skills lint [--fix] [--offline] [--strict] [--rules]` | Check required skills, versions, and duplicates; runs in `xy check` |
+| `xy skills lint [--fix] [--offline] [--strict] [--rules]` | Check required skills, versions, duplicates, and leftover `xy claude` output; runs in `xy check` |
 | `xy skills add <source> --skill <name> -y` | Install one skill (passthrough) |
 | `xy skills remove <name> -y` | Remove one skill (passthrough) |
 
-`xy skills lint` manages a catalog of ten skills (nine before 9.2.0, without xl1-dapp-kit): xy-development, xy-toolchain, ariestools-sdk, xyo-knowledge, and the xl1-* skills. A skill reaches the required set in four ways:
+`xy skills lint` manages a catalog of eleven skills (ten before 10.1.2, without xy-agent; nine before 9.2.0, without xl1-dapp-kit): xy-development, xy-toolchain, xy-agent, ariestools-sdk, xyo-knowledge, and the xl1-* skills. A skill reaches the required set in four ways:
 
 1. **Tier detection.** The lint detects a repo tier from package.json and toolchain signals (unrelated to the package profiles in [project-profiles.md](project-profiles.md)). It also requires ariestools-sdk when the repo produces or uses sdk-js packages and, since 10.0.8, xl1-dapp-kit when it produces or depends on `@xyo-network/dapp-kit` packages.
 
    | Tier | Required | Optional |
    |---|---|---|
-   | `xy` | xy-development, xy-toolchain | — |
-   | `xyo` | adds xyo-knowledge | — |
-   | `xl1` | adds xl1-knowledge, xl1-patterns, xl1-testing | xl1-dapp-kit, xl1-scaffold, xl1-build |
+   | `xy` | xy-development, xy-toolchain | xy-agent (since 10.1.2) |
+   | `xyo` | adds xyo-knowledge | xy-agent (since 10.1.2) |
+   | `xl1` | adds xl1-knowledge, xl1-patterns, xl1-testing | xl1-dapp-kit, xl1-scaffold, xl1-build, and xy-agent (since 10.1.2) |
+
+   An optional skill is not required, and an installed one does not count as `skills.unnecessary`. A repo with no detected tier (`none`) has no optional skills, so an installed xy-agent warns there unless config requires or allows it.
 
 2. **`commands.skillsLint.additionalSkills`** (since 10.0.5) lists catalog skills to require regardless of tier. Root and workspace lists are unioned, and unknown names are config errors.
 3. **`commands.skillsLint.skills`** (since 10.1.1) sets `{ '<name>': { presence: 'required' | 'allowed' | 'off' } }`. `required` adds the skill. `off` drops a tier requirement; a still-installed skill then warns as `skills.unnecessary`, and `off` never silences `skills.package-recommended`. `allowed` only suppresses `skills.unnecessary`, and the skill is not version-checked.
@@ -328,12 +330,22 @@ Since 9.2.1, `xyex plan init` writes a non-governing `.xy/plan.json` bootstrap, 
 | `skills.package-recommended` | error | Skills named in `xy.skills` are installed |
 | `skills.unnecessary` | warn | Installed catalog skills that are not required, optional, `allowed`, or package-recommended |
 | `skills.duplicate-install` | warn | Project skills are not also installed globally |
+| `skills.legacy-generated` | warn | Leftover `xy claude` skills, rules, and commands are absent (since 10.1.2; fixable) |
 
-`xy skills lint --fix` works in project scope. It installs missing required and package-recommended skills, migrates xyo-skills-sourced xy-development and xy-toolchain installs to ariestools-skills, and updates outdated required skills (migration and updates since 9.2.0). It never removes anything. Skills outside the catalog, including xy-agent and retired `xylabs-*` skills, are never version-checked, and are reported only when a package.json `xy.skills` entry names one that is missing; remove unwanted ones with `xy skills remove <name> -y` (see [legacy agent files](toolchain.md#legacy-agent-files-from-xy-claude)).
+`xy skills lint --fix` works in project scope. It installs missing required and package-recommended skills, migrates xyo-skills-sourced xy-development and xy-toolchain installs to ariestools-skills, and updates outdated required skills (migration and updates since 9.2.0). Since 10.1.2, `skills.migrated-source` also reads each installed copy's `SKILL.md`: one with `metadata.status: redirect` (an xyo-skills redirect stub), or, when online, a `metadata.version` ahead of ariestools-skills main, is reported against that file instead of being listed as current, and `--fix` reinstalls it from ariestools-skills.
 
-xy-agent is not in the catalog. `xy skills defaults` installs it with the rest of ariestools-skills, but naming it in `additionalSkills`, `skills`, or `pick` is a config error that makes `xy skills lint` and `xy check` exit 1. Add it with `pnpm xy skills add ariestools/ariestools-skills --skill xy-agent -y`, or list it with its `source` in a package.json `xy.skills` (mind the config caveat above).
+Since 10.1.2, `skills.legacy-generated` warns for each leftover file from the retired `xy claude` command, in the repository root and each `packages/*` directory: the skills `xylabs-xy-cli`, `xylabs-xy-deplint-fix`, `xylabs-e2e-setup`, and `xylabs-refactor-cohesion` under `.agents/skills` or `.claude/skills`; the generated `.claude/rules/xylabs-*.md` files (a fixed list, plus any other containing the `Auto-managed by` marker); and a fixed list of `.claude/commands/xy-*.md` and `xylabs-*.md` files. `--fix`, including `xy check --fix`, deletes them recursively without listing each one and leaves `skills-lock.json` untouched, so review the lint output first. Rules on the fixed list are reported and deleted even when hand-edited. Other `xylabs-*.md` rules without the marker, and command files not on the list, stay. To remove the files by hand, see [legacy agent files](toolchain.md#legacy-agent-files-from-xy-claude). Other skills outside the catalog are never version-checked, and are reported only when a package.json `xy.skills` entry names one that is missing; remove unwanted ones with `xy skills remove <name> -y`.
 
-`xy skills pick [--skill <name>]` (since 10.1.1, needs `--skill` without a TTY) installs catalog skills and records each as `required`, but it rewrites `xy.config.ts`: the whole file when it has no `skills:` key, otherwise that block with only this run's picks, dropping earlier entries such as `allowed` / `off`. Do not use it on an existing config. Edit `commands.skillsLint.skills` by hand, which is also the only way to record `allowed` or `off`, and install with `xy skills add`.
+Since 10.1.2, xy-agent is a catalog skill from ariestools-skills. To require it, which also version-checks it, name it in `commands.skillsLint.additionalSkills`, set `'xy-agent': { presence: 'required' }` under `commands.skillsLint.skills`, or run `pnpm xy skills pick --skill xy-agent`. A package.json `xy.skills` entry needs no `source` for it. `xy skills defaults` installs it with the rest of ariestools-skills, and `xy repo init --skills-optional` installs it on any tier except `none`, although that flag's help still describes only XL1 skills. On 10.1.1 it is outside the catalog: naming it in `additionalSkills` or `skills` is a config error that makes `xy skills lint` and `xy check` exit 1, and `xy skills pick --skill xy-agent` fails with `Unknown skill` before installing anything. On that version, add it with `pnpm xy skills add ariestools/ariestools-skills --skill xy-agent -y` or list it with its `source` in a package.json `xy.skills` (mind the config caveat above).
+
+`xy skills pick [--skill <name>]...` (since 10.1.1, needs `--skill` without a TTY) installs catalog skills and records each as `required` under `commands.skillsLint.skills`. Record `allowed` or `off` by hand. Since 10.1.2 the prompt table shows configured `allowed` and `off` (`not-needed`) states, and pick merges into the existing config in the current directory:
+
+- It looks for `xy.config.{ts,mts,cts,js,mjs,cjs}`, `.xyrc.json`, and `.xyrc`, and writes a minimal `xy.config.ts` only when none exists. It ignores a package.json `xy` key, which the loader reads first (see the caveat above).
+- In a TS or JS config it edits `export default {…}`, else `const config = {…}`, else the first variable initialized with an object literal, keeping comments, other settings, and existing presence entries. Check the diff when the config object is built another way. A JSON config is re-serialized with two-space indentation.
+- When it finds no such object literal, as in `export default defineConfig({…})`, it leaves the file unchanged, prints a snippet to paste, and exits 1 after installing the skills.
+- It edits only a literal `commands` property. On a config that assigns a hoisted `commands` const (the [untyped command keys](#untyped-command-keys) workaround), it adds a second `commands` key, which TypeScript rejects; inline the object first.
+
+On 10.1.1, pick overwrites the whole `xy.config.ts` when it has no `skills:` text, and otherwise replaces the first `skills:` block with only this run's picks, dropping earlier `allowed` / `off` entries. On that version, edit `commands.skillsLint.skills` by hand and install with `xy skills add`.
 
 ### `xyex work` (experimental)
 
@@ -388,7 +400,7 @@ For machine-generated items, such as audit findings:
 | `work.github-available` | warn | GitHub Issues are reachable when dual-write is enabled |
 | `work.github-synced` | warn | Local items and GitHub Issues are in sync |
 
-Set levels under `commands.workLint.rules`; a typed `XyConfig` rejects that key in 10.1.1, so use the [untyped command keys](#untyped-command-keys) workaround.
+Set levels under `commands.workLint.rules`. A typed `XyConfig` accepts that key since 10.1.2; before that, use the [untyped command keys](#untyped-command-keys) workaround.
 
 #### GitHub Issues integration
 
@@ -401,11 +413,14 @@ When `stores.github.enabled` is true (the default for new stores) and the GitHub
   - link stored on the local item under `stores.github` (`number`, `url`, `createdByXyWork: true`)
 - If GitHub is unavailable or create fails, the local item is still written.
 - **`work list --all`** includes open external GitHub issues (no `xy-work` label/marker, not already linked) as normalized `GH-<number>` rows for display; type is inferred from labels when possible.
+- Only `work add` and `work move` write to GitHub immediately. `work update`, `claim`, and `done` change the local item only; run `work sync` afterwards.
 - **`work sync`** reconciles when available:
   - Local active items without a GitHub link → create a marked issue
   - GitHub issues not present locally → import (`XYW-…` id when marked, else `GH-<number>`)
   - Linked pairs: newer title wins; local `done`/`wontfix` closes the issue; closed GitHub issues mark local done
   - Since 10.1.0, sync edits or closes a GitHub issue only when its body marker and stored URL match the local item.
+  - Since 10.1.3, sync pushes the rendered body to every issue `xy work` owns whenever it differs, and the local item always wins: edits made to that issue body on GitHub are overwritten. `work.github-synced` reports the body drift. Change the item locally, then sync.
+- Since 10.1.3, `work update` changes only the priority fields you pass (earlier versions reset the others to 3), and `--blocked-reason ""` clears the reason.
 
 Disable dual-write and sync in `.xy/work/config.json`:
 
@@ -537,7 +552,7 @@ const config: XyConfig = {
 export default config
 ```
 
-The default `dep.workspace.protocol` is `workspace:~`. The rule also accepts a `protocol` option (`'workspace:*' | 'workspace:^' | 'workspace:~'`), but a typed `XyConfig` rejects the `[level, { protocol }]` form in 10.1.1.
+The default `dep.workspace.protocol` is `workspace:~`. The rule also accepts a `protocol` option (`'workspace:*' | 'workspace:^' | 'workspace:~'`), but a typed `XyConfig` still rejects the `[level, { protocol }]` form in 10.1.2.
 
 | Key | Fields (defaults) |
 |---|---|
@@ -547,11 +562,12 @@ The default `dep.workspace.protocol` is `workspace:~`. The rule also accepts a `
 | `commands.license` | `allow` (added to the defaults), `allowOnly` (replaces them), `deny`, `ignorePackages` (`name` or `name@version`) |
 | `commands.packman` | `minimumReleaseAge` (minutes, `1440`), `minimumReleaseAgeExclude`. The lint requires exactly the `@ariestools/*`, `@xylabs/*`, and `@xyo-network/*` scopes the repo uses |
 | `commands.repoLint` / `commands.nodeLint` | `nodeTrack` (`'current'` or `'lts'`, since 10.0.7), `rules` |
-| `commands.agentLint` | `rules`, levels only (since 10.1.1) |
+| `commands.agentLint` | `rules`, levels only (since 10.1.1). Since 10.1.2, declaring the key at all also makes `xy check` run agent lint |
 | `commands.skillsLint` | `additionalSkills` (since 10.0.5), `skills` presence map (since 10.1.1), `rules` |
 | `commands.updo` | `ignoreDeps` (since 10.1.1) |
+| `commands.dependabot` | `rules`; see [`xy license` and `xy secure`](#xy-license-and-xy-secure). In a typed `XyConfig` since 10.1.2 |
 | `commands.clean` | See [Clean](#clean) |
-| `commands.dead`, `commands.workLint`, `commands.planLint`, `commands.npmOrgLint` | Experimental-command settings; may change on a minor release |
+| `commands.dead`, `commands.workLint`, `commands.planLint`, `commands.npmOrgLint` | Experimental-command settings; may change on a minor release. `commands.workLint` is in a typed `XyConfig` since 10.1.2 |
 
 Inspect the installed catalog before inventing rule IDs:
 
@@ -565,7 +581,7 @@ Validate every fixer with three checks: the finding appears before the fix, `--f
 
 ### Untyped command keys
 
-`CommandsConfig` has no `dependabot` or `workLint` key in 10.1.1, so a literal `commands: { dependabot: … }` in a typed `XyConfig` fails with TS2353 (and breaks package type validation when `xy.config.ts` sits inside a package tsconfig). The runtime still reads both. Hoist the whole `commands` object into a const that keeps at least one typed key (for example `deplint: {}`) and assign it. A non-literal object is not excess-property checked. Do not spread an inline literal: `unicorn/no-useless-spread` errors on it, and its autofix restores the TS2353 form.
+Since 10.1.2, `CommandsConfig` types `dependabot` and `workLint`: write them inline and skip this section, which also keeps `xy skills pick` able to edit the config. Before 10.1.2, `CommandsConfig` has neither key, so a literal `commands: { dependabot: … }` in a typed `XyConfig` fails with TS2353 (and breaks package type validation when `xy.config.ts` sits inside a package tsconfig). The runtime still reads both. Hoist the whole `commands` object into a const that keeps at least one typed key (for example `deplint: {}`) and assign it. A non-literal object is not excess-property checked. Do not spread an inline literal: `unicorn/no-useless-spread` errors on it, and its autofix restores the TS2353 form.
 
 ```ts
 const commands = {

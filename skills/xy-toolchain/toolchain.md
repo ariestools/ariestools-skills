@@ -84,7 +84,7 @@ Use `xy` at repository/workspace scope. The CLI discovers workspaces, orders com
 | `xy rebuild [package]` | Clean, then run a non-incremental build |
 | `xy clean [package]` | Remove build artifacts; optional `--full` / `--full-all` for gitignored hygiene (see [commands.md](commands.md#clean)) |
 | `xy test [target]` | Run Vitest for a workspace or path (prefer `@ariestools/vitest-config`; see [testing.md](testing.md)) |
-| `xy check` | Run repository/configuration policy checks, including agent lint since 10.1.1; see [commands.md](commands.md) |
+| `xy check` | Run repository/configuration policy checks, including agent lint (since 10.1.1) when AGENTS.md exists or `commands.agentLint` is declared; see [commands.md](commands.md) |
 | `xy fix [package]` | Run the standard fixable policy and source checks |
 | `xy deplint …` | Dependency policy analysis; `xy deplint pick` for interactive placement (see [commands.md](commands.md)) |
 | `xy agent …` | AGENTS.md and docs convention: `lint`, `init`, `audit`, `index`, `archive` (since 10.1.1); see [commands.md](commands.md) and the [xy-agent](../xy-agent/SKILL.md) skill |
@@ -142,21 +142,28 @@ Compile and build are incremental by default for all-workspace runs. Use `--no-i
 `xy repo init [template] [name]` scaffolds a repository. Without a template it runs an interactive wizard: `pnpm xy repo init`, or `npx --package=@ariestools/toolchain xy repo init` in an empty directory. `cli` is the only template. The defaults are scope `@ariestools`, license MIT, author Aries Tools, pnpm, a monorepo, and skills tier `xy`, so a non-interactive run should pass every choice that differs for the target organization:
 
 ```sh
-pnpm xy repo init cli <name> --scope <scope> --license <spdx> --skills-tier <none|xy|xyo|xl1> --yes
+pnpm xy repo init cli <name> --scope <scope> --license <spdx> --skills-tier <none|xy|xyo|xl1> [--skills-optional] --yes
 ```
 
-Inspect the generated output before committing. Check its pins against current peers: `vitest` must satisfy the `@ariestools/vitest-config` peer (`^5`), `volta.node` should be a current Node release, and a single-package pnpm scaffold may lack `pnpm-workspace.yaml`. Then bring it up to the baseline below.
+`--skills-optional` also installs the tier's optional skills: xy-agent on every tier except `none` (since 10.1.2), plus xl1-dapp-kit, xl1-scaffold, and xl1-build on `xl1`. Its `--help` text still mentions only the XL1 skills.
+
+Inspect the generated output before committing. A 10.1.2 scaffold pins `vitest` and `@vitest/coverage-v8` at `~5.0.3` (satisfying the `@ariestools/vitest-config` peer), `volta.node` at the toolchain's current Node release, and `packageManager` in both layouts. It also writes an AGENTS.md, a CLAUDE.md adapter, papers/README.md, and docs/README.md that pass `xy agent lint --strict`. Two gaps remain:
+
+- A single-package pnpm scaffold has no `pnpm-workspace.yaml`, so `xy packman lint` fails until you create it ([Package manager](#package-manager)).
+- A pnpm monorepo scaffold's `minimumReleaseAgeExclude` lists only `@ariestools/*`. With `--scope @xylabs` or `--scope @xyo-network`, run `pnpm xy packman lint --fix` to add that scope.
+
+A scaffold from 10.1.1 or earlier needs more: raise `vitest` to the `^5` peer, set a current `volta.node`, add `packageManager` and `volta` to a single-package repo, add the release-age settings, and bring AGENTS.md up to agent lint. Then bring the repository up to the baseline below.
 
 Whether scaffolded or set up by hand, a new TypeScript repository needs, in every topology:
 
-1. Pin pnpm in `packageManager` and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)).
+1. Pin pnpm in `packageManager` and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)). A 10.1.2 pnpm monorepo scaffold has both; a single-package scaffold pins pnpm but still needs the file.
 2. Install `@ariestools/toolchain`, the correct config packages, ESLint, and TypeScript at the root ([Installation](#installation)).
 3. Prefer `@ariestools/vitest-config` at the root; a single-package repo passes an explicit `include` ([testing.md](testing.md)). For neutral packages that need common timers/abort globals, add `@ariestools/lib-neutral`.
 4. Set `"type": "module"`.
 5. Put application or library source under `src/`.
 6. Create `xy.config.ts`, `tsconfig.json`, and `eslint.config.ts` at the appropriate root.
 7. Generate `eslint.config.ts` with `pnpm xy lint init` (interactive; see [eslint.md](eslint.md#use-the-active-flat-config) for the non-TTY path and the follow-up fixes) rather than copying an old ESLint configuration.
-8. Run `pnpm xy agent init` (since 10.1.1), then fill in AGENTS.md ([xy-agent](../xy-agent/SKILL.md)). It scaffolds AGENTS.md, a CLAUDE.md adapter, and the docs/ layout without overwriting. Agent lint requires a root AGENTS.md with orient, authority, repository map, commands, and failures sections, and a CLAUDE.md, if present, that is only an `@AGENTS.md` import or a symlink to AGENTS.md. `xy check --fix` cannot create these files.
+8. Run `pnpm xy agent init` (since 10.1.1), then fill in AGENTS.md ([xy-agent](../xy-agent/SKILL.md)). It scaffolds AGENTS.md, a CLAUDE.md adapter, and the docs/ layout without overwriting. A 10.1.2 `xy repo init` scaffold already has a lint-clean AGENTS.md, CLAUDE.md, papers/README.md, and docs/README.md; there, `agent init` only adds the docs/ subfolders. Agent lint errors when the root AGENTS.md is missing or links to a path that does not exist. It warns when AGENTS.md lacks the orient, authority, repository map, commands, or failures section, or when a CLAUDE.md is neither a symlink to AGENTS.md nor a file whose first non-comment line is an `@AGENTS.md` import (Claude-specific notes may follow). `xy check` skips agent lint until AGENTS.md exists or `commands.agentLint` is declared, and `xy check --fix` cannot create these files. The scaffolded papers/README.md carries a `date`, so `docs.stale` warns 180 days later, failing `--strict`, until you update `date` or add `reviewed`.
 9. Run `pnpm xy skills lint --fix` to install the skills the repository requires.
 10. Add `**/.xy/cache/` to the root `.gitignore`; a bare `.xy/cache` entry covers only the root package.
 
@@ -184,11 +191,11 @@ The retired toolchain packages are `@xylabs/toolchain`, `@xylabs/ts-scripts-comm
 3. Move scripts to `xy build`, `xy compile`, `xy lint`, and `xy test`, run from the repository root.
 4. Adopt pnpm (`packageManager` plus one lockfile). `pnpm xyex packman convert pnpm` is an experimental helper that converts the repository to pnpm and swaps the managed `@xylabs` toolchain packages for `@ariestools/toolchain`.
 
-Then run `pnpm xy skills lint --fix`. Since 9.2.0, `skills.migrated-source` is an error until xy-development and xy-toolchain are installed from ariestools-skills.
+Then run `pnpm xy skills lint --fix`. Since 9.2.0, `skills.migrated-source` is an error until xy-development and xy-toolchain are installed from ariestools-skills. Since 10.1.2 it also flags a copy installed from an xyo-skills redirect stub, even one with no skills-lock.json entry.
 
 ### Upgrading 9.x to 10.x
 
-10.0.0 removed four top-level aliases. On 10.x each old name prints `Command not found` and exits 0, so a script, CI step, or agent command that still uses one passes without checking anything:
+10.0.0 removed four top-level aliases. Through 10.1.1 each old name prints `Command not found` and exits 0, so a script, CI step, or agent command that still uses one passes without checking anything. From 10.1.2 they exit 1, and `gitlint` and `lintlint` name their replacement:
 
 | Removed | Use |
 |---|---|
@@ -199,7 +206,7 @@ Then run `pnpm xy skills lint --fix`. Since 9.2.0, `skills.migrated-source` is a
 
 9.2.0 removed `xy skills updo`; use `xy skills lint --fix`. Search package.json scripts, `.github/workflows/`, `.claude/commands/`, and legacy skills for the old names, for example with `git grep -nE 'xy (gitlint|lintlint|node-lint|republint)|skills updo'`.
 
-10.x patch releases also add error-level gates ([Version notes](#version-notes)). Rerun `pnpm xy build` and `pnpm xy check` after every toolchain bump, not only after a major.
+10.x patch releases also change gates: most add error-level rules, and 10.1.2 makes unknown commands fail while relaxing four agent-lint rules to warnings ([Version notes](#version-notes)). Rerun `pnpm xy build` and `pnpm xy check` after every toolchain bump, not only after a major.
 
 ### Legacy agent files from `xy claude`
 
@@ -207,14 +214,20 @@ Toolchains before 8.2.8 had an `xy claude` command that wrote agent files, and m
 
 - the skills `xylabs-xy-cli`, `xylabs-xy-deplint-fix`, `xylabs-e2e-setup`, and `xylabs-refactor-cohesion`;
 - `.claude/rules/xylabs-*.md`;
-- `.claude/commands/xy-*.md`.
+- `.claude/commands/xy-*.md` and `.claude/commands/xylabs-*.md`.
 
-They describe `@xylabs/ts-scripts-yarn3`, Yarn, tsup, and commands that no longer exist, such as `compile-only`, `lintlint`, `gitlint`, `deploy-minor`/`-major`/`-next`, `gen-docs`, `readme`, `knip`, and `dupdeps`. This skill supersedes them wherever they conflict; do not run their commands. `xy skills lint` and `xy check` never report them. With the owner's agreement, remove the ones present, reviewing the globbed paths first:
+They describe `@xylabs/ts-scripts-yarn3`, Yarn, tsup, and commands that no longer exist, such as `compile-only`, `lintlint`, `gitlint`, `deploy-minor`/`-major`/`-next`, `gen-docs`, `readme`, `knip`, and `dupdeps`. This skill supersedes them wherever they conflict; do not run their commands. From 10.1.2 those commands exit 1: `xy compile-only`, `xy lintlint`, `xy gitlint`, and `xy deploy-minor` name their replacement, and any `xy claude-*` command points to `xy skills`.
+
+Since 10.1.2, `skills.legacy-generated` (warn) reports each such file in `xy skills lint` and `xy check`, at the repository root and in every `packages/*` directory. It matches the four skills under `.agents/skills/` or `.claude/skills/`, the rule and command files `xy claude` wrote by name, and any other `.claude/rules/xylabs-*.md` that contains the generator's `Auto-managed by` marker. A `xylabs-*.md` rule it does not name and that lacks the marker, or an `xy-*.md` command it does not list, is left alone. `pnpm xy skills lint --fix` (or `xy check --fix`) deletes the reported files without listing them, so review the lint output with the owner first. It does not remove everything: it leaves skills-lock.json unchanged, and where `.claude/skills/<name>` is a symlink into `.agents/skills/<name>`, it deletes the directory and then skips the now-dangling link, which a rerun no longer reports. Run the `xy skills remove` line below before `--fix`, or afterwards `git rm` any `.claude/skills/xylabs-*` link left behind and drop the four names from skills-lock.json.
+
+On 10.1.1 and earlier nothing reports these files. With the owner's agreement, remove the ones present. Preview what the patterns match by adding `-n` to the `git rm` line first:
 
 ```sh
 pnpm xy skills remove xylabs-xy-cli xylabs-xy-deplint-fix xylabs-e2e-setup xylabs-refactor-cohesion -y
-git rm .claude/rules/xylabs-*.md .claude/commands/xy-*.md
+git rm --ignore-unmatch '.claude/rules/xylabs-*.md' '.claude/commands/xy-*.md' '.claude/commands/xylabs-*.md'
 ```
+
+The quotes let git expand the patterns against tracked files, and `--ignore-unmatch` keeps a pattern that matches nothing from aborting the whole command (unquoted, zsh stops with `no matches found` and bash hands git a pathspec it rejects).
 
 ### Troubleshooting
 
@@ -224,7 +237,7 @@ If a package command unexpectedly recurses, inspect same-named package scripts a
 
 ## Version notes
 
-This skill is verified against `@ariestools/toolchain` 10.1.1; anything without a version marker exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0`; `pnpm xy --version` reports it only from 10.0.6. A top-level command the installed version lacks prints `Command not found` and exits 0, even under `--strict`; a missing subcommand may instead be passed through or rejected, so check the output and the table below rather than the exit code.
+This skill is verified against `@ariestools/toolchain` 10.1.3; anything without a version marker exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0`; `pnpm xy --version` reports it only from 10.0.6. A top-level command the installed version lacks prints `Command not found`. From 10.1.2 it exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the table below, not only the exit code.
 
 | Since | Change |
 |---|---|
@@ -244,3 +257,5 @@ This skill is verified against `@ariestools/toolchain` 10.1.1; anything without 
 | 10.0.9 | Publint `pub.importsMatchExports` (error), and `publint --fix` will not add an export condition that the matching `#alias` does not select. Monolith platform declaration trees share the modules-platform declarations, and layout sync warns about identity-splitting shims |
 | 10.1.0 | `@ariestools/vitest-config` default include adds `packages/*/spec/**` and `.tsx`/`.mts`/`.cts` specs. Unicorn v77 rules staged across ESLint tiers (off at 2, warn at 3, error at 4). Compile source directories, entries, and `outdir` / `outfile` / `inject` paths must resolve inside the package. `xyex work sync` edits or closes only issues whose body marker and URL match |
 | 10.1.1 | `xy agent` family, with agent lint inside `xy check` (errors); `xy skills pick` and per-skill presence in `commands.skillsLint.skills`; `commands.updo.ignoreDeps`; `publish` and `deploy` hand off to a root script only with `--defer` |
+| 10.1.2 | An unknown top-level `xy` or `xyex` command exits 1, and retired names such as `gitlint` print their replacement; `xy git <typo>` exits 1. `xy check` runs agent lint only when AGENTS.md exists or `commands.agentLint` is declared. `agents.adapter-thin`, `agents.required-sections`, `agents.no-absolute-paths`, and `docs.index-current` drop to warn; `CLAUDE.md` and `GEMINI.md` may add notes after a leading `@AGENTS.md` import, and `.github/copilot-instructions.md` may link to `../AGENTS.md`; and agent lint prints its findings without `--json`. Other agent-lint changes: `agents.required-sections` also matches authoritative, what not to do, and pitfall; `agents.authority-rows-resolve` reads each row's path from the Authority column's link; the `docs.front-matter` fix infers `kind` from the folder and no longer writes `kind: doc`; `docs.stale` skips evidence, decisions, archive, and superseded or retired files; `docs.orphan` no longer counts a mention in the docs/README.md index; `docs.superseded-archived` also covers `retired`, requires the file to sit under `docs/archive/`, and accepts a repository-root `supersededBy`; and `decisions.naming` parses prefixed ids such as `XY-D001`. `xy agent archive` keeps the path below docs/ (`docs/guides/x.md` moves to `docs/archive/guides/x.md`) and sets `state: retired` or keeps `superseded`, where 10.1.1 wrote `archived`. The `xy agent init` AGENTS.md stub lints clean. `xyex plan lint` `plan.root.claude-imports-agents` passes only when `@AGENTS.md` is CLAUDE.md's first visible line; an inline or later import passed in 10.1.1. `--strict` and `XY_STRICT=1` escalate agent-lint and skills-lint warnings, including inside `xy check`, and `xy check --json` lists `errors` and `warnings`. Skills lint adds `skills.legacy-generated` (warn, fixable), takes xy-agent into the catalog (optional on every tier except `none`, so an installed xy-agent on a tier-`none` repo now warns `skills.unnecessary`), and flags redirect-stub installs under `skills.migrated-source`. `xy skills pick` merges presence into the existing config and has its own `--help`. A typed `XyConfig` accepts `commands.dependabot` and `commands.workLint`. `xy repo init` pins `vitest` `~5.0.3`, the current Node in `volta.node`, and `pnpm@12.10.1` (single-package layouts now keep `packageManager` and `volta`); adds the release-age settings to a pnpm monorepo's `pnpm-workspace.yaml`; writes an AGENTS.md that passes agent lint, with papers/README.md and docs/README.md; and hardens the CI workflow. Its `--skills-optional` adds xy-agent |
+| 10.1.3 | `xyex work sync` pushes the rendered body to issues `xy work` owns whenever it differs (local wins), and `work.github-synced` reports body drift; `work update` keeps priority fields it is not given; `--blocked-reason ""` clears the reason |
