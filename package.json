@@ -6,6 +6,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "validate:skills": "node scripts/validate-skills.mjs skills",
+    "validate:upstream": "node scripts/validate-skills.mjs skills --upstream",
     "sync:claude": "node scripts/marketplace-sync/build-claude.mjs",
     "sync:codex": "node scripts/marketplace-sync/build-codex.mjs"
   },

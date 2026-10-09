@@ -20,7 +20,7 @@ Then read only the authority for the task in hand, from the table below. Do not 
 | Skill content, triggers or frontmatter | [skills/](skills/), one `SKILL.md` router plus sub-files per skill | Source of truth. The only editable copy of the six skills |
 | Facts about the `xy` CLI, the SDK, sdk-react or the actor and host kits | The source of the `toolchain`, `sdk-js`, `sdk-react`, `actor-kit`, `cli-kit` and `browser-kit` repositories in the `ariestools` GitHub organization, at the version the skill names; npm for published versions, peers and deprecations | Ground truth. A skill that disagrees with the source is the defect. Their READMEs can lag the code |
 | Marketplace listing text and manifests | [metadata.json](scripts/marketplace-sync/metadata.json) and the renderers beside it | Source of truth for both mirrors. Its `version` belongs to release-please |
-| What CI rejects in a skill | [validate-skills.mjs](scripts/validate-skills.mjs) | Normative. CI runs it on pull requests and on pushes to `main` and `develop` |
+| What CI rejects in a skill | [validate-skills.mjs](scripts/validate-skills.mjs) | Normative. CI runs it on pull requests and on pushes to `main` and `develop`, and with `--upstream` on pull requests into `main` |
 | Install instructions and the human overview | [README.md](README.md) | Reference, not policy. This file wins where they differ |
 | Previews, releases and branching | [DEVELOPMENT.md](DEVELOPMENT.md) | Reference. This file wins where they differ |
 | Past audits of the skills | [docs/evidence/](docs/evidence/), superseded runs in [docs/archive/](docs/archive/) | Dated records of what was true at a named commit. Cite them; never edit one to match new content |
@@ -57,7 +57,8 @@ Each skill builds on the layers below it. `ariestools-sdk-react` and `ariestools
 
 | Command | Use |
 | --- | --- |
-| `pnpm validate:skills` | The skill gate CI runs: directory names, no symlinks, frontmatter, descriptions (error over 1024 characters, warning over 900), every relative link and `#anchor` under `skills/`, and the public anchors below. Excludes rendering |
+| `pnpm validate:skills` | The skill gate CI runs: directory names, no symlinks, frontmatter, descriptions (error over 1024 characters, warning over 900), every relative link and `#anchor` under `skills/`, the public anchors below, and that every mention of a verified version (`metadata.verified-toolchain`) in `skills/` and this file matches it. Excludes rendering |
+| `pnpm validate:upstream` | The same, plus each verified version must equal its package's npm `latest` (network). CI runs it on pull requests into `main`, so a release waits for a re-verification whenever the toolchain has published since |
 | `pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugin/*.json` | Render the Claude marketplace tree and check its JSON parses |
 | `pnpm sync:codex --out .preview/codex && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json` | Render the Codex tree and check its JSON parses |
 | `claude --plugin-dir .preview/claude` | Load the rendered plugin in a local Claude Code session |
@@ -92,7 +93,7 @@ Other skills and the installed xyo-skills pack deep-link these, and those links 
 | release-please → `main` | Squash |
 | `main` → `develop` sync | Merge commit (automated) |
 
-CI: `validate-plugins.yml` (render both trees, manifest and tree checks, `validate-skills.mjs`), `validate-skills.yml` (`validate-skills.mjs` on PRs that touch `skills/`), `lint-pr-title.yml`, `release-please.yml`, `sync-main-to-develop.yml`.
+CI: `validate-plugins.yml` (render both trees, manifest and tree checks, `validate-skills.mjs`, plus `--upstream` on pull requests into `main`), `validate-skills.yml` (`validate-skills.mjs` on PRs that touch `skills/`), `lint-pr-title.yml`, `release-please.yml`, `sync-main-to-develop.yml`.
 
 ## Failures: what NOT to do
 
@@ -105,3 +106,4 @@ CI: `validate-plugins.yml` (render both trees, manifest and tree checks, `valida
 - Do not run `npx skills add … --all`, or target the OpenClaw agent, from inside this checkout. OpenClaw's project skills directory is `skills/`, and Skills.sh deletes an existing `skills/<name>` before linking, replacing the source with a symlink.
 - Do not put symlinks under `skills/`; the validator rejects them and the renderers would copy them.
 - Do not write audit references, finding ids, dates or absolute paths into skill text, and do not link from a skill to anything outside `skills/`; installed copies cannot resolve it.
+- Do not bump `metadata.verified-toolchain`, or the prose and `npx` pin that repeat it, without re-verifying the skills against that version's source. Add its row to the xy-toolchain Version notes when it changes anything the skills describe.
