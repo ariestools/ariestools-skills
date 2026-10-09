@@ -2,7 +2,7 @@
 name: xy-development
 description: Core development standards for TypeScript conventions, Git workflow, testing principles, behavior-preserving refactors, repository workflow, and the Definition of Done. Use when writing or reviewing TypeScript or organizing imports; writing tests; refactoring, moving code between packages, or auditing a monorepo's package structure; running a repo's build, lint, test, or dev commands; adding or upgrading dependencies; committing, branching, merging, or releasing; writing PRD acceptance criteria; or before declaring any task complete.
 metadata:
-  version: 0.1.6 # x-release-please-version
+  version: 0.1.7 # x-release-please-version
 ---
 
 # Development Standards
