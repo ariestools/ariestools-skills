@@ -19,7 +19,9 @@
         "skills/xy-agent/SKILL.md",
         "skills/xy-development/SKILL.md",
         "skills/xy-toolchain/SKILL.md",
-        "skills/ariestools-sdk/SKILL.md"
+        "skills/ariestools-sdk/SKILL.md",
+        "skills/ariestools-sdk-react/SKILL.md",
+        "skills/ariestools-actor/SKILL.md"
       ]
     }
   }

@@ -11,11 +11,11 @@ metadata:
 
 Use the active packages from [`ariestools/sdk-js`](https://github.com/ariestools/sdk-js) under the `@ariestools/*` scope. Do not install retired `@xylabs/*` utility names for new work, nor the frozen `@ariestools/{indexed-db,mongo,vitest-matchers,vitest-extended}` 8.0.3 packages that npm deprecation notices point to. Prefer existing repository dependencies and versions; pin according to the consuming repo.
 
-**Scope.** Only packages published from sdk-js. Not covered: sdk-react (`@ariestools/sdk-react*`), actor-kit (`@ariestools/actor*`, `@ariestools/provider*`), browser-kit, cli-kit and `@ariestools/cli` — read those repos' READMEs. Toolchain and config packages belong to [xy-toolchain](../xy-toolchain/SKILL.md).
+**Scope.** Only packages published from sdk-js. React work on `@ariestools/sdk-react*` belongs to [ariestools-sdk-react](../ariestools-sdk-react/SKILL.md). Actors, providers and their CLI and browser hosts (`@ariestools/actor*`, `@ariestools/provider*`, `@ariestools/cli-kit*`, `@ariestools/browser-kit*`) belong to [ariestools-actor](../ariestools-actor/SKILL.md). Neither covers `@ariestools/cli`, the `aries` operator CLI. Toolchain and config packages belong to [xy-toolchain](../xy-toolchain/SKILL.md).
 
 **Runtime.** This skill describes sdk-js 9.x, whose packages declare `engines.node >=26`, above the toolchain's own Node 22 floor; see [Runtime baseline](overview.md#runtime-baseline).
 
-**Skill identity.** When you present a plan, an acknowledgement or a completion summary, state which skills informed it as `ariestools-sdk v<version>`. Read the version from this file's `metadata.version`, never from an example.
+**Skill identity.** When you present a plan, an acknowledgement, or a completion summary, state which skills informed it as `ariestools-sdk v<version>`, and list each other active skill from this pack the same way. Read the version from this file's `metadata.version`, never from an example.
 
 ## References
 
@@ -41,7 +41,9 @@ Read for import style (root barrel vs subpaths), ESM only, tree-shaking, depreca
 
 ## Related skills
 
-- **[xy-development](../xy-development/SKILL.md)** — TypeScript, Git, testing principles and the Definition of Done; this skill builds on it.
-- **[xy-toolchain](../xy-toolchain/SKILL.md)** — the `xy` CLI, configs, Vitest, deplint and package policy that sdk-js packages and their consumers build with; this skill builds on it.
+- **[xy-development](../xy-development/SKILL.md)** — TypeScript, Git, testing principles and the Definition of Done; this skill builds on it. Install: `npx skills add ariestools/ariestools-skills --skill xy-development`.
+- **[xy-toolchain](../xy-toolchain/SKILL.md)** — the `xy` CLI, configs, Vitest, deplint and package policy that sdk-js packages and their consumers build with; this skill builds on it. Install: `npx skills add ariestools/ariestools-skills --skill xy-toolchain`.
+- **[ariestools-sdk-react](../ariestools-sdk-react/SKILL.md)** — React UI on `@ariestools/sdk-react*`, which imports this SDK's root barrel without declaring it and uses `@ariestools/pixel` and `@ariestools/eth-address`; it builds on this skill. Install: `npx skills add ariestools/ariestools-skills --skill ariestools-sdk-react`.
+- **[ariestools-actor](../ariestools-actor/SKILL.md)** — actors, providers and the actor engine from actor-kit, hosted by cli-kit or browser-kit, which build on this SDK's `creatable` and logger utilities; it builds on this skill. Install: `npx skills add ariestools/ariestools-skills --skill ariestools-actor`.
 
 If a linked skill is not installed, add it with `npx skills add ariestools/ariestools-skills --skill <name>`.

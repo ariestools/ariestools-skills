@@ -123,7 +123,7 @@ Single-package compilation always validates in the package rather than using the
 
 `compile.compiler` selects the TypeScript that runs type-check and declaration emit: `'typescript'` (default) or `'native'`, the TypeScript 7 Go compiler. The native compiler exports no compiler API, so it is installed beside the JS `typescript` package, not instead of it. ESLint, deplint, dead, and api-exposure still load `typescript`, which stays within the toolchain peer range (`^5.9 || ^6.0`). Compile resolves the native compiler from the package under the alias `typescript-native` (`"typescript-native": "npm:typescript@~7.0.2"`); `compile.nativePackage` changes the alias name.
 
-Enable it with `pnpm xyex enable ts-native [--no-install]` (since 9.0.2). The command adds the alias devDependency, sets `compile.compiler: 'native'` in the root config, and removes `compile.validator: 'shared'`. It does not edit package configs, so add `compiler: 'native'` to every package `xy.config.ts` that exists (see [Configuration](#configuration)).
+Enable it with `pnpm xyex enable ts-native [--no-install]` (since 9.0.2; before 9.2.0, when `xyex` was added, run it as `pnpm xy enable ts-native`). The command adds the alias devDependency, sets `compile.compiler: 'native'` in the root config, and removes `compile.validator: 'shared'`. It does not edit package configs, so add `compiler: 'native'` to every package `xy.config.ts` that exists (see [Configuration](#configuration)).
 
 The setting is experimental, and shared examples must not require it. When a repository already sets it, keep it.
 

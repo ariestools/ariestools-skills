@@ -232,13 +232,13 @@ Do not use a globally installed Vitest or assume a package-local `test` script e
 
 ## Full-app Playwright e2e
 
-`xy test` runs Vitest only, and the toolchain ships no Playwright Test preset. Keep full-app UI e2e in its own workspace package:
+Full-app UI e2e runs outside the `xy` CLI: `xy test` runs Vitest only, no `xy` command runs Playwright Test, and the toolchain ships no Playwright Test preset. Keep the suite in its own pnpm workspace package:
 
-- Put it in a package such as `packages/e2e`, with its own `playwright.config.ts` and a `test` script that runs `playwright test`.
-- Run it with `pnpm --filter <e2e-package> test`.
-- Its `*.spec.ts` files must live under `spec/` (`repo.spec-layout`), where the preset's default include finds them (`packages/*/src/**/spec/`, and `packages/*/spec/` since 10.1.0). Exclude the package from Vitest with `exclude: ['packages/e2e/**']`.
-- Use the repository's shared tsconfig and ESLint config.
-- Component-level browser tests belong in the preset's `browser` project, not in Playwright Test.
+- Put it in a private package such as `packages/e2e`, with `@playwright/test` as a devDependency, its own `playwright.config.ts`, and a `test` script that runs `playwright test`. Install its browsers from the package: `pnpm --filter <e2e-package> exec playwright install chromium` (name every browser its `projects` use; add `--with-deps` on bare CI runners). Rerun it after bumping `@playwright/test`. The root install [above](#shared-preset-ariestoolsvitest-config) covers only the Vitest browser realm's `playwright`.
+- Run it with `pnpm --filter <e2e-package> test`. Do not target it with `pnpm xy test <e2e-package>`, which runs `vitest .` inside the package.
+- Its `*.spec.ts` files must live under `spec/` (`repo.spec-layout`). Use the package-root `spec/` with no `src/`: `xy compile` then emits nothing for the package, while a `src/` holding only specs fails declaration emit. The preset's default include also finds package-root specs (since 10.1.0), so exclude the package from the root Vitest config with the top-level `exclude: ['packages/e2e/**']`. If `packages/e2e` already holds Vitest serialized suites, give the Playwright package another name.
+- Give it a `tsconfig.json` that extends `@ariestools/tsconfig` (`@ariestools/tsconfig-dom` when `page.evaluate` callbacks use DOM APIs; see [TypeScript configuration](typescript.md)). `xy compile` type-checks the specs and `playwright.config.ts` through it, and the root `@ariestools/eslint-config-flat` or `@ariestools/eslint-config-react-flat` config lints the package like any other workspace.
+- Component-level browser tests belong in the `@ariestools/vitest-config` `browser` project (Vitest browser mode through `@vitest/browser-playwright`), not in Playwright Test.
 
 ## Test structure
 

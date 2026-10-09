@@ -30,13 +30,13 @@ audience: "Project owner; engineering thread"
 | `reviewed` | Required for `kind: runbook` |
 | `commit` | Required for `kind: evidence` |
 | `amends` | Evidence only |
-| `supersededBy` | Required when `state: superseded`. A path from the repository root, or relative to this file; 10.1.1 accepts only the relative form |
+| `supersededBy` | Required when `state: superseded`. A path from the repository root, or relative to this file |
 
 `status` is free prose and carries the nuance no enum will: who ratified it, what it supersedes, which section, and under what conditions. Keep it. The enumerated fields exist so a tool can act; `status` exists so a human understands.
 
 `xy agent` reads front matter one line at a time. Keep every field on one line: write lists in flow form (`[a, b]`), and keep `status` a single quoted string with no `|`, because it becomes a cell in the generated index. Never put a trailing `# comment` after a value: the parser keeps it, so the comment lands in the index cell and makes `date` and `supersededBy` unreadable.
 
-**What the linter checks.** From toolchain 10.1.1, `xy agent lint` (run by `xy check` where `AGENTS.md` exists or `commands.agentLint` is declared) checks only that each Markdown file under `docs/`, `papers/` and `specs/`, other than a `README.md`, has front matter with a `kind`. It validates no values and none of the per-kind fields above, apart from requiring a `state` on decision records and a version, status and date in each paper; keeping them right is the author's job. Since 10.1.2, `--fix` gives a file with no front matter the `kind` its folder implies (`decision`, `evidence`, `runbook` or `plan` under `docs/`, `paper`, `spec`) and builds the index from it in the same run; a file elsewhere, such as a handoff at the `docs/` root, keeps its warning until you write the front matter. On 10.1.1, `--fix` writes `kind: doc`: replace it with the real kind, then run `pnpm xy agent index`.
+**What the linter checks.** `xy agent lint` (run by `xy check` where `AGENTS.md` exists or `commands.agentLint` is declared, since toolchain 10.1.2; 10.1.1 runs it in every repository) checks only that each Markdown file under `docs/`, `papers/` and `specs/`, other than a `README.md`, has front matter with a `kind`. It validates no values and none of the per-kind fields above, apart from requiring a `state` on decision records and a version, status and date in each paper; keeping them right is the author's job. `--fix` gives a file with no front matter the `kind` its folder implies (`decision`, `evidence`, `runbook` or `plan` under `docs/`, `paper`, `spec`) and builds the index from it in the same run; a file elsewhere, such as a handoff at the `docs/` root, keeps its warning until you write the front matter.
 
 Where a document already shows a visible header block under its H1 (`- **Version:** 0.4.6-draft`), keep it — papers in particular benefit from wearing their status on their face. Just keep the two consistent.
 
@@ -59,7 +59,7 @@ Where a document already shows a visible header block under its H1 (`- **Version
 
 One decision per file in `docs/decisions/`. In a new repository, name it `<PREFIX>-D0001-kebab-title.md`, where `PREFIX` is the repository's short code (`CC`, `IMM`, `EK`). In an existing one, keep its scheme and write the id exactly as the repository already cites it, zero-padded to the same width (`CC-D021-kebab-title.md`, `ADR-0006-kebab-title.md`, `D-004-kebab-title.md`). Put the id in the filename — decisions get cited across documents, and an id that lives only in prose cannot be found.
 
-`xy agent lint` (decisions.naming) warns when `docs/decisions/` mixes naming schemes or a record has no `state`. It checks ids for duplicates and gaps in `0001-…` and `ADR-0001-…` names and, since 10.1.2, in prefixed names such as `CC-D021-…`. Other schemes, such as `D-004-…`, pass unchecked, so keep their ids unique and contiguous yourself.
+`xy agent lint` (decisions.naming) warns when `docs/decisions/` mixes naming schemes or a record has no `state`. It checks ids for duplicates and gaps in `0001-…`, `ADR-0001-…` and prefixed names such as `CC-D021-…`. Other schemes, such as `D-004-…`, pass unchecked, so keep their ids unique and contiguous yourself.
 
 A decision record is **immutable once accepted**. Revisit a decision by writing a new one that supersedes it; do not edit history into agreement with the present.
 
@@ -72,7 +72,7 @@ Every record carries:
 
 **Revisit triggers are the field that matters most and the one most often omitted.** Without them, nobody can tell a still-correct decision from a fossil, and an audit cannot either. Write them as observable conditions: *"Review when a second real runtime adapter appears, or when external consumers require a stable composition facade."*
 
-Keep `docs/decisions/README.md` as a hand-kept register — id, linked title, state, date. Since 10.1.2 the generated index no longer counts as a link (`docs.orphan`), so a record that no other document names warns, and the register is what names it.
+Keep `docs/decisions/README.md` as a hand-kept register — id, linked title, state, date. The generated index does not count as a link (`docs.orphan`), so a record that no other document names warns, and the register is what names it.
 
 ## Evidence documents
 
@@ -96,13 +96,13 @@ A runbook is a live document and the only tier that is dangerous when stale. Eve
 
 When the system a runbook describes is retired, do not delete the runbook if it still specifies behavior that exists elsewhere. State plainly at the top what is still true and what is not, set `state` accordingly, and archive it when nothing depends on it.
 
-**Staleness.** `xy agent lint` (docs.stale) warns when a document's `reviewed`, or failing that its `date`, is older than 180 days, or 90 under `docs/runbooks/`. On a live document — a runbook, a handoff, the roadmap — re-verify it and update `reviewed`. Since 10.1.2 it skips `docs/evidence/`, `docs/decisions/`, `docs/archive/` and any `superseded` or `retired` document. 10.1.1 warns on those too: accept the warning there, and never add `reviewed:` to an immutable record to silence it.
+**Staleness.** `xy agent lint` (docs.stale) warns when a document's `reviewed`, or failing that its `date`, is older than 180 days, or 90 under `docs/runbooks/`. On a live document — a runbook, a handoff, the roadmap — re-verify it and update `reviewed`. It skips `docs/evidence/`, `docs/decisions/`, `docs/archive/` and any `superseded` or `retired` document. Never add `reviewed:` to an immutable record.
 
 ## Supersession
 
 When one document replaces another:
 
-1. Set `state: superseded` and `supersededBy: <path>` on the old document. Write the path from the repository root (`docs/plans/NEW.md`): it resolves before and after the move into `docs/archive/`, and `xy agent archive` copies it into the banner. On 10.1.1, which resolves it only relative to the document, write it relative to the document's archived location instead.
+1. Set `state: superseded` and `supersededBy: <path>` on the old document. Write the path from the repository root (`docs/plans/NEW.md`): it resolves before and after the move into `docs/archive/`, and `xy agent archive` copies it into the banner.
 2. State in the new document's `status` what it supersedes, by path or file name, down to the section where the overlap is partial. That mention is also what keeps the archived file from warning as `docs.orphan`.
 3. Archive the old document (below).
 4. Run `pnpm xy agent index`.
@@ -125,15 +125,15 @@ Move the file under `docs/archive/`, keeping its path below `docs/`: `docs/plans
 
 Links now resolve from one folder deeper, so a relative link out of the document needs one more `../`; adjust any the move broke. Set `state` to `superseded` or `retired`, keep `date` as written, and run `pnpm xy agent index`.
 
-`pnpm xy agent archive <path>` (since toolchain 10.1.1) does the move and regenerates the index, and refuses if the destination is taken. Since 10.1.2 it keeps the path below `docs/` (a file from outside `docs/` lands directly in `docs/archive/`), sets `state: retired` unless the document is already `superseded`, edits no other front matter, and prepends a dated banner: "Superseded by <supersededBy> on <date>" or "Retired on <date>", then the original path. Set `superseded` and `supersededBy` before running it, add the reason to a retirement banner, and fix the links the move broke. On 10.1.1 it moves the file flat to `docs/archive/<name>`, sets `state: archived`, writes a generic banner, and rewrites the front matter line by line, stripping quotes and dropping block lists. After running it there, restore the front matter, replace the banner with the one above, and set `superseded` or `retired`.
+`pnpm xy agent archive <path>` does the move and regenerates the index, and refuses if the destination is taken. It keeps the path below `docs/` (a file from outside `docs/` lands directly in `docs/archive/`), sets `state: retired` unless the document is already `superseded`, edits no other front matter, and prepends a dated banner: "Superseded by <supersededBy> on <date>" or "Retired on <date>", then the original path. Pass the path from the repository root, as `docs/plans/OLD.md`. With a `./docs/…` or absolute argument the command does not see the `docs/` prefix: the file lands flat in `docs/archive/`, links written for the deeper path break, and the banner records the path as typed. Set `superseded` and `supersededBy` before running it, add the reason to a retirement banner, and fix the links the move broke.
 
-**What is archivable:** a plan whose work is done or abandoned; a runbook for a system that no longer exists; an evidence document for a surface that was removed; a handoff whose effort has ended; a proposal that was declined. **What is not:** anything still cited by `AGENTS.md`, a paper, or a live decision record. Fix the citation first, then archive. Since 10.1.2 an archived document that nothing else names warns as `docs.orphan`. A superseded one is named by its successor's `status` (step 2 of [Supersession](#supersession)); a retirement with no successor usually is not, so expect and accept that warning.
+**What is archivable:** a plan whose work is done or abandoned; a runbook for a system that no longer exists; an evidence document for a surface that was removed; a handoff whose effort has ended; a proposal that was declined. **What is not:** anything still cited by `AGENTS.md`, a paper, or a live decision record. Fix the citation first, then archive. An archived document that nothing else names warns as `docs.orphan`. A superseded one is named by its successor's `status` (step 2 of [Supersession](#supersession)); a retirement with no successor usually is not, so expect and accept that warning.
 
 ## The generated index
 
-`docs/README.md` is generated from front matter and never hand-edited. Run `pnpm xy agent index` (since toolchain 10.1.1) after any change under `docs/`. `xy agent lint --fix` and `xy agent archive` also rewrite it, and `xy agent init` creates it when it is missing, as does `xy repo init` since 10.1.2. `xy agent lint` warns (docs.index-current) while the file differs from what the generator would write, so `xy check --strict` fails on it.
+`docs/README.md` is generated from front matter and never hand-edited. Run `pnpm xy agent index` after any change under `docs/`. `xy agent lint --fix` and `xy agent archive` also rewrite it, and `xy agent init` and `xy repo init` create it when it is missing. `xy agent lint` warns (docs.index-current) while the file differs from what the generator would write, so `xy check --strict` fails on it.
 
-The generator writes a `# Docs` heading and a `Document | Kind | Status` table with one row per Markdown file under `docs/` except the index itself: a link to the file, its `kind`, and its `status`, or its `state` when it has no `status`. `papers/` and `specs/` are not listed; the `AGENTS.md` authority table routes to them. A row in the index is not a link: since 10.1.2, `docs.orphan` warns on every `docs/` file, decision, evidence and archived records included, whose path or file name appears nowhere but the index — not in `AGENTS.md`, and not in another document under `docs/`, `papers/` or `specs/`. An older toolchain has no generator. Write the same table by hand there, so the file is already correct when the repository upgrades.
+The generator writes a `# Docs` heading and a `Document | Kind | Status` table with one row per Markdown file under `docs/` except the index itself: a link to the file, its `kind`, and its `status`, or its `state` when it has no `status`. `papers/` and `specs/` are not listed; the `AGENTS.md` authority table routes to them. A row in the index is not a link: `docs.orphan` warns on every `docs/` file, decision, evidence and archived records included, whose path or file name appears nowhere but the index — not in `AGENTS.md`, and not in another document under `docs/`, `papers/` or `specs/`. Without `xy agent` there is no generator: write the same table by hand, so the file is already correct when the repository upgrades.
 
 This is the piece that makes the rest work. A hand-maintained index is forgotten within weeks; a generated one cannot drift from what the front matter says. Treat it exactly like any other generated artifact — change the source, regenerate, and never edit the output.
 

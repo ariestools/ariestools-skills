@@ -72,7 +72,7 @@ Add the appropriate ESLint and TypeScript variants from [eslint.md](eslint.md) a
 
 ## Root CLI versus package hooks
 
-Use `xy` at repository/workspace scope. The CLI discovers workspaces, orders compilation, applies concurrency, supports incremental execution, and aggregates diagnostics.
+Use `xy` at repository/workspace scope. Run it from the repository root, and target one workspace with a package argument (`pnpm xy build <package>`). Never `cd` into a package to build it. Workspace packages define no `build` script (the `xy repo init` package template has only `package-compile`), so `pnpm --filter <package> build` fails. Use `pnpm --filter <package> run <script>` only for scripts that package actually defines. The CLI discovers workspaces, orders compilation, applies concurrency, supports incremental execution, and aggregates diagnostics.
 
 `@ariestools/toolchain` installs two CLIs (since 9.2.0): `xy`, which is semver-stable, and `xyex`, an experimental superset whose commands and flags may change on a minor release. Prefer `xy` in scripts, CI, and examples. Run `pnpm xyex <command>` only for commands that `pnpm xy --stability` marks experimental; under `xy` they still run, with a warning. See [channels](commands.md#stable-and-experimental-channels) and the toolchain's [stability policy](https://github.com/ariestools/toolchain/blob/main/docs/STABILITY.md).
 
@@ -84,7 +84,7 @@ Use `xy` at repository/workspace scope. The CLI discovers workspaces, orders com
 | `xy rebuild [package]` | Clean, then run a non-incremental build |
 | `xy clean [package]` | Remove build artifacts; optional `--full` / `--full-all` for gitignored hygiene (see [commands.md](commands.md#clean)) |
 | `xy test [target]` | Run Vitest for a workspace or path (prefer `@ariestools/vitest-config`; see [testing.md](testing.md)) |
-| `xy check` | Run repository/configuration policy checks, including agent lint (since 10.1.1) when AGENTS.md exists or `commands.agentLint` is declared; see [commands.md](commands.md) |
+| `xy check` | Run repository/configuration policy checks, including agent lint (since 10.1.1; since 10.1.2 only when AGENTS.md exists or `commands.agentLint` is declared); see [commands.md](commands.md) |
 | `xy fix [package]` | Run the standard fixable policy and source checks |
 | `xy deplint …` | Dependency policy analysis; `xy deplint pick` for interactive placement (see [commands.md](commands.md)) |
 | `xy agent …` | AGENTS.md and docs convention: `lint`, `init`, `audit`, `index`, `archive` (since 10.1.1); see [commands.md](commands.md) and the [xy-agent](../xy-agent/SKILL.md) skill |
@@ -163,7 +163,7 @@ Whether scaffolded or set up by hand, a new TypeScript repository needs, in ever
 5. Put application or library source under `src/`.
 6. Create `xy.config.ts`, `tsconfig.json`, and `eslint.config.ts` at the appropriate root.
 7. Generate `eslint.config.ts` with `pnpm xy lint init` (interactive; see [eslint.md](eslint.md#use-the-active-flat-config) for the non-TTY path and the follow-up fixes) rather than copying an old ESLint configuration.
-8. Run `pnpm xy agent init` (since 10.1.1), then fill in AGENTS.md ([xy-agent](../xy-agent/SKILL.md)). It scaffolds AGENTS.md, a CLAUDE.md adapter, and the docs/ layout without overwriting. A 10.1.2 `xy repo init` scaffold already has a lint-clean AGENTS.md, CLAUDE.md, papers/README.md, and docs/README.md; there, `agent init` only adds the docs/ subfolders. Agent lint errors when the root AGENTS.md is missing or links to a path that does not exist. It warns when AGENTS.md lacks the orient, authority, repository map, commands, or failures section, or when a CLAUDE.md is neither a symlink to AGENTS.md nor a file whose first non-comment line is an `@AGENTS.md` import (Claude-specific notes may follow). `xy check` skips agent lint until AGENTS.md exists or `commands.agentLint` is declared, and `xy check --fix` cannot create these files. The scaffolded papers/README.md carries a `date`, so `docs.stale` warns 180 days later, failing `--strict`, until you update `date` or add `reviewed`.
+8. Run `pnpm xy agent init` (since 10.1.1), then fill in AGENTS.md ([xy-agent](../xy-agent/SKILL.md)). It scaffolds AGENTS.md, a CLAUDE.md adapter, and the docs/ layout without overwriting. A 10.1.2 `xy repo init` scaffold already has a lint-clean AGENTS.md, CLAUDE.md, papers/README.md, and docs/README.md; there, `agent init` only adds the docs/ subfolders. Agent lint errors when the root AGENTS.md is missing or links to a path that does not exist. It warns when AGENTS.md lacks the orient, authority, repository map, commands, or failures section, or when a CLAUDE.md is neither a symlink to AGENTS.md nor a file whose first non-comment line is an `@AGENTS.md` import (Claude-specific notes may follow). Since 10.1.2, `xy check` skips agent lint until AGENTS.md exists or `commands.agentLint` is declared (10.1.1 runs it in every repository), and `xy check --fix` cannot create these files. The scaffolded papers/README.md carries a `date`, so `docs.stale` warns 180 days later, failing `--strict`, until you update `date` or add `reviewed`.
 9. Run `pnpm xy skills lint --fix` to install the skills the repository requires.
 10. Add `**/.xy/cache/` to the root `.gitignore`; a bare `.xy/cache` entry covers only the root package.
 
@@ -184,7 +184,7 @@ Finish with `pnpm xy check --fix`, then run `pnpm xy build`, `pnpm xy test`, and
 
 ### Migrating from `@xylabs/*`
 
-The retired toolchain packages are `@xylabs/toolchain`, `@xylabs/ts-scripts-common`, `@xylabs/ts-scripts-pnpm`, `@xylabs/ts-scripts-yarn3`, `@xylabs/ts-scripts-react-pnpm`, `@xylabs/ts-scripts-react-yarn3`, and the `@xylabs` ESLint-config and tsconfig packages. The compatibility stubs are no longer built in the active monorepo. No `xy` or `xyex` command rewrites package.json for you; migrate by hand, following the toolchain's [migration guide](https://github.com/ariestools/toolchain/blob/main/docs/migrate-xylabs.md):
+The retired toolchain packages are `@xylabs/toolchain`, `@xylabs/ts-scripts-common`, `@xylabs/ts-scripts-pnpm`, `@xylabs/ts-scripts-yarn3`, `@xylabs/ts-scripts-react-pnpm`, `@xylabs/ts-scripts-react-yarn3`, and the `@xylabs` ESLint-config and tsconfig packages. The compatibility stubs are no longer built in the active monorepo. Running `xy` never migrates these packages for you (no command calls the toolchain's `deprecationMigrate` helper; only the experimental `packman convert` in step 4 swaps the toolchain and ts-scripts packages; the ESLint-config and tsconfig packages are always manual). Migrate by hand, following the toolchain's [migration guide](https://github.com/ariestools/toolchain/blob/main/docs/migrate-xylabs.md):
 
 1. Replace the legacy packages in `devDependencies` with `@ariestools/toolchain`.
 2. Point the ESLint config and tsconfig `extends` at the `@ariestools/*` packages.
