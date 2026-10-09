@@ -24,7 +24,7 @@ pnpm add -D @ariestools/tsconfig @ariestools/tsconfig-dom @ariestools/tsconfig-r
 
 The parent-config peers are tilde ranges on the exact lockstep release (`@ariestools/tsconfig-react@10.1.2` peers `@ariestools/tsconfig` and `@ariestools/tsconfig-dom` at `~10.1.2`), so bumping one package alone leaves its peers unsatisfied. Upgrade `@ariestools/tsconfig`, `-dom`, and `-react` together (for example with `pnpm xy updo`), and keep `@ariestools/lib-neutral` and `@ariestools/toolchain` on the same release.
 
-Keep `typescript` within the toolchain's peer range, `^5.9 || ^6.0`, and follow the consuming repository's exact range policy. Never upgrade it to 7: npm `latest` for `typescript` is the 7.x native (Go) compiler, so an unversioned install pulls it in, and it exports no compiler API for ESLint, deplint, dead-code, and API-exposure checks to load. `xy updo` will not offer that bump, even with `--latest`. TypeScript 7 is supported only as an experimental side-by-side alias (`typescript-native: npm:typescript@~7.0.2` with `compile.compiler: 'native'`), set up with `pnpm xyex enable ts-native` (since 9.0.2). It is incompatible with `compile.validator: 'shared'` ([type validation](compilation.md#type-validation)), and shared examples must not require it.
+Keep `typescript` within the toolchain's peer range, `^5.9 || ^6.0`, and follow the consuming repository's exact range policy. Never upgrade it to 7: npm `latest` for `typescript` is the 7.x native (Go) compiler, so an unversioned install pulls it in, and it exports no compiler API for ESLint, deplint, dead-code, and API-exposure checks to load. `xy updo` will not offer that bump, even with `--latest`. TypeScript 7 is supported only as an experimental side-by-side alias (`typescript-native: npm:typescript@~7.0.2` with `compile.compiler: 'native'`), set up with `pnpm xyex enable ts-native` (since 9.0.2; before 9.2.0, when `xyex` was added, run it as `pnpm xy enable ts-native`). It is incompatible with `compile.validator: 'shared'` ([type validation](compilation.md#type-validation)), and shared examples must not require it.
 
 ## Understand the base config
 
@@ -33,7 +33,7 @@ The base currently supplies strict, ESM-oriented settings including:
 - `target`, `lib`: ESNext
 - `module`, `moduleResolution`: NodeNext
 - `strict`, `noImplicitAny`, `noImplicitOverride`
-- `allowImportingTsExtensions`, `allowJs`, `resolveJsonModule`
+- `allowImportingTsExtensions` (write relative imports with the source extension, `./thing.ts`; the toolchain resolves them on emit; see the [xy-development TypeScript conventions](../xy-development/typescript.md#esm-only)), `allowJs`, `resolveJsonModule`
 - `isolatedModules`, `erasableSyntaxOnly`
 - `experimentalDecorators` (legacy decorator semantics, not TC39 decorators) and `importHelpers`
 - `esModuleInterop`, `allowSyntheticDefaultImports`, `skipLibCheck`
