@@ -2,9 +2,9 @@
   "name": "ariestools-skills",
   "version": "0.1.7",
   "displayName": "Aries Tools Skills",
-  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, the @ariestools/sdk utility libraries, the @ariestools/sdk-react React UI libraries, actor-kit actors and providers with their cli-kit and browser-kit hosts, and repository documentation conventions for agents (AGENTS.md, docs/papers lifecycle, xy agent lint).",
-  "shortDescription": "Aries Tools TypeScript toolchain, development, SDK, React SDK, actor-kit, and agent documentation (AGENTS.md) skills.",
-  "longDescription": "A layered skill stack for Aries Tools repositories: TypeScript/Git/testing standards (xy-development), the @ariestools/* toolchain surface — xy CLI, configs, vitest-config, deplint (xy-toolchain) — and three sibling library skills on top: the @ariestools/sdk utility libraries plus specialist packages (ariestools-sdk), the @ariestools/sdk-react React UI packages with their peers, import rule and house patterns (ariestools-sdk-react), and actor-kit actors, providers and the actor engine with the cli-kit and browser-kit hosts (ariestools-actor). A cross-cutting companion covers repository documentation conventions for agents — the AGENTS.md entry point, per-tool adapters, the docs/ and papers/ lifecycle, and xy agent lint (xy-agent).",
+  "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, the @ariestools/sdk utility libraries, the @ariestools/sdk-react React UI libraries, actor-kit actors and providers with their cli-kit and browser-kit hosts, repository documentation conventions for agents (AGENTS.md, docs/papers lifecycle, xy agent lint), and product planning from idea to MVP (White, Yellow, Green, Red and Light papers, roadmap, per-version PRDs).",
+  "shortDescription": "Aries Tools TypeScript toolchain, development, SDK, React SDK, actor-kit, agent documentation (AGENTS.md), and product-planning skills.",
+  "longDescription": "A layered skill stack for Aries Tools repositories: TypeScript/Git/testing standards (xy-development), the @ariestools/* toolchain surface — xy CLI, configs, vitest-config, deplint (xy-toolchain) — and three sibling library skills on top: the @ariestools/sdk utility libraries plus specialist packages (ariestools-sdk), the @ariestools/sdk-react React UI packages with their peers, import rule and house patterns (ariestools-sdk-react), and actor-kit actors, providers and the actor engine with the cli-kit and browser-kit hosts (ariestools-actor). Two cross-cutting companions sit beside the stack. One covers repository documentation conventions for agents — the AGENTS.md entry point, per-tool adapters, the docs/ and papers/ lifecycle, and xy agent lint (xy-agent). The other turns a product idea into a plan of record: White, Yellow and Green papers with optional Red and Light papers, version pins between them, a roadmap with an MVP line, and one PRD per major version (xy-product-plan).",
   "keywords": [
     "ariestools",
     "typescript",
@@ -19,7 +19,10 @@
     "mui",
     "actor",
     "cli-kit",
-    "browser-kit"
+    "browser-kit",
+    "product-planning",
+    "roadmap",
+    "prd"
   ],
   "category": {
     "slug": "developer-tools",
@@ -47,7 +50,8 @@
     "Fix xy deplint findings for a private service",
     "Configure Vitest with @ariestools/vitest-config",
     "Migrate this app from @xylabs/react-* to @ariestools/sdk-react",
-    "Write a PeriodicActor and run it in a CLI with @ariestools/cli-kit"
+    "Write a PeriodicActor and run it in a CLI with @ariestools/cli-kit",
+    "Turn this product idea into White, Yellow and Green papers and an MVP roadmap"
   ],
   "capabilities": [
     "Read",

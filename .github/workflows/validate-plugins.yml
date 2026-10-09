@@ -60,6 +60,7 @@ jobs:
           test -d /tmp/render/claude/skills/ariestools-sdk
           test -d /tmp/render/claude/skills/ariestools-sdk-react
           test -d /tmp/render/claude/skills/ariestools-actor
+          test -d /tmp/render/claude/skills/xy-product-plan
           echo "✓ Rendered trees include expected static content"
 
       - name: Validate skill frontmatter
