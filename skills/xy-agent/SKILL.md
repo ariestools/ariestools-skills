@@ -2,7 +2,7 @@
 name: xy-agent
 description: Repository documentation conventions for AI agents — the AGENTS.md entry point, thin per-tool adapters (CLAUDE.md, GEMINI.md, copilot-instructions), the docs/ lifecycle tree, and papers/ normative baselines. Covers required AGENTS.md sections, the size budget, front matter and document states, decision records, dated evidence documents, supersession and archiving, the generated docs index, and auditing for rot. Use when writing, reorganizing, or auditing AGENTS.md, adapter files, docs/, or papers/; adding a decision or evidence record; superseding or archiving a document; or when `xy check` or `xy agent lint` reports agents.*, docs.*, decisions.* or papers.* findings (toolchain 10.1.1+).
 metadata:
-  version: 0.1.6 # x-release-please-version
+  version: 0.1.7 # x-release-please-version
 ---
 
 # Agent Documentation Conventions

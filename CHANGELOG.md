@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.7](https://github.com/ariestools/ariestools-skills/compare/v0.1.6...v0.1.7) (2026-10-09)
+
+
+### Features
+
+* add sdk-react and actor skills ([da1e10f](https://github.com/ariestools/ariestools-skills/commit/da1e10f601114b6961048b493c98406020a5a47d))
+* **skills:** add sdk-react and actor skills, close verification gaps ([#23](https://github.com/ariestools/ariestools-skills/issues/23)) ([244677f](https://github.com/ariestools/ariestools-skills/commit/244677f8b2ec8152be1b118edd8a7a3c102c5892))
+
 ## [0.1.6](https://github.com/ariestools/ariestools-skills/compare/v0.1.5...v0.1.6) (2026-10-09)
 
 
