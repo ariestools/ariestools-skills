@@ -100,7 +100,7 @@ import type { Payload } from '@xyo-network/payload-model'
 
 This is simpler, more maintainable, and the bundler eliminates unused exports.
 
-Some packages also publish subpath exports (`pkg/feature`) built as separate bundles, so a class or singleton reached through a subpath can be a different object from the same name on the root. **Do not mix a package's root and subpath imports in one dependency graph.** Follow the style the package's other consumers use, and check the package's own skill for its barrel and any exceptions: the ariestools-sdk skill for `@ariestools/*`, and domain packs such as `XYOracleNetwork/xyo-skills` for theirs.
+Some packages also publish subpath exports (`pkg/feature`) built as separate bundles, so a class, singleton, or other module state reached through a subpath can be a different object from the same name on the root, and `instanceof` checks across the two fail. **By default, do not mix a package's root and subpath imports in one dependency graph.** A package's own skill sets its barrel and can sanction narrow exceptions, so check it and follow it: the ariestools-sdk skill for the sdk-js packages (it allows `@ariestools/sdk` subpaths for `import type` and stateless functions but never for classes or stateful setup, and requires a backend subpath, never the root, for `@ariestools/storage-adapters`), the ariestools-sdk-react skill for `@ariestools/sdk-react*` (apps import umbrella subpaths, libraries the owning focused package's subpath, and nothing imports a focused package's root), and domain packs such as `XYOracleNetwork/xyo-skills` for theirs. Otherwise, follow the style the package's other consumers use.
 
 ## Import Style
 
