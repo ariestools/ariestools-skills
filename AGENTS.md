@@ -61,7 +61,7 @@ Each skill builds on the layers below it. `ariestools-sdk-react` and `ariestools
 | `pnpm sync:claude --out .preview/claude && jq empty .preview/claude/.claude-plugin/*.json` | Render the Claude marketplace tree and check its JSON parses |
 | `pnpm sync:codex --out .preview/codex && jq empty .preview/codex/.agents/plugins/marketplace.json .preview/codex/plugins/ariestools-skills/.codex-plugin/plugin.json` | Render the Codex tree and check its JSON parses |
 | `claude --plugin-dir .preview/claude` | Load the rendered plugin in a local Claude Code session |
-| `npx -p @ariestools/toolchain@10.1.3 xy agent lint` | Check this file, `CLAUDE.md` and `docs/` against the xy-agent convention. This repo has no toolchain dependency, so nothing runs it automatically |
+| `npx -p @ariestools/toolchain@10.1.5 xy agent lint` | Check this file, `CLAUDE.md` and `docs/` against the xy-agent convention. This repo has no toolchain dependency, so nothing runs it automatically |
 
 The scripts are plain Node with no dependencies, so there is nothing to install. Three traps bite repeatedly:
 

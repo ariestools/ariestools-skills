@@ -10,6 +10,7 @@ The stable `xy agent` command implements this catalog:
 
 ```text
 pnpm xy agent lint            run the catalog. --rules (ids and levels), --json, --strict, --fix
+                              --fix-interactive (experimental, 10.1.5): --fix, then asks on a TTY
 pnpm xy agent audit           the lifecycle subset: live state, evidence, orphans, staleness, supersession
 pnpm xy agent init            create missing files only: placeholder AGENTS.md, CLAUDE.md import,
                               docs/ tier folders, index. Absorbs nothing, never overwrites
@@ -23,7 +24,9 @@ pnpm xy agent archive <path>  move under docs/archive/, keeping the path below d
 
 **Check `pnpm xy --help` before assuming the command exists.** A toolchain without it prints `Command not found [agent]` and exits 0, which reads like a pass. Run the checks by hand there, and keep the [template](templates.md) shapes so the upgrade does not break the gate. On 10.1.1, read [Toolchain 10.1.1](#toolchain-1011) before trusting a result or running a fixer.
 
-**Only structural fixers are safe:** index regeneration, archiving, and inserting missing front matter, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix` wherever `xy check` runs agent lint) regenerates `docs/README.md` and gives a file with no front matter a `kind` inferred from its folder, and `xy agent index` and `xy agent archive` do the rest. The inferred kind is `decision`, `evidence`, `runbook` or `plan` under the matching `docs/` folder, `paper` under `papers/`, and `spec` under `specs/`; any other file keeps its `docs.front-matter` warning. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
+**Only structural fixers are safe:** index regeneration, archiving, inserting missing front matter, and moving or deduplicating an adapter's import, because their failure is visible. Those are the fixers that ship — `xy agent lint --fix` (also run by `xy check --fix` wherever `xy check` runs agent lint) regenerates `docs/README.md` and gives a file with no front matter a `kind` inferred from its folder, and `xy agent index` and `xy agent archive` do the rest. Since toolchain 10.1.5, `--fix` also adds that `kind` to front matter that lacks one, and repairs an adapter where no text is lost (see `agents.adapter-thin` in [AGENTS.md](agents-md.md)). The inferred kind is `decision`, `evidence`, `runbook` or `plan` under the matching `docs/` folder, `paper` under `papers/`, and `spec` under `specs/`; any other file keeps its `docs.front-matter` warning. **Never write a fixer that rewrites prose.** A prose fixer that gets it wrong reports success and leaves a document that reads plausibly and says the wrong thing.
+
+The experimental `--fix-interactive` (since 10.1.5) goes further, writing sections, link targets, front matter, archive moves and authority rows, but only from answers a person types: it needs a TTY and cannot run with `--json`, so an agent's non-interactive shell cannot run it. List those edits as proposals instead.
 
 An audit runs `xy agent lint` and `xy check` without `--fix` and proposes fixes to the owner first. After a front-matter fix, check each inferred `kind` and add the rest of the front matter by hand; the same run builds the index from the new front matter.
 
