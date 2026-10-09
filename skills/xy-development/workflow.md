@@ -130,7 +130,7 @@ The completion gate is **layered**. Before declaring any task complete, walk eve
 
 1. **Layer 1 — Generic DoD** (this file): builds, lints, tests, dependencies, dev server, no placeholders, no regressions. Applies to every project. In `@ariestools/toolchain` repos, run it through the `xy` gates above and xy-toolchain's [profile verification](../xy-toolchain/project-profiles.md#verify-the-selected-profile).
 2. **Layer 2 — Domain DoD** (when a domain skill pack is installed — e.g. dApp checklists in product-specific skill repos): extends Layer 1 with domain-specific gates. Applies only when the project is in that domain.
-3. **Layer 3 — Project-specific acceptance criteria**: if a `PRD.md` exists at the working directory, its `## Acceptance criteria` section is also gating. Generated at planning time per the next section.
+3. **Layer 3 — Project-specific acceptance criteria**: the `## Acceptance criteria` section of the project's active PRD is also gating. The active PRD is a `PRD.md` at the working directory, or, in a product planned as a series of versions, the versioned PRD that the roadmap and `AGENTS.md` name as active (`docs/plans/MVP_PRD.md`, then `V2_PRD.md`, …). Generated at planning time per the next section.
 
 **The rule:** if any item across any applicable layer fails, the work is not done. Fix the failing item and re-walk the relevant layer. **Continue iterating until every applicable layer passes.** Do not stop on partial pass. Do not report complete with known-failing items rationalized as "out of scope" unless the criterion was explicitly marked optional or skipped with a reason in the layer's own conventions (e.g. dApp DoD sections tagged "if applicable").
 
@@ -138,7 +138,7 @@ This rule applies equally to new features, bug fixes, and refactors. It is the o
 
 ## Writing Project-Specific Acceptance Criteria
 
-When a project has a `PRD.md` (written at planning time by a domain planning/scaffold skill, or by the project author), its `## Acceptance criteria` section is **generated** — not pulled from a fixed catalog. This is because the space of buildable projects is open-ended, and a project's success shape is best derived from its spec and the relevant domain skills loaded at planning time.
+When a project has a PRD (a `PRD.md` written at planning time by a domain planning/scaffold skill or by the project author, or a versioned PRD such as `docs/plans/MVP_PRD.md`), its `## Acceptance criteria` section is **generated** — not pulled from a fixed catalog. This is because the space of buildable projects is open-ended, and a project's success shape is best derived from its spec and the relevant domain skills loaded at planning time.
 
 When generating Layer 3 criteria for a PRD, follow this shape:
 
