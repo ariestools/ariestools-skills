@@ -2,7 +2,7 @@
 
 Copy, then delete every placeholder you do not fill. An unfilled template section is worse than an absent one — it reads as an answer.
 
-From @ariestools/toolchain 10.1.1, `xy agent lint` checks these shapes, and since 10.1.2 `xy check` runs it only where AGENTS.md exists or `commands.agentLint` is declared. An AGENTS.md, adapter or docs index that departs from them draws warnings, which fail under `--strict` or `XY_STRICT=1`; only a missing AGENTS.md or a broken link in it is an error (10.1.1 also errors on the adapters, the required sections and the index). Older toolchains have no `xy agent` command; use the same shapes anyway, so the upgrade does not break the gate.
+`xy agent lint` checks these shapes, and `xy check` runs it where AGENTS.md exists or `commands.agentLint` is declared. An AGENTS.md, adapter or docs index that departs from them draws warnings, which fail under `--strict` or `XY_STRICT=1`; only a missing AGENTS.md or a broken link in it is an error. On a toolchain without `xy agent`, use the same shapes anyway, so the upgrade does not break the gate.
 
 ## AGENTS.md
 
@@ -68,7 +68,7 @@ full explanation.>
 - <actions that remain with the owner: publish, deploy, spend, alias>
 ```
 
-`xy agent lint` finds the required sections by keyword — orient, authority, repository map (or layout, packages), command, fail — so keep those words if you retitle one; since 10.1.2 it also accepts authoritative, what not to do and pitfall. Write every repository path as a Markdown link, never a code span or an `@path` import: the linter resolves links only, and an import would load its target into every session. Keep the authority table task-first, with the linked path in the column headed Authority, which is where `agents.authority-rows-resolve` reads it. Link every Authority cell to a target that contains `/` or ends in `.md` (a root `package.json` as `./package.json`): otherwise the rule takes the first such word anywhere in the row, and a task class such as "Build and CI/CD" warns as a missing file. `xy work` is experimental, hence `xyex`; usage is in the [xy-toolchain commands reference](../xy-toolchain/commands.md#skills-and-work-tracking). See [agents-md.md](agents-md.md) for what each section is for.
+`xy agent lint` finds the required sections by keyword. If you retitle one, keep its keyword (Orient, Authority, Repository map, Command, Fail), which matches on every toolchain version; [Required sections](agents-md.md#required-sections) lists the alternatives and the version that added each. Write every repository path as a Markdown link, never a code span or an `@path` import: the linter resolves links only, and an import would load its target into every session. Keep the authority table task-first, with the linked path in the column headed Authority, which is where `agents.authority-rows-resolve` reads it. Link every Authority cell to a target that contains `/` or ends in `.md` (a root `package.json` as `./package.json`): otherwise the rule takes the first such word anywhere in the row, and a task class such as "Build and CI/CD" warns as a missing file. `xy work` is experimental, hence `xyex`; usage is in the [xy-toolchain commands reference](../xy-toolchain/commands.md#skills-and-work-tracking). See [agents-md.md](agents-md.md) for what each section is for.
 
 ## CLAUDE.md
 
@@ -76,7 +76,7 @@ full explanation.>
 @AGENTS.md
 ```
 
-Keep the import alone, with at most an HTML comment above it. This is what `pnpm xy agent init` writes. Since 10.1.2 `agents.adapter-thin` also accepts notes after the import, provided the import stays the first visible line. It reports a duplicate only when the notes repeat AGENTS.md's H1 and half its H2 headings, so keep any restatement out by hand. An import further down warns as `pointer-not-import`; on 10.1.1 any added line is a `pointer-not-import` error. Prefer a `.claude/rules/` file (template below) for Claude-only instructions, and put instructions every agent needs in AGENTS.md.
+Keep the import alone, with at most an HTML comment above it. This is what `pnpm xy agent init` writes. `agents.adapter-thin` also accepts notes after the import, provided the import stays the first visible line. It reports a duplicate only when the notes repeat AGENTS.md's H1 and half its H2 headings, so keep any restatement out by hand. An import further down warns as `pointer-not-import`. Prefer a `.claude/rules/` file (template below) for Claude-only instructions, and put instructions every agent needs in AGENTS.md.
 
 A symlink (`ln -s AGENTS.md CLAUDE.md`) also passes `xy agent lint`, but prefer the file. Experimental `xyex plan lint` rejects a symlinked CLAUDE.md, Claude's Edit and Write tools refuse to write through it, and a Windows clone without `core.symlinks` gets a one-line text file instead of the instructions.
 
@@ -106,7 +106,7 @@ Default: do not create it. An absent file passes, and Copilot's cloud agent, Cop
 ln -s ../AGENTS.md .github/copilot-instructions.md
 ```
 
-Copilot documents no `@` import, so a one-line `@AGENTS.md` file gives those surfaces nothing. If a repository genuinely needs Copilot-only text here, write a regular file that links to AGENTS.md and adds only that text; since 10.1.2 `agents.adapter-thin` passes it:
+Copilot documents no `@` import, so a one-line `@AGENTS.md` file gives those surfaces nothing. If a repository genuinely needs Copilot-only text here, write a regular file that links to AGENTS.md and adds only that text; `agents.adapter-thin` passes it:
 
 ```markdown
 Follow the repository instructions in [AGENTS.md](../AGENTS.md).
@@ -114,7 +114,7 @@ Follow the repository instructions in [AGENTS.md](../AGENTS.md).
 <Copilot-only instructions>
 ```
 
-A link is a pointer, not an import, so do not rely on Copilot following it. A file with no link to AGENTS.md warns. On 10.1.1 a Copilot file passes only as a symlink or a lone `@AGENTS.md` line, which gives Copilot nothing; the linked form fails there (error). Copilot path rules go in `.github/instructions/` (below).
+A link is a pointer, not an import, so do not rely on Copilot following it. A file with no link to AGENTS.md warns. Copilot path rules go in `.github/instructions/` (below).
 
 ## Decision record
 
@@ -230,11 +230,11 @@ For a retirement with no successor:
 > path: `docs/runbooks/OLD.md`. Nothing supersedes it.
 ```
 
-`pnpm xy agent archive <path>` (since 10.1.1) moves the file and regenerates the index. Since 10.1.2 it keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Add the reason to a retirement banner, or replace it with one of these. On 10.1.1 it moves the file flat, sets `state: archived`, writes a generic banner, and strips quotes and block lists from the front matter. See [lifecycle.md](lifecycle.md#archiving).
+`pnpm xy agent archive <path>` moves the file and regenerates the index. It keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Write `<path>` as `docs/…`, not `./docs/…` or an absolute path, or the file lands flat in `docs/archive/`. Add the reason to a retirement banner, or replace it with one of these. See [lifecycle.md](lifecycle.md#archiving).
 
 ## docs/README.md
 
-Do not write this file. Run `pnpm xy agent index` (since 10.1.1) after any change under `docs/`. `xy agent lint --fix`, `xy check --fix` (where it runs agent lint) and `xy agent archive` regenerate it too, and `xy agent init` creates it when missing, as does `xy repo init` since 10.1.2. `xy agent lint` warns with `docs.index-current` when the committed file differs from the generated text at all, which fails `xy check --strict` (and plain `xy check` on 10.1.1).
+Do not write this file. Run `pnpm xy agent index` after any change under `docs/`. `xy agent lint --fix`, `xy check --fix` (where it runs agent lint) and `xy agent archive` regenerate it too, and `xy agent init` and `xy repo init` create it when missing. `xy agent lint` warns with `docs.index-current` when the committed file differs from the generated text at all, which fails `xy check --strict`.
 
 The generator writes exactly this shape: one row per `docs/**/*.md` except the index itself, sorted by path, with the front-matter `status`, or `state` when there is no `status`.
 
@@ -248,7 +248,7 @@ The generator writes exactly this shape: one row per `docs/**/*.md` except the i
 | [evidence/2026-08-29-....md](evidence/2026-08-29-....md) | evidence | active |
 ```
 
-Keep `status` to one line with no `|`, because it lands in a table cell. `papers/` and `specs/` are not indexed; AGENTS.md links them directly. On an older toolchain, maintain the file by hand in exactly this shape.
+Keep `status` to one line with no `|`, because it lands in a table cell. `papers/` and `specs/` are not indexed; AGENTS.md links them directly. On a toolchain without `xy agent`, maintain the file by hand in exactly this shape.
 
 ## .claude/rules/ path-scoped rule
 
