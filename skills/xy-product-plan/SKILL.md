@@ -2,7 +2,7 @@
 name: xy-product-plan
 description: Product planning from idea to buildable plan — refining a product idea in discussion, then writing the paper series in order — White Paper (why and what), Yellow Paper (how), Green Paper (business case and monetization), optional Red Paper (legal, regulatory, competitive, funding, infrastructure, operational and existential risk) and optional Light Paper (short public summary) — then docs/ROADMAP.md with a clear MVP line and one PRD per major version (MVP_PRD.md, V2_PRD.md) holding scope, implementation plan, deployment target and acceptance criteria. Covers what each document contains, cross-document version pins, amendments and how a change cascades downstream. Use when starting a new product or product repository, writing, reviewing or amending any of these papers, drawing or moving the MVP line, or writing a PRD.
 metadata:
-  version: 0.1.7 # x-release-please-version
+  version: 0.1.8 # x-release-please-version
 ---
 
 # Product Planning
