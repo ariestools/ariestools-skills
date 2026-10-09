@@ -50,4 +50,5 @@ Read when creating a file this convention describes. Copy-paste skeletons that p
 These are navigation links, not dependencies; each skill installs separately.
 
 - **[xy-development](../xy-development/SKILL.md)** — the base this skill builds on: TypeScript, Git, testing, and the Definition of Done this pattern plugs into. Install: `npx skills add ariestools/ariestools-skills --skill xy-development`.
+- **[xy-product-plan](../xy-product-plan/SKILL.md)** — what goes in the papers this skill places: the White, Yellow, Green, Red and Light papers in order, version pins between them, the roadmap's MVP line and per-version PRDs. Install: `npx skills add ariestools/ariestools-skills --skill xy-product-plan`.
 - **[xy-toolchain](../xy-toolchain/SKILL.md)** — the `xy` CLI. [Documentation conventions](../xy-toolchain/commands.md#documentation-conventions) covers `xy agent` and the experimental `xyex plan`; [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking) covers `xy skills` and the experimental `xyex work`, which this pattern uses to track documentation maintenance. Install: `npx skills add ariestools/ariestools-skills --skill xy-toolchain`.
