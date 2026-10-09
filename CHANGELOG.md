@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.6](https://github.com/ariestools/ariestools-skills/compare/v0.1.5...v0.1.6) (2026-10-09)
+
+
+### Bug Fixes
+
+* **skills:** sync skills with toolchain 10.1.1 and sdk 9.0.1 ([#18](https://github.com/ariestools/ariestools-skills/issues/18)) ([0414996](https://github.com/ariestools/ariestools-skills/commit/041499671fa5d86766cffd469950a7e383e7d326))
+* **skills:** update skills for toolchain 10.1.2 and 10.1.3 ([#19](https://github.com/ariestools/ariestools-skills/issues/19)) ([0a7c117](https://github.com/ariestools/ariestools-skills/commit/0a7c117e2136dda2d186d982448f700e5a38d0c6))
+* sync skills with toolchain 10.1.3 and sdk 9.0.1 ([26b080c](https://github.com/ariestools/ariestools-skills/commit/26b080cf5659e796a5809e30fc565be3edac94d8))
+
 ## [0.1.5](https://github.com/ariestools/ariestools-skills/compare/v0.1.4...v0.1.5) (2026-09-01)
 
 
