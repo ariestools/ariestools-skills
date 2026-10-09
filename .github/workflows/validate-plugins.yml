@@ -65,3 +65,9 @@ jobs:
 
       - name: Validate skill frontmatter
         run: node scripts/validate-skills.mjs skills
+
+      # Release path: a verified version (metadata.verified-toolchain) must equal
+      # npm latest, so a toolchain release forces a re-verification before ours.
+      - name: Check verified versions against npm latest
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: node scripts/validate-skills.mjs skills --upstream
