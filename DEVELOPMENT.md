@@ -50,7 +50,7 @@ pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugin
 
 ## Ownership
 
-- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `xy-agent`** — edit only in this repo.
+- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `ariestools-sdk-react` / `ariestools-actor` / `xy-agent`** — edit only in this repo.
 - **`xyo-knowledge` / `xl1-*`** — edit in [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
 - Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs for `xy-development` and `xy-toolchain` only.
 - Adding a skill also means adding its `SKILL.md` to `extra-files` in `release-please-config.json`, a `test -d` line in `.github/workflows/validate-plugins.yml`, and an entry in the layer tables (README.md, AGENTS.md) and `scripts/marketplace-sync/metadata.json`.
@@ -59,16 +59,22 @@ pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugin
 
 ```
 skills/
-├── xy-development/     Layer 1 — TypeScript, Git, testing, workflow
+├── xy-development/        Layer 1 — TypeScript, Git, testing, workflow
 │   ├── SKILL.md
 │   └── …
-├── xy-toolchain/       Layer 2 — @ariestools/toolchain (xy CLI), configs, policy
+├── xy-toolchain/          Layer 2 — @ariestools/toolchain (xy CLI), configs, policy
 │   ├── SKILL.md
 │   └── …
-├── ariestools-sdk/     Layer 3 — @ariestools/sdk
+├── ariestools-sdk/        Layer 3 — @ariestools/sdk
 │   ├── SKILL.md
 │   └── …
-└── xy-agent/           cross-cutting — AGENTS.md, adapters, docs/ and papers/
+├── ariestools-sdk-react/  Layer 3, sibling of ariestools-sdk — @ariestools/sdk-react*
+│   ├── SKILL.md
+│   └── …
+├── ariestools-actor/      Layer 3, sibling of ariestools-sdk — actor-kit, cli-kit, browser-kit
+│   ├── SKILL.md
+│   └── …
+└── xy-agent/              cross-cutting — AGENTS.md, adapters, docs/ and papers/
     ├── SKILL.md
     └── …
 ```
