@@ -8,31 +8,45 @@ Before running any build, lint, test, or dev command, **discover what the repo a
 
 Before executing commands in a repo, check these in order:
 
-1. **Package manager** — detect from the lock file and use that exclusively:
+1. **Repo instructions** — read the repo's `AGENTS.md` / `CLAUDE.md` first. Where they name commands or conventions, they override this checklist.
+
+2. **Package manager and runtime** — check the root `packageManager` field first (it pins the exact version), then the lock file, and use that manager exclusively:
    - `pnpm-lock.yaml` → use `pnpm`
+   - `bun.lock` / `bun.lockb` → use `bun`
    - `yarn.lock` → use `yarn`
    - `package-lock.json` → use `npm`
    - Never mix package managers. Never run `npm install` in a pnpm repo.
+   - Use the Node version pinned by the `volta` field, `.nvmrc`, or `engines`.
+   - CLI flags differ between package-manager majors (pnpm 12 rejects some pnpm 10 flags), so check `<pm> <cmd> --help` for the pinned version before relying on a flag.
 
-2. **package.json scripts** — read `scripts` in `package.json` before running anything:
+3. **package.json scripts and CI** — read `scripts` in `package.json` before running anything:
    - If `"build"` exists, use `pnpm build` — not raw `tsc` or `esbuild`
    - If `"lint"` exists, use `pnpm lint` — not raw `eslint .`
    - If `"test"` exists, use `pnpm test` — not raw `jest` or `vitest`
    - If `"dev"` exists, use `pnpm dev` — not raw `ts-node` or `tsx`
    - The scripts may include flags, configs, or pipelines that raw commands miss.
+   - If the script you need is absent, look for a repo CLI among the root `devDependencies` (XY repos: `pnpm xy <command>` from the root; see [xy-toolchain](../xy-toolchain/toolchain.md#start-from-repository-truth)). A missing script never makes raw `tsc`, `eslint`, or `vitest` the answer.
+   - Check `.github/workflows/*` for the commands CI treats as the gate.
 
-3. **Monorepo awareness** — check if the repo uses workspaces:
+4. **Monorepo awareness** — check if the repo uses workspaces:
    - Look for `workspaces` in `package.json`, `pnpm-workspace.yaml`, `nx.json`, or `lerna.json`
    - Run commands at the correct scope (root vs. package)
-   - Use workspace-aware commands: `pnpm --filter <package> build`, not `cd packages/foo && pnpm build`
+   - Use the repo's workspace-aware entry point from the root: its CLI with a package argument (XY repos: `pnpm xy build <package>`), or `pnpm --filter <package> run <script>` only for scripts that package actually defines. Never `cd` into a package to build it.
 
-4. **Config files** — check for existing configuration before assuming defaults:
+5. **Config files** — check for existing configuration before assuming defaults:
    - `tsconfig.json` / `tsconfig.*.json` — don't assume compiler options
-   - `.eslintrc.*` / `eslint.config.*` — don't assume lint rules
+   - `eslint.config.*` — don't assume lint rules (`.eslintrc.*` is legacy; ESLint 10 no longer reads it)
    - `vitest.config.*` / `jest.config.*` — don't assume test setup
+   - `pnpm-workspace.yaml` — workspace packages and package-manager policy
+   - Repo CLI config such as `xy.config.ts` — don't assume tool defaults
    - These files are authoritative. Don't override them with CLI flags unless intentionally fixing something.
 
-5. **Dependency versions** — when adding new dependencies, always use `pnpm add <package>` (or the repo's package manager equivalent) to resolve the latest published version. Do not manually write version numbers in package.json from memory — they may be significantly outdated. If a specific version is required for peer dependency compatibility, pin to that version explicitly (e.g., `pnpm add @mui/material@~7.3.9`).
+6. **Dependency versions** — add new dependencies with the package manager (`pnpm add <package>` or the equivalent) so it resolves a current version. Do not manually write version numbers in package.json from memory — they may be significantly outdated.
+   - In a workspace, add to the package that owns the dependency (`pnpm --filter <package> add <dep>`, `-D` for dev); use `-w` only for root tooling.
+   - Respect the repo's package-manager policy (pnpm `minimumReleaseAge`, and the build allowlist `allowBuilds`, or `onlyBuiltDependencies` on older pnpm 10). The resolved version may trail npm `latest` by design — do not override it. A dependency that needs install scripts needs an entry in that allowlist.
+   - "Latest" can fall outside a tool's peer range (e.g. TypeScript 7 vs `@ariestools/toolchain`, which needs 5.9 or 6). Check the peers of the tools that consume a package before adding or bumping it. In XY repos, upgrade with `pnpm xy updo`, which keeps TypeScript below 7.
+   - If a peer needs a specific version, pin to the range the dependency's `peerDependencies` declare (`pnpm view <dep> peerDependencies`, then `pnpm add <peer>@<range>`).
+   - After adding, match the repo's range form; `pnpm add` saves `^` by default (XY repos check the form with `pnpm xy deplint`).
 
 ### Repo Conventions
 
@@ -44,15 +58,15 @@ Beyond scripts and config files, observe how the existing codebase does things:
 
 When in doubt, read existing code first and follow its lead.
 
-The same applies to documents. If the repo has an `AGENTS.md`, a `docs/` tree, or a `papers/` directory, follow their existing conventions for naming, front matter, and where a new document belongs. The [xy-agent skill](../xy-agent/SKILL.md) describes the house pattern for these and is recommended where a repo has adopted it.
+The same applies to documents. If the repo has an `AGENTS.md`, a `docs/` tree, or a `papers/` directory, follow their existing conventions for naming, front matter, and where a new document belongs. The [xy-agent skill](../xy-agent/SKILL.md) describes the house pattern for these and is recommended where a repo has adopted it. If `../xy-agent/` is missing, install it with `npx skills add ariestools/ariestools-skills --skill xy-agent`.
 
 ### Credential Safety
 
 Never commit secrets or authentication tokens to the repository:
-- `.npmrc` — may contain npm auth tokens after `npm login`. Always add it to `.gitignore`.
-- `.env`, `.env.*` — may contain API keys and secrets. Always gitignored.
+- Registry credentials belong in the user-level `~/.npmrc` or as `${NPM_TOKEN}`-style environment references. A tracked project `.npmrc` may hold only non-secret settings — do not delete or untrack it, and never write a token into it.
+- `.env`, `.env.*` — may contain API keys and secrets. Gitignore them, keeping the `!.env.example` exception for a committed template.
 - Never log, echo, or display auth tokens in command output.
-- When setting up a new project, verify `.gitignore` includes `.npmrc` and `.env` before the first commit.
+- When setting up a new project, verify `.gitignore` covers `.env` / `.env.*` and that no tracked file holds a token before the first commit.
 
 ### The Rule
 
@@ -62,7 +76,7 @@ If the repo has a way to do it, use the repo's way. Ad-hoc commands are for expl
 
 ## Definition of Done
 
-A feature is not complete until **all of the following are true**:
+A feature is not complete until **all of the following are true**. The gates are tool-neutral; run each through the repo's own command. In repos using `@ariestools/toolchain`, build, lint, dependency, and publish checks are `pnpm xy build --strict`, tests are `pnpm xy test` (`xy build` runs none), and repository policy is `pnpm xy check` — see xy-toolchain's [lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
 
 ### 1. Builds Cleanly
 - The repo's build command (`pnpm build` or equivalent) succeeds with zero errors
@@ -71,6 +85,7 @@ A feature is not complete until **all of the following are true**:
 
 ### 2. Linter Passes
 - The repo's lint command (`pnpm lint` or equivalent) passes with zero errors and zero warnings
+- A zero exit code proves zero warnings only in strict / max-warnings-0 mode; otherwise read the warning count
 - Don't suppress lint rules to make it pass — fix the underlying issue
 - If a lint rule must be disabled, use an inline comment with a justification
 
@@ -85,23 +100,23 @@ A feature is not complete until **all of the following are true**:
 - Dependencies are installed via the repo's package manager — don't forget to actually run `pnpm install` (or equivalent)
 - No phantom dependencies — if your code imports it, it must be in `package.json` (don't rely on transitive installs)
 - Version ranges follow the repo's existing conventions (pinned, caret, tilde)
-- All peer dependency warnings are resolved — install the required peers at the versions the package expects, not just the latest. Note: `pnpm install` suppresses warnings when the lockfile is already up to date. After adding or changing dependencies, run `pnpm install --resolution-only` to force a fresh resolution check that surfaces all peer dependency warnings.
-- **Transitive peer dependencies can cause runtime failures that the compiler and linter miss.** pnpm's strict isolation means peer deps of your dependencies are not automatically available to Vite's bundler. If a dependency uses MUI, emotion, or another framework internally, your app must install those peer deps explicitly. When adding a new dependency, check its `peerDependencies` (and those of its direct dependencies) for packages your app doesn't already provide. A clean `pnpm compile` does not guarantee the app will run — missing peer deps surface as `Could not resolve "..."` errors at runtime.
+- All peer dependency issues are resolved — install the required peers at the versions the package expects, not just the latest. Install output is not a reliable peer report: a no-op install (lockfile already up to date) prints no peer warnings. After adding or changing dependencies, run an explicit check for the pinned pnpm major (`packageManager`): on pnpm 11+, `pnpm peers check` (non-zero exit on issues; `--json` for automation, `--lockfile-only` to skip reading `node_modules`); on pnpm 10, `pnpm install --resolution-only`.
+- **Transitive peer dependencies can cause runtime failures that the compiler and linter miss.** pnpm's strict isolation means peer deps of your dependencies are not automatically available to Vite's bundler. If a dependency uses MUI, emotion, or another framework internally, your app must install those peer deps explicitly. When adding a new dependency, check its `peerDependencies` (and those of its direct dependencies) for packages your app doesn't already provide. A clean compile or type-check does not guarantee the app will run — missing peer deps surface as `Could not resolve "..."` errors at runtime.
 
 ### 5. Dev Server Starts and App Loads Cleanly (apps only)
 - If the project is an application with a dev server (`pnpm dev` or equivalent), start it and confirm it launches without errors
-- The production build and dev server often use different tools (e.g., Vite uses Rollup for `build` but esbuild for `dev`) — passing one does not guarantee the other
+- The production build and dev server often use different tools (e.g., Vite serves unbundled ESM in `dev` but produces a Rolldown bundle in `build`) — passing one does not guarantee the other
 - **A dev server that starts is not the same as an app that runs.** Compilation success does not catch runtime errors, missing peer deps surfaced by the browser bundler, import resolution failures, or errors thrown during component mount. You must actually load the page.
-- Use a browser MCP server to verify the running app:
-  - **Claude in Chrome MCP** (`mcp__Claude_in_Chrome__*`) — use `navigate` to open the dev server URL, then `read_console_messages` to check for errors/warnings and `read_network_requests` to check for failed requests (4xx/5xx, unresolved modules).
-  - **Claude Preview MCP** (`mcp__Claude_Preview__*`) — use `preview_start` with the dev URL, then `preview_console_logs` and `preview_network` to inspect the same.
+- Use whatever browser automation the session provides to verify the running app:
+  - Open the dev server URL, then read the console messages (errors/warnings) and network requests (failed 4xx/5xx, unresolved modules).
+  - Tool names vary by host and change between releases. In Claude Code, for example, the Claude in Chrome tools (`mcp__claude-in-chrome__*`) and the desktop app's built-in browser pane (`mcp__Claude_Browser__*`) both offer `navigate`, `read_console_messages`, and `read_network_requests`.
   - Exercise the feature you just built — click the button, submit the form, navigate the route — and re-check the console. Mount-time errors often only appear after interaction.
 - An app is only "done" when it loads with a clean console and no failed network requests on the golden path.
-- If no browser MCP server is available in this session, **say so explicitly** — do not claim the app works based solely on a successful compile. State: "dev server starts, but I could not verify runtime behavior in a browser."
+- If no browser automation is available in this session, **say so explicitly** — do not claim the app works based solely on a successful compile. State: "dev server starts, but I could not verify runtime behavior in a browser."
 
 ### 6. No Placeholders or Mocks in Delivered Code
-- Every user-visible action must do what it claims. If the UI says "Recorded on XL1 Blockchain", the code must actually submit a transaction — not call `console.log` with a TODO comment.
-- Do not stub integrations with placeholder implementations (e.g., `Account.random()` instead of a real wallet connection, a no-op function behind a "Submit" button). If the real integration isn't wired up yet, the UI should not present it as functional.
+- Every user-visible action must do what it claims. If the UI says "Saved", the code must actually persist it — not call `console.log` with a TODO comment.
+- Do not stub integrations with placeholder implementations (e.g., a throwaway random key instead of a real wallet or auth connection, a no-op function behind a "Submit" button). If the real integration isn't wired up yet, the UI should not present it as functional.
 - If something genuinely cannot be implemented yet (missing API, blocked dependency), disable the UI element or show an explicit "not yet available" state — never fake success.
 
 ### 7. No Regressions
@@ -111,9 +126,9 @@ A feature is not complete until **all of the following are true**:
 
 ### Applying the Definition of Done
 
-The completion gate is **layered**. Before declaring any task complete, walk every layer that applies:
+The completion gate is **layered**. Before declaring any task complete, walk every layer that applies. (These are completion-gate layers, not the xy-development → xy-toolchain → ariestools-sdk skill stack.)
 
-1. **Layer 1 — Generic DoD** (this file): builds, lints, tests, dependencies, dev server, no placeholders, no regressions. Applies to every project.
+1. **Layer 1 — Generic DoD** (this file): builds, lints, tests, dependencies, dev server, no placeholders, no regressions. Applies to every project. In `@ariestools/toolchain` repos, run it through the `xy` gates above and xy-toolchain's [profile verification](../xy-toolchain/project-profiles.md#verify-the-selected-profile).
 2. **Layer 2 — Domain DoD** (when a domain skill pack is installed — e.g. dApp checklists in product-specific skill repos): extends Layer 1 with domain-specific gates. Applies only when the project is in that domain.
 3. **Layer 3 — Project-specific acceptance criteria**: if a `PRD.md` exists at the working directory, its `## Acceptance criteria` section is also gating. Generated at planning time per the next section.
 
@@ -130,7 +145,7 @@ When generating Layer 3 criteria for a PRD, follow this shape:
 ### What goes in
 - **One criterion per user-facing requirement.** If the spec says "two players can play simultaneously," that's a criterion. If the spec says "anyone can browse past games without a wallet," that's a separate criterion.
 - **Both positive and negative assertions.** Positives describe what works ("the reveal phase records the outcome on-chain"). Negatives describe what is prevented ("no player can see the opponent's plaintext before both commit"). Negative criteria are often the most load-bearing — they capture the requirements the user implied but didn't articulate.
-- **Domain anti-patterns translated into project assertions.** The domain DoDs (e.g. `dapp-checklist.md`) enumerate generic anti-patterns. Convert the ones that apply to this project into PRD-style criteria so the loop has a project-local form to check. Example: dApp DoD says "no hand-rolled JSON-RPC envelopes"; PRD criterion becomes "`grep -rE '\"jsonrpc\"\\s*:' src/` returns nothing."
+- **Domain anti-patterns translated into project assertions.** A domain pack's DoD checklist enumerates generic anti-patterns. Convert the ones that apply to this project into PRD-style criteria so the loop has a project-local form to check. Example: dApp DoD says "no hand-rolled JSON-RPC envelopes"; PRD criterion becomes "`grep -rE '\"jsonrpc\"\\s*:' src/` returns nothing."
 - **Verification methodology.** When the project includes headless verification, name the script's pass condition explicitly: "`pnpm verify` exits 0 after running a full round end-to-end."
 
 ### What stays out
