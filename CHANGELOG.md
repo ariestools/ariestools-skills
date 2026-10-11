@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.9](https://github.com/ariestools/ariestools-skills/compare/v0.1.8...v0.1.9) (2026-10-11)
+
+
+### Features
+
+* add protocol-governed architecture skill ([7ca7287](https://github.com/ariestools/ariestools-skills/commit/7ca72870587f0547c741912f3c24ff2d647a60db))
+* release autonomous worker architecture guidance ([9c31ba8](https://github.com/ariestools/ariestools-skills/commit/9c31ba8a4244a111baed971a364a356d2f12050b))
+
 ## [0.1.8](https://github.com/ariestools/ariestools-skills/compare/v0.1.7...v0.1.8) (2026-10-09)
 
 

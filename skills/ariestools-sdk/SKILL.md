@@ -2,7 +2,7 @@
 name: ariestools-sdk
 description: Aries Tools shared TypeScript/JavaScript libraries published from the sdk-js monorepo. Covers the @ariestools/sdk umbrella (assert, delay, fetch, hex, promise, storage, zod helpers, and other modules), specialist packages (express, storage-adapters, threads, testing, telemetry, crypto-auth, eth-address, pixel, json-rpc-engine, sdk-meta), root-barrel import conventions, runtime peers (zod, OpenTelemetry), the Node 26 baseline, and migration from retired @xylabs/* names. Use when importing, installing, or choosing @ariestools/* packages published from sdk-js, wiring HTTP clients, storage adapters, workers, Express APIs, or Vitest matchers, or replacing @xylabs/* utilities.
 metadata:
-  version: 0.1.8 # x-release-please-version
+  version: 0.1.9 # x-release-please-version
 ---
 
 # Aries Tools SDK
