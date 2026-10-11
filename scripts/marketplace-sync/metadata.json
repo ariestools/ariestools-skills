@@ -1,6 +1,6 @@
 {
   "name": "ariestools-skills",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "displayName": "Aries Tools Skills",
   "description": "Agent skills for Aries Tools TypeScript development: shared conventions, the @ariestools/toolchain xy CLI, ESLint and TypeScript configs, Vitest presets, dependency policy, the @ariestools/sdk utility libraries, the @ariestools/sdk-react React UI libraries, actor-kit actors and providers with their cli-kit and browser-kit hosts, repository documentation conventions for agents (AGENTS.md, docs/papers lifecycle, xy agent lint), product planning from idea to MVP (papers, roadmap, per-version PRDs), and distributed architecture with autonomous replaceable workers, protocol-defined authority, reconciliation, safe concurrency and justified coordination.",
   "shortDescription": "Aries Tools development, toolchain, SDK, React, actor-kit, agent documentation, product planning, and distributed architecture skills.",
