@@ -6,6 +6,8 @@ It is the paper amended most often, because this is where the design meets reali
 
 **Derived from:** White.
 
+For distributed responsibilities, work discovery, concurrency, or recovery, consult [ariestools-architecture](../ariestools-architecture/SKILL.md) when available before choosing the mechanisms. Specify authoritative evidence, independent work discovery, safe effect admission, replacement behavior, fault assumptions, and resource bounds. Justify each coordination mechanism by its named invariant or resource constraint and authority scope. Put the resulting product rules and failure-oriented conformance criteria here; a shared preference does not silently amend an accepted White or Yellow baseline.
+
 ## Outline
 
 Sections marked *core* appear in nearly every good Yellow Paper. Add as many mechanism sections as the product needs; a mechanism-heavy Yellow Paper is usually the longest document in the series.

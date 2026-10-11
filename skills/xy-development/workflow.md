@@ -60,6 +60,12 @@ When in doubt, read existing code first and follow its lead.
 
 The same applies to documents. If the repo has an `AGENTS.md`, a `docs/` tree, or a `papers/` directory, follow their existing conventions for naming, front matter, and where a new document belongs. The [xy-agent skill](../xy-agent/SKILL.md) describes the house pattern for these and is recommended where a repo has adopted it. If `../xy-agent/` is missing, install it with `npx skills add ariestools/ariestools-skills --skill xy-agent`.
 
+### Architecture decisions
+
+When a change introduces distributed work, a controller or exclusive claim, or new recovery and effect semantics, consult the [ariestools-architecture skill](../ariestools-architecture/SKILL.md) if available. Identify how eligible workers discover obligations, how their outcomes are accepted, how concurrent attempts remain safe at the effect boundary, and how a replacement recovers. Name the invariant or resource bound behind any required coordination and keep its authority scoped to that requirement.
+
+This is a decision review, not a new universal completion gate or permission request. Keep ordinary changes within the repository's accepted design. If the skill is not installed, apply the concise default above and the repository's existing contracts; read an accessible canonical source when more detail is needed. Do not invent toolchain catalog support or block unrelated implementation on installing a companion skill.
+
 ### Credential Safety
 
 Never commit secrets or authentication tokens to the repository:

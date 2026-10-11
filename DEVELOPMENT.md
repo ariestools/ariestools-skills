@@ -51,10 +51,10 @@ pnpm sync:codex  --out .preview/codex  && jq empty .preview/codex/.agents/plugin
 
 ## Ownership
 
-- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `ariestools-sdk-react` / `ariestools-actor` / `xy-agent` / `xy-product-plan`** — edit only in this repo.
+- **`xy-development` / `xy-toolchain` / `ariestools-sdk` / `ariestools-sdk-react` / `ariestools-actor` / `xy-agent` / `xy-product-plan` / `ariestools-architecture`** — edit only in this repo.
 - **`xyo-knowledge` / `xl1-*`** — edit in [XYOracleNetwork/xyo-skills](https://github.com/XYOracleNetwork/xyo-skills).
 - Reject PRs that reintroduce full body copies of the base skills into `xyo-skills`; that pack keeps temporary redirect stubs for `xy-development` and `xy-toolchain` only.
-- Adding a skill also means adding its `SKILL.md` to `extra-files` in `release-please-config.json`, a `test -d` line in `.github/workflows/validate-plugins.yml`, and an entry in the layer tables (README.md, AGENTS.md) and `scripts/marketplace-sync/metadata.json`.
+- Adding a skill also means adding its `SKILL.md` to `extra-files` in `release-please-config.json`, an entry in the expected skill list in `.github/workflows/validate-plugins.yml` for both rendered trees, and an entry in the layer tables (README.md, AGENTS.md) and `scripts/marketplace-sync/metadata.json`.
 
 ## Skill layout
 
@@ -78,7 +78,10 @@ skills/
 ├── xy-agent/              cross-cutting — AGENTS.md, adapters, docs/ and papers/
 │   ├── SKILL.md
 │   └── …
-└── xy-product-plan/       cross-cutting — papers, roadmap MVP line, per-version PRDs
+├── xy-product-plan/       cross-cutting — papers, roadmap MVP line, per-version PRDs
+│   ├── SKILL.md
+│   └── …
+└── ariestools-architecture/ cross-cutting — autonomous workers, protocols, recovery, scoped coordination
     ├── SKILL.md
     └── …
 ```

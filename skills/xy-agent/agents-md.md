@@ -75,6 +75,7 @@ Add these when the repository has the content. Do not invent them to fill a temp
 
 - **`## Current phase`** — what exists, and more prominently what does *not*. State what has received no review, no evidence, no validation. Preserve any owner-directed sequence with its date.
 - **`## Governing boundaries`** — invariants, most usefully in the form *"X proves A. It does not prove B."* A signature proves attribution to a key; it does not prove personhood, honesty, or consent. This shape stops overclaiming better than any prohibition.
+- **`## Architectural preference`** — where the repository adopts shared design guidance, state a concise default and explicitly route architecture decisions to the available [ariestools-architecture skill](../ariestools-architecture/SKILL.md). Keep product-specific protocol rules and exceptions in the linked accepted papers or decision records; a pointer alone neither installs nor loads the skill. Do not impose adoption or rewrite an existing architecture during unrelated documentation work.
 - **`## Normative product decisions`** — settled constants an agent must not re-derive: exact names, coefficients, identifiers, wire prefixes.
 - **`## Known divergences between documents and code`** — where the documents are currently wrong, and which side wins. Retire entries as they are resolved so the section cannot grow without bound. This section is the honest alternative to letting an agent discover the divergence the hard way.
 - **`## Source discipline`** — immutability rules for `references/` and `prototypes/`.
