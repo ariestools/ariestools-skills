@@ -13,6 +13,8 @@ metadata:
 
 This skill defines foundational development practices. Where a repository's own `AGENTS.md` or `CLAUDE.md` says otherwise, the repository wins. Load the sub-topic that matches your current task:
 
+**Architecture decisions.** Before a change introduces distributed worker responsibilities, recovery rules, or new coordination authority, consult [ariestools-architecture](../ariestools-architecture/SKILL.md) when available. Prefer protocol-defined autonomous, replaceable workers with durable evidence and safe concurrent effects; justify coordination by its invariant or resource constraint. Preserve the accepted architecture during routine maintenance. The [workflow](workflow.md#architecture-decisions) describes this scoped review, including when the architecture skill is absent.
+
 ## Table of Contents
 
 ### [TypeScript Conventions](typescript.md)
@@ -34,6 +36,7 @@ Read when moving code between files or packages, splitting or merging packages, 
 
 These are navigation links, not dependencies of this skill; each installs separately.
 
+- **[ariestools-architecture](../ariestools-architecture/SKILL.md)** — the shared design preference and review criteria for autonomy, authority, concurrency, and recovery. Consult at architectural decisions; ordinary implementation within an accepted design does not reopen it.
 - **[xy-toolchain](../xy-toolchain/SKILL.md)** — the `xy` CLI, build/lint/test commands, and the tooling these principles run on. Install: `npx skills add ariestools/ariestools-skills --skill xy-toolchain`.
 - **[ariestools-sdk](../ariestools-sdk/SKILL.md)** — which `@ariestools/*` utilities to use and how to import them. Read it when the repo depends on sdk-js packages; `xy skills lint` requires it only there, so it is often absent elsewhere. Install: `npx skills add ariestools/ariestools-skills --skill ariestools-sdk`.
 - **[ariestools-sdk-react](../ariestools-sdk-react/SKILL.md)** — which `@ariestools/sdk-react*` package owns a component or hook, its peers, and the import rule that keeps one copy of each React context. Read it when the repo depends on sdk-react packages; since toolchain 10.1.4, `xy skills lint` requires it only there. Install: `npx skills add ariestools/ariestools-skills --skill ariestools-sdk-react`.

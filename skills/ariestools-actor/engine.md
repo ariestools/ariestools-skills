@@ -40,6 +40,8 @@ The engine **compiles** (parses the system config, selects one installed declara
 
 ## Supervision
 
+These policies manage a launch's local actor lifecycles. When designing how several hosts discover and perform application work, consult [ariestools-architecture](../ariestools-architecture/SKILL.md) when available and evaluate business authority and recovery separately. Local supervision does not itself specify distributed work admission, deduplication, or replacement progress.
+
 | Policy | Start | Readiness | Failure or stop |
 |---|---|---|---|
 | `parallelActorEngineSupervision` (engine default; browser-kit sets no policy, so it gets this) | One owned `Orchestrator` per launch; actors start in parallel and kick off warm passes | `whenReady(readyTimeoutMs)` | Stop, with a shutdown fallback |

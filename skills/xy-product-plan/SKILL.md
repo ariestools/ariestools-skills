@@ -15,6 +15,8 @@ This skill describes how a product goes from an idea to a plan that can be built
 
 **Read the repository's own `AGENTS.md` first.** It is authoritative for that repository. In a repository that already has papers under other names or in other places, follow what it does and do not reorganize it mid-task.
 
+**Architecture decisions.** When specifying the system model, worker responsibilities, coordination, or recovery in a Yellow Paper or PRD, consult [ariestools-architecture](../ariestools-architecture/SKILL.md) when available. Prefer protocol-defined autonomous, replaceable workers with durable evidence and safe concurrent effects, and explain coordination through its invariant or resource constraint. Record the product's actual rules and exceptions in its papers; preserve accepted baselines and follow the existing amendment process. This planning process remains usable when the companion skill is absent.
+
 **The rule this exists to enforce:** every document names the versions of the documents it was derived from, and a change flows downstream only after it has been made upstream. A downstream document never contradicts its source, not even temporarily.
 
 ## The sequence
@@ -119,6 +121,7 @@ Read when writing, amending or closing a PRD (`MVP_PRD.md`, `V2_PRD.md`, …). C
 
 These are navigation links, not dependencies; each skill installs separately.
 
+- **[ariestools-architecture](../ariestools-architecture/SKILL.md)**: the shared architectural preference and review criteria. Consult while designing the system and trust model, mechanisms, recovery, or implementation architecture; carry the affected observable criteria into the PRD.
 - **[xy-agent](../xy-agent/SKILL.md)**: where documents live and how they age. Front matter, the state vocabulary, `docs/` lifecycle tiers, decision and evidence records, archiving, and `xy agent lint`. Install: `npx skills add ariestools/ariestools-skills --skill xy-agent`.
 - **[xy-toolchain](../xy-toolchain/SKILL.md)**: the tools that support this process in an `@ariestools/toolchain` repository. [Plan tooling](../xy-toolchain/plan.md) covers `xy repo init`, the experimental `xyex plan`, `xy agent` and `xyex work` as they apply here. Install: `npx skills add ariestools/ariestools-skills --skill xy-toolchain`.
 - **[xy-development](../xy-development/SKILL.md)**: the Definition of Done. A PRD's `## Acceptance criteria` is its [Layer 3](../xy-development/workflow.md#applying-the-definition-of-done). Install: `npx skills add ariestools/ariestools-skills --skill xy-development`.

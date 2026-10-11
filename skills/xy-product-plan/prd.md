@@ -64,6 +64,8 @@ Use exactly the heading `## Acceptance criteria`. It is what the Definition of D
 
 State every criterion at the PRD's deployment target. "Two invited users on the hosted beta see the same balance within five seconds" is a criterion. "Sync works" is not. An MVP often needs more than the usual five to ten items. Group them by milestone rather than dropping any.
 
+For distributed workers or coordination changes, consult the available [architecture review criteria](../ariestools-architecture/review.md#observable-acceptance-criteria) and select scenarios that exercise the version's actual guarantees: participant loss, concurrent attempts, ambiguous effects, missed hints, recovery, and resource limits. Cite the Yellow rules these scenarios establish. A proposed criterion is not passing evidence, and the review does not add work outside this version's scope.
+
 ## Stop conditions
 
 Stop and go back to the owner when:
