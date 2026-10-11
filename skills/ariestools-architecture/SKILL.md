@@ -2,7 +2,7 @@
 name: ariestools-architecture
 description: "Design and review distributed systems using protocol-governed autonomous, replaceable workers. Covers independent work discovery, durable evidence, safe concurrent attempts, reconciliation, bounded activity, and narrowly justified coordination. Use when defining worker or service responsibilities, recovery and effect semantics, or introducing a scheduler, controller, leader, authoritative queue, or repair service. Applies across frameworks and hosting platforms; routine changes within an accepted architecture do not reopen its design."
 metadata:
-  version: 0.1.8 # x-release-please-version
+  version: 0.1.9 # x-release-please-version
 ---
 
 # Aries Tools Architecture
