@@ -4,14 +4,14 @@ description: The Aries Tools TypeScript toolchain (@ariestools/toolchain) behind
 metadata:
   version: 0.1.9 # x-release-please-version
   toolchain: ">=9.0.0"
-  verified-toolchain: 10.1.5
+  verified-toolchain: 10.2.0
 ---
 
 # XY Toolchain
 
 **Authority.** This skill is maintained only in [`ariestools/ariestools-skills`](https://github.com/ariestools/ariestools-skills). Copies under `XYOracleNetwork/xyo-skills` are redirect stubs — edit here, never there. If the repository also has `xylabs-*` skills, `.claude/rules/xylabs-*.md`, or `.claude/commands/xy-*.md` and `xylabs-*.md`, they are retired output of the removed `xy claude` command; this skill supersedes them. Since 10.1.2, `xy skills lint` reports them and `--fix` removes most of them ([legacy agent files](toolchain.md#legacy-agent-files-from-xy-claude)).
 
-**Toolchain versions.** This skill is verified against `@ariestools/toolchain` 10.1.5; anything not marked "(since X)" exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0` (`pnpm xy --version` is reliable only from 10.0.6). A top-level command the installed version lacks prints `Command not found`. From 10.1.2 that exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the Version notes, not only the exit code. [Version notes](toolchain.md#version-notes) collects the gates.
+**Toolchain versions.** This skill is verified against `@ariestools/toolchain` 10.2.0; anything not marked "(since X)" exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0` (`pnpm xy --version` is reliable only from 10.0.6). A top-level command the installed version lacks prints `Command not found`. From 10.1.2 that exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the Version notes, not only the exit code. [Version notes](toolchain.md#version-notes) collects the gates.
 
 **Skill identity.** When you present a plan, an acknowledgement, or a completion summary, state which skills informed it as `xy-toolchain v<version>`, and list each other active skill from this pack the same way. Read the version from this file's `metadata.version`, never from an example or from `verified-toolchain`.
 

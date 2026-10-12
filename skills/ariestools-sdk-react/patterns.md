@@ -36,7 +36,7 @@ export const useSession = (): SessionState => use(SessionContext)
 - Export the provider, the hook and the state type. Exporting the context object is optional: `UserEventsContext` is exported, `ErrorReporterContext` is not.
 - Each exported context must live in exactly one module. A provider and its hooks work only when every consumer reaches that module through the same copy ([imports.md](imports.md)).
 
-The React ESLint layer starts at tier 2 ([rule tiers](../xy-toolchain/eslint.md#rule-tiers)). Its React X presets (eslint-plugin-react-x 5.24.8) set:
+The React ESLint layer starts at tier 2 ([rule tiers](../xy-toolchain/eslint.md#rule-tiers)). Its React X presets (eslint-plugin-react-x 5.26.0) set:
 
 - `react-x/no-use-context`, `no-context-provider`, `no-forward-ref` and `no-unstable-context-value`: warn;
 - `react-x/no-class-component`: error, except for classes with `componentDidCatch` or `getDerivedStateFromError` (error boundaries).

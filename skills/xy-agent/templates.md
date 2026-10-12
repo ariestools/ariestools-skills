@@ -230,13 +230,13 @@ For a retirement with no successor:
 > path: `docs/runbooks/OLD.md`. Nothing supersedes it.
 ```
 
-`pnpm xy agent archive <path>` moves the file and regenerates the index. It keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Write `<path>` as `docs/…`, not `./docs/…` or an absolute path, or the file lands flat in `docs/archive/`. Add the reason to a retirement banner, or replace it with one of these. See [lifecycle.md](lifecycle.md#archiving).
+`pnpm xy agent archive <path>` moves the file and regenerates the index. It keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Since 10.2.0 `<path>` is relative to the current folder. On 10.1.5 and earlier, run it from the repository root and write `<path>` as `docs/…`, not `./docs/…` or an absolute path, or the file lands flat in `docs/archive/`. Add the reason to a retirement banner, or replace it with one of these. See [lifecycle.md](lifecycle.md#archiving).
 
 ## docs/README.md
 
-Do not write this file. Run `pnpm xy agent index` after any change under `docs/`. `xy agent lint --fix`, `xy check --fix` (where it runs agent lint) and `xy agent archive` regenerate it too, and `xy agent init` and `xy repo init` create it when missing. `xy agent lint` warns with `docs.index-current` when the committed file differs from the generated text at all, which fails `xy check --strict`.
+Do not write the table. Run `pnpm xy agent index` after any change under `docs/`. `xy agent lint --fix`, `xy check --fix` (where it runs agent lint) and `xy agent archive` regenerate it too, and `xy agent init` and `xy repo init` create the file when missing. `xy agent lint` warns with `docs.index-current` when the file differs from the generated text at all, which fails `xy check --strict`.
 
-The generator writes exactly this shape: one row per `docs/**/*.md` except the index itself, sorted by path, with the front-matter `status`, or `state` when there is no `status`.
+The generator writes exactly this shape: one row per `docs/**/*.md` that Git does not ignore, except the index itself, sorted by path, with the front-matter `status`, or `state` when there is no `status`.
 
 ```markdown
 # Docs
@@ -248,7 +248,20 @@ The generator writes exactly this shape: one row per `docs/**/*.md` except the i
 | [evidence/2026-08-29-....md](evidence/2026-08-29-....md) | evidence | active |
 ```
 
-Keep `status` to one line with no `|`, because it lands in a table cell. `papers/` and `specs/` are not indexed; AGENTS.md links them directly. On a toolchain without `xy agent`, maintain the file by hand in exactly this shape.
+Since 10.2.0, a `docs/README.md` can carry hand-written text, such as a register or a reading guide, around the table. Mark where the table goes with two markers, each on a line of its own; the generator rewrites only what lies between them:
+
+```markdown
+# Docs
+
+<hand-written introduction>
+
+<!-- xy agent index: start -->
+<!-- xy agent index: end -->
+```
+
+Without the markers, a file that holds anything but the generated shape is reported and never rewritten; on 10.1.5 and earlier there are no markers, and the generators replace the whole file. Links in the hand-written text count for `docs.orphan`; the generated rows do not.
+
+Keep `status` to one line with no `|`, because it lands in a table cell. `papers/` and `specs/` are not indexed; AGENTS.md links them directly. On a toolchain without `xy agent`, maintain the file by hand in exactly the generated shape.
 
 ## .claude/rules/ path-scoped rule
 
