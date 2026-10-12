@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.10](https://github.com/ariestools/ariestools-skills/compare/v0.1.9...v0.1.10) (2026-10-12)
+
+
+### Bug Fixes
+
+* release xy-agent guidance for the reworked agent lint ([7c5381e](https://github.com/ariestools/ariestools-skills/commit/7c5381e67629e3fba1114f48a8256072111022a6))
+* **skills:** describe the reworked xy agent lint shipping in toolchain 10.1.6 ([b97123e](https://github.com/ariestools/ariestools-skills/commit/b97123e8360d54c3f02e4a3049a7cddefe80af94))
+* **skills:** verify against toolchain 10.2.0 ([0d8fe81](https://github.com/ariestools/ariestools-skills/commit/0d8fe81f6506c8795fd19b20c02011ba35c48753))
+* **skills:** verify against toolchain 10.2.0 ([fbdcbab](https://github.com/ariestools/ariestools-skills/commit/fbdcbab4eece07ac26b061872a332873d2c653e2))
+
 ## [0.1.9](https://github.com/ariestools/ariestools-skills/compare/v0.1.8...v0.1.9) (2026-10-11)
 
 
