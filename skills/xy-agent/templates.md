@@ -230,7 +230,7 @@ For a retirement with no successor:
 > path: `docs/runbooks/OLD.md`. Nothing supersedes it.
 ```
 
-`pnpm xy agent archive <path>` moves the file and regenerates the index. It keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Since 10.1.6 `<path>` is relative to the current folder. On 10.1.5 and earlier, run it from the repository root and write `<path>` as `docs/…`, not `./docs/…` or an absolute path, or the file lands flat in `docs/archive/`. Add the reason to a retirement banner, or replace it with one of these. See [lifecycle.md](lifecycle.md#archiving).
+`pnpm xy agent archive <path>` moves the file and regenerates the index. It keeps the path below `docs/`, sets `state: retired` unless the document is already `superseded`, leaves the rest of the front matter alone, and prepends its own dated banner with the successor from `supersededBy`, or "Retired", and the original path. Since 10.2.0 `<path>` is relative to the current folder. On 10.1.5 and earlier, run it from the repository root and write `<path>` as `docs/…`, not `./docs/…` or an absolute path, or the file lands flat in `docs/archive/`. Add the reason to a retirement banner, or replace it with one of these. See [lifecycle.md](lifecycle.md#archiving).
 
 ## docs/README.md
 
@@ -248,7 +248,7 @@ The generator writes exactly this shape: one row per `docs/**/*.md` that Git doe
 | [evidence/2026-08-29-....md](evidence/2026-08-29-....md) | evidence | active |
 ```
 
-Since 10.1.6, a `docs/README.md` can carry hand-written text, such as a register or a reading guide, around the table. Mark where the table goes with two markers, each on a line of its own; the generator rewrites only what lies between them:
+Since 10.2.0, a `docs/README.md` can carry hand-written text, such as a register or a reading guide, around the table. Mark where the table goes with two markers, each on a line of its own; the generator rewrites only what lies between them:
 
 ```markdown
 # Docs
