@@ -1,6 +1,6 @@
 ---
 name: xy-development
-description: Core development standards for TypeScript conventions, Git workflow, testing principles, behavior-preserving refactors, repository workflow, and the Definition of Done. Use when writing or reviewing TypeScript or organizing imports; writing tests; refactoring, moving code between packages, or auditing a monorepo's package structure; running a repo's build, lint, test, or dev commands; adding or upgrading dependencies; committing, branching, merging, or releasing; writing PRD acceptance criteria; or before declaring any task complete.
+description: Core development standards for TypeScript conventions, Git workflow, testing principles, behavior-preserving refactors, repository workflow, and the Definition of Done. Use when writing or reviewing TypeScript or organizing imports; writing tests; refactoring, moving code between packages, or auditing a monorepo's package structure; running a repo's build, lint, test, or dev commands; adding or upgrading dependencies; committing, branching, merging, releasing, or deploying; writing PRD acceptance criteria; or before declaring any task complete.
 metadata:
   version: 0.1.10 # x-release-please-version
 ---
@@ -22,6 +22,9 @@ Read when writing, reviewing, or refactoring TypeScript code, or organizing impo
 
 ### [Git Workflow](git.md)
 Read when committing, branching, pushing, merging or opening PRs, undoing a change, resolving a rejected push, or cutting a release. Covers conventional commits and PR titles, atomic commits, commit identity and repository hygiene, the history-rewrite policy, branching-model detection, merge methods, and releases.
+
+### [Deployment Conventions](deployment.md)
+Read when creating, changing, simplifying, or migrating deployment workflows or provider branch mappings. Covers `<environment>[-<component>]-<target>[-<build-mode>]` names, native Vercel versus CI prebuilt/image delivery, one automatic build/deploy path, explicit approval for naming exceptions, homelab scope, and compatibility across independently deployed components.
 
 ### [Testing Principles](testing.md)
 Read when writing tests, discussing test strategy, or evaluating coverage. Covers framework-agnostic principles: behavior-focused names, arrange/act/assert, one concept per test, testing the public interface, independent and deterministic tests, minimal mocking that still leaves the real wiring tested, and coverage priorities. Frameworks, runners, and spec layout are defined in the xy-toolchain skill ([xy-toolchain testing](../xy-toolchain/testing.md)).

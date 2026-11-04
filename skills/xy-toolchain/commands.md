@@ -46,7 +46,7 @@ Since 9.2.0 the toolchain package ships two binaries:
 | `xyex packman convert <pm>` / `packman clean` | Package-manager migration aids | `packman clean` deletes `node_modules` and lockfiles; it is not a build-artifact cleaner (use `xy clean`) |
 | `xyex sonar` | Quarantined Sonar check | Needs a local `sonar.eslintrc`; may be removed |
 
-React projects also get the stable `xy start` and the experimental `analyze`, `eject`, and `sitemap`; `start` and `eject` wrap CRA `react-scripts` and do not apply to Vite or Next. `xy relint` is deprecated in favor of `xy lint --fresh`. Read experimental flags from `pnpm xyex <cmd> --help` rather than copying them.
+React projects also get the stable `xy start` and the experimental `analyze` and `sitemap`; `start` wraps CRA `react-scripts` and does not apply to Vite or Next. `xyex eject` was removed in 10.2.2. `xy relint` is deprecated in favor of `xy lint --fresh`. Read experimental flags from `pnpm xyex <cmd> --help` rather than copying them.
 
 ### Global flags
 
@@ -100,7 +100,7 @@ To also gate repository policy, run `pnpm xy check --strict` after the build (pu
 
 - First set git config with plain git: `git config core.autocrlf false && git config core.eol lf`, plus `git config core.ignorecase false` on case-insensitive filesystems. A fresh clone has neither of the first two keys, so `git.autocrlf` and `git.eol` warn and fail `--strict`. Do not use `xy git lint --fix` for this; it can also rewrite `.gitignore`.
 - Since 10.1.2, `--strict` and `XY_STRICT=1` also escalate agent-lint and skills-lint warnings, both inside `xy check` and in the standalone linters. Before 10.1.2, `xy check --strict` leaves them as warnings and the standalone linters ignore `XY_STRICT=1`, so when those warnings must block on those versions, also run `pnpm xy agent lint --strict` and `pnpm xy skills lint --strict`.
-- `xy check` is not hermetic and has no `--offline`. `skills.required-current` fetches upstream skill versions: offline it passes silently, online a new skill release can fail CI with no repository change. Once agent-lint warnings gate, as they do under `xy check --strict` since 10.1.2, `docs.stale` depends on today's date and `docs.evidence-immutable` needs full history (`fetch-depth: 0`).
+- `xy check` is not hermetic. Since 10.2.2, `xy check --offline` passes through to skills lint, and `xy skills lint --offline` correctly skips upstream skill version checks; other check steps are unchanged. Through 10.2.1 the skills CLI accepted `--offline` but did not pass it to the version checker, and `xy check` had no offline option. Without it, `skills.required-current` fetches upstream skill versions: a failed lookup passes silently, while a new upstream skill release can fail CI with no repository change. Once agent-lint warnings gate, as they do under `xy check --strict` since 10.1.2, `docs.stale` depends on today's date and `docs.evidence-immutable` needs full history (`fetch-depth: 0`).
 
 ## Dependency and publish analysis
 
@@ -182,7 +182,7 @@ Treat `refType` as deprecated. Its historical behavior combines placement with a
 
 Placement overrides also inform `xy api-exposure`. Root and package `commands.deplint.packages` entries deep-merge, so a root placement can combine with a package-level presence override. Keep package-role classification separate from these per-dependency policies, and do not distort source imports to satisfy an inappropriate classifier default.
 
-Other `commands.deplint` fields: `classifier` (default `legacy`), `exclude` (workspace-relative globs skipped by source scanning, for generated trees such as release folders), `plugins` (extra rule modules), `rules`, and the role facets `role`, `hasImportConsumers`, `peerTarget`, `allowMoveToDev`, `prodInstallMatters`, `runtimeEntry`, and `runtimeRoots`, which derive from the role when unset.
+Other `commands.deplint` fields: `classifier` (default `legacy`), `exclude` (workspace-relative globs skipped by source scanning, for generated trees such as release folders), `plugins` (extra rule modules; since 10.2.2 relative paths resolve from the config that declares each plugin, and local paths must stay inside its Git checkout), `rules`, and the role facets `role`, `hasImportConsumers`, `peerTarget`, `allowMoveToDev`, `prodInstallMatters`, `runtimeEntry`, and `runtimeRoots`, which derive from the role when unset.
 
 #### Interactive pick
 
@@ -430,7 +430,7 @@ When `stores.github.enabled` is true (the default for new stores) and the GitHub
   - Local active items without a GitHub link → create a marked issue
   - GitHub issues not present locally → import (`XYW-…` id when marked, else `GH-<number>`)
   - Linked pairs: newer title wins; local `done`/`wontfix` closes the issue; closed GitHub issues mark local done
-  - Since 10.1.0, sync edits or closes a GitHub issue only when its body marker and stored URL match the local item.
+  - Since 10.1.0, sync edits or closes a GitHub issue only when its body marker and stored URL match the local item. Since 10.2.2, the issue must also retain the `xy-work` label; a marker without that label is not attached to an existing local item.
   - Since 10.1.3, sync pushes the rendered body to every issue `xy work` owns whenever it differs, and the local item always wins: edits made to that issue body on GitHub are overwritten. `work.github-synced` reports the body drift. Change the item locally, then sync.
 - Since 10.1.3, `work update` changes only the priority fields you pass (earlier versions reset the others to 3), and `--blocked-reason ""` clears the reason.
 
@@ -502,7 +502,7 @@ export default config
 - `patterns` — extra package-relative globs beyond builtins.
 - `include` — always cleaned; bypasses `clean.gitignored-only`, still subject to hard safety and `exclude`.
 - `exclude` — never cleaned (plus immutable `.git` and default `node_modules` excludes).
-- Hard rules `clean.inside-root` and `clean.relative-pattern` always apply and cannot be turned off.
+- Hard rules `clean.inside-root` and `clean.relative-pattern` always apply and cannot be turned off. Since 10.2.2, containment follows real filesystem paths and clean skips symlink targets, including paths that escape through a symlinked directory.
 
 Prefer `xy clean` over ad-hoc `rm -rf dist`. Use `--full` only when you intend fresh-clone hygiene; use `--full-all` only when you intentionally want to delete excluded trees such as `node_modules` under packages.
 

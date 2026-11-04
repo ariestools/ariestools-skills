@@ -83,7 +83,9 @@ In other modes, string `entry` items are added to the mode's defaults, and an `{
 
 ## Compile modes
 
-`xy compile` emits JavaScript with esbuild (bundled ESM `.mjs` with sourcemaps, `target: 'esnext'`) and declarations with tsc, or with the [native compiler](#native-compiler-experimental) when enabled. Do not describe the current compiler as tsup or as a dual `dist/esm` and `dist/cjs` pipeline. Put esbuild overrides in `compile.esbuild.options` (shared) or a source-directory map (per directory). `compile.tsup.options` is deprecated but still honored, and legacy tsup keys such as `dts`, `clean`, and `entry` outside a source-directory map are ignored. Every configured source directory, entry, `outdir`, `outfile`, and `inject` path must resolve inside the package directory, or compile throws (since 10.1.0).
+`xy compile` emits JavaScript with esbuild (bundled ESM `.mjs` with sourcemaps, `target: 'esnext'`) and declarations with tsc, or with the [native compiler](#native-compiler-experimental) when enabled. Do not describe the current compiler as tsup or as a dual `dist/esm` and `dist/cjs` pipeline. Put esbuild overrides in `compile.esbuild.options` (shared) or a source-directory map (per directory). Since 10.2.2, `compile.tsup`, the compile `outDir` alias, `XyTsupConfig`, `PackageCompileTsupConfig`, `packageCompileTsup`, and `tsupOptions` are removed. Migrate shared options to `compile.esbuild.options`, use esbuild's lowercase `outdir`, and use `XyConfig` or `XyEsbuildConfig`. `tsup.config.*` no longer affects incremental hashes. Pass one `format` (`'esm'`, `'cjs'`, or `'iife'`); a multi-format array throws.
+
+Every configured source directory, entry, `outdir`, `outfile`, and `inject` path must resolve inside the package directory, or compile throws (since 10.1.0). Since 10.2.2 this check follows real filesystem paths, so a symlink cannot escape the package; it also covers custom output names, `entryNames`, `chunkNames`, `assetNames`, `nodePaths`, path-valued aliases, and `stdin.resolveDir`. The compiler owns `absWorkingDir`, `entryPoints`, `outbase`, and `tsconfig`; supply entries through the target's source-directory map instead. Function-form `outExtension` is ignored with a warning; use an object such as `{ '.js': '.mjs' }`.
 
 | Mode | Use when |
 |---|---|
@@ -95,6 +97,8 @@ In other modes, string `entry` items are added to the mode's defaults, and an `{
 
 Configure bundle selection through `compile.bundlePackages` (`all`, `workspace`, `scopes`, and `external`). `library` mode honors it to inline only selected packages, and `transpile` ignores it. `mode: 'bundle'` with no `all`, `workspace`, or `scopes` rule inlines every npm package, so pair `bundle` with explicit `scopes`, `workspace`, or `external`. Avoid bundling dependencies accidentally merely to silence resolution errors.
 
+Since 10.2.2 selected-package bundling uses an esbuild resolver plugin, composed with user plugins; preserve that composition when customizing the build.
+
 `mode: 'tsc'` is reserved in the public type but is not wired into compilation; the compile fails on it (since 9.2.0). Do not recommend it as an operational mode.
 
 ## Type validation
@@ -105,7 +109,7 @@ Configure bundle selection through `compile.bundlePackages` (`all`, `workspace`,
 - A workspace `xy compile`, `xy build`, or `xy rebuild` emits every package first, in dependency order (`dependencies` and `devDependencies`) with `--emit-only`, then validates each package with `--validate-only` or runs the shared host once. Emit skips full validation, but declaration emit still type-checks each source folder, so source type errors still fail emit and stop dependents. A workspace compile that fails validation can leave fresh `dist` output.
 - A workspace `xy recompile` cleans, then runs each package's full compile in dependency order. With the shared validator, packages emit only and one shared validation follows.
 
-A successful raw `tsc` validation is therefore not proof that package emission or publish checks pass.
+A successful raw `tsc` validation is therefore not proof that package emission or publish checks pass. Since 10.2.2 compile resolves the chosen TypeScript package explicitly and fails when it is unavailable; it no longer falls back to whichever `tsc` is on `PATH`.
 
 Use these controls narrowly:
 
