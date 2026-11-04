@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.11](https://github.com/ariestools/ariestools-skills/compare/v0.1.10...v0.1.11) (2026-11-04)
+
+
+### Features
+
+* adopt lightweight deployment conventions ([38e34c2](https://github.com/ariestools/ariestools-skills/commit/38e34c291428df3ff142b5e4f8f47ac08c9ea357))
+* **skills:** simplify deployment routes and naming ([#41](https://github.com/ariestools/ariestools-skills/issues/41)) ([4d84a3c](https://github.com/ariestools/ariestools-skills/commit/4d84a3ce07c9467b7460a4aace4ae4475ef0d1b7))
+
 ## [0.1.10](https://github.com/ariestools/ariestools-skills/compare/v0.1.9...v0.1.10) (2026-10-12)
 
 
