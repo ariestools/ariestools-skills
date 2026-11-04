@@ -97,7 +97,7 @@ Each tier includes the tiers below it:
 | 3 | Opinionated default: optional rules and stricter promotions |
 | 4 | Experimental canary rules for migration testing; may change on a minor |
 
-Higher tiers add errors, not just warnings. With type checking, moving from tier 2 to tier 3 makes 38 more rules errors (the opinionated Unicorn preset, `strict-boolean-expressions`, `unicorn/filename-case` and the `workspaces/*` rules among them) and adds 22 warnings. Moving from tier 3 to tier 4 adds 68 warnings and promotes 22 Unicorn rules from warning to error; the Unicorn v77 rules are off at tier 2, warnings at tier 3 and errors at tier 4 (since 10.1.0). Tier 4 can therefore fail lint without `--strict`. Preview the impact with `pnpm xy lint --analyze` before changing tier, and use tier 4 for evaluation, not as an automatic default. Use `pnpm xy lint --strict` or `XY_STRICT=1` when warnings must fail CI.
+Higher tiers add errors, not just warnings. Since 10.2.1, Unicorn migration queues no longer hold rules at lower severities: unopinionated rules take their upstream levels from tier 2, and opinionated rules are errors from tier 3, subject to the shared explicit overrides. Tier 4 currently has the same Unicorn severities as tier 3; it remains an experimental surface. The old versioned migration-queue and migration-layer exports were removed. With type checking, tier 3 also promotes `strict-boolean-expressions`, `no-deprecated`, `unicorn/filename-case` and the `workspaces/*` rules to errors. Preview the actual installed config with `pnpm xy lint --analyze` before changing tier, and use tier 4 for evaluation, not as an automatic default. Use `pnpm xy lint --strict` or `XY_STRICT=1` when warnings must fail CI.
 
 Set `isTypeChecked: false` when the repository intentionally avoids parser type information. Change the persisted setting safely with:
 
@@ -126,7 +126,7 @@ At tier 3 with type checking, these are errors:
 | `@typescript-eslint/member-ordering` | Fields, constructor, accessors, then methods; static before instance, public before private; alphabetical within each group |
 | `unicorn/filename-case` | camelCase, kebab-case or PascalCase file names |
 
-Fix these too: `@typescript-eslint/consistent-type-imports` (separate `import type`), `simple-import-sort` import and export order, `@stylistic/max-len` 200, `@typescript-eslint/explicit-member-accessibility` (omit `public`), the `enum` ban in `no-restricted-syntax` (use a string-literal union or a `const` object), and `import-x/no-cycle`. `pnpm xy lint --fix` sorts imports and splits type imports. Run `pnpm xy lint --rules` for the effective level of every rule.
+Fix these too: `@typescript-eslint/consistent-type-imports` (separate `import type`), `simple-import-sort` import and export order, `@stylistic/max-len` 200, `@typescript-eslint/explicit-member-accessibility` (omit `public`), the `enum` ban in `no-restricted-syntax` (use a string-literal union or a `const` object), its ban on `value.constructor.name` since 10.2.1 (use an explicit stable identifier), and `import-x/no-cycle`. `pnpm xy lint --fix` sorts imports and splits type imports. Run `pnpm xy lint --rules` for the effective level of every rule.
 
 ## Included concerns
 

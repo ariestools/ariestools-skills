@@ -58,6 +58,14 @@ Dashboards and observers should help explain and diagnose progress without holdi
 
 Justify necessary coordination using the [coordination decision](review.md#coordination-decision). Seek the smallest sufficient scope, such as one account, resource, or operation family. A coordination decision for one invariant does not automatically justify a manager for the whole application.
 
+## Deployment and version skew
+
+Design routine component upgrades to tolerate the peer versions still active during rollout and rollback. Existing browser tabs, cached clients, queued work and in-flight operations survive even a coordinated same-commit release. Prefer stable contracts, additive API/data changes, optional fields and explicit unavailable behavior over requiring a frontend and backend to switch simultaneously. Make retries safe at the actual effect boundary. Introduce capabilities or protocol versions when a concrete incompatibility calls for them, not as a universal framework.
+
+A convenient combined deployment may remain combined; independence of contracts does not require more services. A small deployment workflow should remain small. The [deployment conventions](../xy-development/deployment.md) define branch names and the automatic prerelease delivery default.
+
+When a destructive migration, incompatible signed-protocol transition, exclusive resource or constrained fleet rollout genuinely needs coordination, name that invariant and confine the mechanism to the affected operation. Preserve durable-state and custody boundaries. Do not require every ordinary application update to traverse that exceptional operation's release machinery.
+
 ## Examples
 
 | Situation | Preferred shape and required boundary |

@@ -82,6 +82,8 @@ If the repo has a way to do it, use the repo's way. Ad-hoc commands are for expl
 
 ## Definition of Done
 
+These criteria verify implementation work; they do not make every routine deployment rerun full development qualification. For deployment-only changes or shipping already verified application source, use [Deployment conventions](deployment.md) and verify the changed route and its result. Preserve application/protocol invariants without adding release gates by default.
+
 A feature is not complete until **all of the following are true**. The gates are tool-neutral; run each through the repo's own command. In repos using `@ariestools/toolchain`, build, lint, dependency, and publish checks are `pnpm xy build --strict`, tests are `pnpm xy test` (`xy build` runs none), and repository policy is `pnpm xy check` — see xy-toolchain's [lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
 
 ### 1. Builds Cleanly
