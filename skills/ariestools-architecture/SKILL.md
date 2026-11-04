@@ -1,6 +1,6 @@
 ---
 name: ariestools-architecture
-description: "Design and review distributed systems using protocol-governed autonomous, replaceable workers. Covers independent work discovery, durable evidence, safe concurrent attempts, reconciliation, bounded activity, and narrowly justified coordination. Use when defining worker or service responsibilities, recovery and effect semantics, or introducing a scheduler, controller, leader, authoritative queue, or repair service. Applies across frameworks and hosting platforms; routine changes within an accepted architecture do not reopen its design."
+description: "Design and review distributed systems using protocol-governed autonomous, replaceable workers. Covers independent work discovery, durable evidence, safe concurrent attempts, reconciliation, bounded activity, and narrowly justified coordination. Use when defining worker or service responsibilities, recovery and effect semantics, designing component upgrades that tolerate version skew, or introducing a scheduler, controller, leader, authoritative queue, or repair service. Applies across frameworks and hosting platforms; routine changes within an accepted architecture do not reopen its design."
 metadata:
   version: 0.1.10 # x-release-please-version
 ---
@@ -24,6 +24,8 @@ Use [review.md](review.md) when comparing architectures, introducing concentrate
 Scale the review to the decision. A new distributed protocol needs its trust and failure assumptions stated; a small change to one established worker may need only the affected concurrency or recovery criterion. Do not apply swarm machinery to ordinary local computations or rewrite an accepted architecture during unrelated maintenance.
 
 ## References
+
+- **[Deployment and version skew](principles.md#deployment-and-version-skew)** — read when frontend/backend synchronization, independent releases or an upgrade coordinator is proposed. Deployment naming and the lightweight delivery default live in [xy-development deployment conventions](../xy-development/deployment.md).
 
 - **[Principles](principles.md)** — read when assigning responsibilities, selecting evidence and notifications, designing independent worker passes, or defining concurrency, recovery, and resource bounds. Includes examples and the boundary between local supervision and application authority.
 - **[Review and acceptance criteria](review.md)** — read when assessing a design, choosing coordination, or writing observable failure and recovery criteria. Includes a compact decision record and failure scenarios.

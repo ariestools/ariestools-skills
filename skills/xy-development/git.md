@@ -1,5 +1,7 @@
 # Git Workflow
 
+Deployment branch names and delivery behavior follow [Deployment conventions](deployment.md). Keep those branches as pointers to runnable revisions, distinct from the repository's feature/integration/release branching model.
+
 ## Conventional Commits
 
 All commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
