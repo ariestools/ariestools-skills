@@ -246,10 +246,10 @@ Use the focused command when diagnosing one policy family:
 | `xy agent lint` | AGENTS.md, tool adapters, and the `docs/` / `papers/` convention (since 10.1.1); see [Documentation conventions](#documentation-conventions) | Yes, first; since 10.1.2 only with a root `AGENTS.md` or a declared `commands.agentLint` |
 | `xy git lint` | Git config (`core.autocrlf` false, `core.eol` lf, `core.ignorecase` false) and a `.gitignore` entry that ignores `.xy/cache` in every package (`git.ignore-toolchain-cache`, since 9.1.1) | Yes |
 | `xy packman lint` | pnpm `minimumReleaseAge`, `minimumReleaseAgeExclude`, and `verifyDepsBeforeRun`, and Yarn `enableScripts: false`; all errors, fixable once `pnpm-workspace.yaml` exists. It does not check pnpm `allowBuilds`: add an entry by hand for a dependency that needs install scripts | Yes |
-| `xy repo lint` | Monorepos only: workspace layout (`packages/` folder, glob coverage), versions and internal ranges, engines and Volta, package-manager fields, pnpm release age and overrides, spec layout, a consumer `README.md` per package and its `files` entry (since 10.0.5), and Dependabot enablement | Yes |
+| `xy repo lint` | Monorepos only: workspace layout (`packages/` folder, glob coverage), versions and internal ranges, engines, root `devEngines` (Node 26 and pnpm 12), no legacy `packageManager` or `volta`, pnpm release age and overrides, spec layout, a consumer `README.md` per package and its `files` entry (since 10.0.5), and Dependabot enablement | Yes |
 | `xy lint lint` | Local ESLint config package, `.gitignore` parity, redundant rules, and overrides | Yes |
 | `xy skills lint` | Required catalog skills, versions, duplicate global installs, catalog skills that are neither required nor optional for the tier nor `allowed` in config, and leftover `xy claude` output (since 10.1.2); see [`xy skills`](#xy-skills) | Yes |
-| `xy node lint` | Root Volta pin and package `engines.node` portability | No; run `xy node lint [--fix]` on its own |
+| `xy node lint` | Package `engines.node` portability | No; run `xy node lint [--fix]` on its own |
 
 `xy check` also runs publint. `xy check --fix` applies the fixable forms of the families `xy check` runs; `xy fix` covers a different set (see [Lifecycle gates](#lifecycle-gates)). Since 10.1.2 that includes deleting leftover `xy claude` output (`skills.legacy-generated`, see [`xy skills`](#xy-skills)). Run it locally, never in CI, review the diff, then rerun without `--fix`. For CI, see [CI gates](#ci-gates).
 
@@ -264,12 +264,11 @@ A new workspace package needs a `README.md` or `xy check` fails; `xy repo lint -
 
 `xy repo lint` includes `repo.dependabot-enabled` (since 9.0.1), which warns when GitHub Dependabot alerts are switched off for the repository and enables them under `--fix` (needs admin on the repo; reports the finding as still open when the token cannot). It stays silent when `gh` is missing, unauthenticated, or the remote is not GitHub.
 
-`repo.engines-lts` (error) and `node.volta-node-latest` compare against the latest Node **Current** release by default. With that default, an `engines` range that excludes the latest Current errors, an older `volta.node` warns (failing `--strict`), and `xy node lint --fix` bumps an LTS `volta.node` pin to the latest Current. Repos that deliberately track Node LTS set both tracks (since 10.0.7):
+`repo.engines-lts` (error) compares `engines` ranges against the latest Node **Current** release by default. `repo.dev-engines` (error) requires the root `devEngines` block to pin Node `>=26.0.0 <27.0.0` and pnpm `>=12.0.0 <13.0.0` with `onFail: "error"`. Repos that deliberately track Node LTS for published `engines` ranges set `commands.repoLint.nodeTrack` to `'lts'` (since 10.0.7):
 
 ```ts
 const config: XyConfig = {
   commands: {
-    nodeLint: { nodeTrack: 'lts' },
     repoLint: { nodeTrack: 'lts' },
   },
 }

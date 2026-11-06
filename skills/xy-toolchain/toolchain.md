@@ -30,13 +30,14 @@ Use pnpm for new repositories. It is the fully supported and recommended package
 
 The CLI detects the package manager in this order:
 
-1. The root `packageManager` field.
-2. pnpm workspace or lock files.
-3. Bun lock files.
-4. Yarn lock/config files.
-5. npm lock files.
+1. The root `devEngines.packageManager` name.
+2. The legacy root `packageManager` field.
+3. pnpm workspace or lock files.
+4. Bun lock files.
+5. Yarn lock/config files.
+6. npm lock files.
 
-Since 10.2.2 the implementation falls back to npm when no signal exists (Yarn through 10.2.1). Do not rely on that fallback: set `packageManager`, commit exactly one lockfile, and use that manager exclusively.
+Since 10.2.2 the implementation falls back to npm when no signal exists (Yarn through 10.2.1). Do not rely on that fallback: set `devEngines.packageManager`, commit exactly one lockfile, and use that manager exclusively.
 
 Every pnpm repository, single-package or monorepo, needs a root `pnpm-workspace.yaml`. `xy packman lint` runs in `xy check` and fails without the file, and its `--fix` cannot create it. Minimal content:
 
@@ -156,7 +157,7 @@ A scaffold from 10.1.1 or earlier needs more: raise `vitest` to the `^5` peer, s
 
 Whether scaffolded or set up by hand, a new TypeScript repository needs, in every topology:
 
-1. Pin pnpm in `packageManager` and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)). A 10.1.2 pnpm monorepo scaffold has both; a single-package scaffold pins pnpm but still needs the file.
+1. Pin Node 26 and pnpm 12 in root `devEngines` (`runtime` `>=26.0.0 <27.0.0`, `packageManager` `>=12.0.0 <13.0.0`, both `onFail: "error"`) and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)). Do not set the legacy `packageManager` field or `volta`. A 10.1.2 pnpm monorepo scaffold has the workspace file; a single-package scaffold still needs it.
 2. Install `@ariestools/toolchain`, the correct config packages, ESLint, and TypeScript at the root ([Installation](#installation)).
 3. Prefer `@ariestools/vitest-config` at the root; a single-package repo passes an explicit `include` ([testing.md](testing.md)). For neutral packages that need common timers/abort globals, add `@ariestools/lib-neutral`.
 4. Set `"type": "module"`.
@@ -172,7 +173,7 @@ Single-package repositories: the root is the package, and a published one declar
 Monorepos: repo lint, part of `xy check`, also enforces:
 
 - The root is `private: true`; workspace packages live under `packages/`, are covered by the `pnpm-workspace.yaml` globs, and keep specs in `spec/` folders.
-- Only the root declares `volta`; pin a current Node release there (an older pin warns). The root and private packages declare no `engines`.
+- The root declares `devEngines` for Node 26 and pnpm 12 and does not declare `volta` or the legacy `packageManager` field. The root and private packages declare no `engines`.
 - Every publishable package declares `engines.node`, for example `">=22"`, and the range must include the latest Node release. Repositories that deliberately track Node LTS set `nodeTrack: 'lts'` ([commands.md](commands.md#repository-policy)). Do not strip `engines` from neutral or browser packages to satisfy `xy node lint`.
 - Every workspace package has a consumer README.md, listed in `files` when publishable (since 10.0.5; `xy repo lint --fix` scaffolds one).
 

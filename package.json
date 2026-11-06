@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "validate:skills": "node scripts/validate-skills.mjs skills",
     "validate:upstream": "node scripts/validate-skills.mjs skills --upstream",
@@ -13,8 +12,16 @@
   "engines": {
     "node": ">=24"
   },
-  "volta": {
-    "node": "24.15.0",
-    "pnpm": "10.33.2"
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "onFail": "error",
+      "version": ">=26.0.0 <27.0.0"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "onFail": "error",
+      "version": ">=12.0.0 <13.0.0"
+    }
   }
 }
