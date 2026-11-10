@@ -54,7 +54,7 @@ React projects also get the stable `xy start` and the experimental `analyze` and
 | Flag | Behavior |
 |---|---|
 | `--jobs <n>` | Limit parallel work; defaults to the machine's available CPU parallelism |
-| `--json` | Emit a machine-readable result envelope and suppress decorative output |
+| `--json` | Emit one `schemaVersion: 1` envelope on stdout and send human logs to stderr (since 10.3.0) |
 | `--rules` | List supported rules and effective levels for a rule-bearing command |
 | `--stability` | List command, package, and experimental config stability (since 9.2.0) |
 | `--strict` | Treat warnings as failures (also `XY_STRICT=1`) |
@@ -66,7 +66,7 @@ React projects also get the stable `xy start` and the experimental `analyze` and
 
 A top-level command with no subcommand, including one given a positional such as `xy test <target>`, defers to a same-named root `package.json` script and forwards its arguments. Subcommands such as `xy lint lint` never defer.
 
-Do not infer that a zero exit code means zero warnings unless `--strict` was active. For automation, prefer `--json` over parsing decorated terminal output. Since 10.1.2, the `xy check --json` envelope also carries the sub-linters' `errors` and `warnings` diagnostics beside `errorCount` and `warningCount`; a linter that reports only counts adds none, so the arrays can be shorter than the counts.
+Do not infer that a zero exit code means zero warnings unless `--strict` was active. For automation, read the `--json` envelope. Since 10.3.0 that envelope is the only thing on stdout: `command`, `durationMs`, `exitCode`, `success`, `errorCount`, `warningCount`, and `schemaVersion: 1`, plus `data`, `errors`, and `warnings` when the command has them. Human logs go to stderr. An unknown command and a CLI validation failure are envelopes too. `xy updo` cannot run with `--json`. `xy skills pick` cannot run with `--json` unless `--skill <name>` is passed. Since 10.1.2, `xy check --json` carries the sub-linters' diagnostics beside the counts; a linter that reports only counts adds none, so `errors` and `warnings` can be shorter than the counts.
 
 ## Lifecycle gates
 
