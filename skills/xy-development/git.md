@@ -61,27 +61,24 @@ Use LF line endings and case-sensitive filenames; never commit tool caches or ge
 
 ## Never Rewrite History
 
-Git history is append-only. We add to it; we don't rewrite it. Repository and workspace instructions (CLAUDE.md, AGENTS.md) take precedence over this section.
+Git history on shared branches is append-only. Repository instructions (CLAUDE.md, AGENTS.md) take precedence over this section.
 
-**Never do any of the following:**
-- `git commit --amend` — make a new commit instead
-- `git rebase` (interactive or otherwise) — merge instead
-- `git push --force` or `git push --force-with-lease` — if the push is rejected, resolve it with a merge
-- `git reset --hard` to a previous commit — use `git revert` to undo changes
-- `git filter-branch` or `git rebase --onto` — history stays as-is
+**Never rewrite `main`, `develop`, or any branch others have built on.** That includes amend, rebase, `git push --force`, `git push --force-with-lease`, `git reset --hard`, `git filter-branch`, and `git rebase --onto`. If a push to one of those branches is rejected, resolve it with a merge.
 
-**Exceptions:** When repository or workspace instructions require it (for example, to fix commit identity), correct a local, unpushed commit, keeping its tree, parents, message, and dates. If such a commit was already pushed to your own topic branch, force-push it with `--force-with-lease` only with the user's explicit approval. Never rewrite `main`, `develop`, or any branch others have built on. This is not a general license to amend or rebase.
+On your own unpushed topic branch, leave the commits as they are unless the user asks you to amend or rebase them. When a correction is only for commit identity, keep the tree, parents, message, and dates. A topic branch that is already pushed is rewritten only with the user's explicit approval, and then with `--force-with-lease`.
 
-**Why:** Rewriting history destroys the audit trail, breaks collaborators' branches, and makes releases irreproducible — what you see should be what actually happened and what was actually shipped.
+**Why:** Rewriting a shared branch destroys the audit trail, breaks collaborators' branches, and makes releases irreproducible — what you see should be what actually happened and what was actually shipped.
 
 **If you made a mistake in a commit:**
-- Wrong code? Make a new commit that fixes it.
-- Bad commit message? Let it stand — the next commit's message can provide context.
+- Wrong code? Make a new commit that fixes it, unless the user asked you to amend an unpushed commit.
+- Bad commit message? Let it stand, unless the user asked you to amend it. The next commit's message can provide context.
 - Committed to the wrong branch? Cherry-pick to the right branch, revert on the wrong one.
 
 ## Branching Model
 
-Detect the repo's model before you branch. Read its CLAUDE.md, AGENTS.md, CONTRIBUTING.md, or DEVELOPMENT.md, and check for a `develop` branch with `git ls-remote --heads origin develop`.
+Work in the checkout you were given. Do not create a git worktree. Creating one is a host or user action. If the session is already in a worktree, that directory is the repository root: branch, commit, and validate there, and leave the main checkout unchanged.
+
+Take the base branch from the repository's `AGENTS.md` when it names one. Otherwise detect the model with `git ls-remote --heads origin develop`.
 
 - **`develop` exists → [Gitflow](https://nvie.com/posts/a-successful-branching-model/).** Branch off `develop` and merge back into `develop`.
 - **No `develop` → trunk.** Use short-lived branches off `main`, merged back into `main`. The Aries Tools library repos work this way.
@@ -110,8 +107,4 @@ Detect the repo's model before you branch. Read its CLAUDE.md, AGENTS.md, CONTRI
 
 ## Releases
 
-Releases follow the repo's documented process (CLAUDE.md, AGENTS.md, DEVELOPMENT.md, or CONTRIBUTING.md). Never hand-edit version fields. Common patterns:
-
-- **release-please (skill packs):** merge `develop` → `main` with a merge commit. Release-please opens a release PR that bumps versions and tags the release when merged, and an automated `main` → `develop` sync follows.
-- **`xy deploy` (trunk library repos, as in the toolchain's CONTRIBUTING.md):** Only when the repository owner directs a release: `pnpm xy deploy <level>` bumps and builds; commit the bumps if it left them uncommitted and create an annotated `vX.Y.Z` tag; `pnpm xy publish`; then push commits and tags. `xy deploy` alone neither tags nor publishes. See [xy-toolchain › Releasing](../xy-toolchain/commands.md#releasing-owner-directed).
-- **Other Gitflow repos:** merge as the repo instructs. There is no `release/*` branch step.
+Releases follow the repository's documented process. Never hand-edit version fields. When the owner directs a release in a trunk library repository, `pnpm xy deploy <level>` bumps and builds; commit the bumps if it left them uncommitted and create an annotated `vX.Y.Z` tag; `pnpm xy publish`; then push commits and tags. `xy deploy` alone neither tags nor publishes. See [xy-toolchain › Releasing](../xy-toolchain/commands.md#releasing-owner-directed).

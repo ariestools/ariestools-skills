@@ -27,7 +27,7 @@ This skill builds on [xy-development](../xy-development/SKILL.md), which covers 
 
 ### [Project profiles](project-profiles.md)
 
-Read first when classifying a package's role (library, library/CLI, CLI, service, app, workspace-root, tooling), visibility, runtime, and framework; choosing neutral/node/browser/React guidance; overriding a misdetected deplint role, such as a single-package service detected as `workspace-root`; deciding how monorepo and single-package setup differ; or determining whether framework tooling or `xy compile` owns production output.
+Read first when classifying a package's role (library, library/CLI, CLI, service, app, workspace-root, tooling), visibility, runtime, and framework; choosing neutral/node/browser/React guidance; overriding a misdetected deplint role, such as a single-package service detected as `workspace-root`; deciding how monorepo and single-package setup differ; or determining whether framework tooling or `xy compile` owns production output. [Verify the selected profile](project-profiles.md#verify-the-selected-profile) is the check after that configuration change. The task-completion gate is the [Definition of Done](../xy-development/workflow.md#definition-of-done).
 
 ### [Toolchain and project setup](toolchain.md)
 
