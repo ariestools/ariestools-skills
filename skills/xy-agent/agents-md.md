@@ -63,6 +63,8 @@ A table of paths with a **handling verdict**, not a description:
 
 A table of command to use, titled by what an agent needs rather than what exists. Each entry states scope **and exclusions** — "the complete local gate… *excludes* local-chain E2E" is worth more than a command list, because it tells an agent when a green result is not enough.
 
+The completion gate is one row. In a repository that uses `@ariestools/toolchain` and needs no exception, that row is `pnpm xy build <package>` and `pnpm xy test <package-or-path>` from the repository root, and it excludes `xy check`, `--strict`, and a second run of `xy lint`, `xy deplint`, or `xy publint`. State a real exception in that same row: a root `build` script that `xy build` defers to, a lint run that is not a gate, or a required package scope. When the change touches repository policy, `AGENTS.md`, `docs/`, skills, or package-manager configuration, give `pnpm xy check` its own row and say that an ordinary source change omits it.
+
 Follow it with the traps that bite repeatedly, stated compactly with a pointer to the full explanation. A named count helps: *"Three traps bite repeatedly, and README's 'Before you run one' section covers them in full."*
 
 ### `## Failures: what NOT to do`
@@ -79,7 +81,7 @@ Add these when the repository has the content. Do not invent them to fill a temp
 - **`## Normative product decisions`** — settled constants an agent must not re-derive: exact names, coefficients, identifiers, wire prefixes.
 - **`## Known divergences between documents and code`** — where the documents are currently wrong, and which side wins. Retire entries as they are resolved so the section cannot grow without bound. This section is the honest alternative to letting an agent discover the divergence the hard way.
 - **`## Source discipline`** — immutability rules for `references/` and `prototypes/`.
-- **`## Completion discipline`** — the gate to run, and the actions an agent may never take (publish, deploy, spend, alias a domain).
+- **`## Completion discipline`** — the actions an agent may never take (publish, deploy, spend, alias a domain). Point the gate at the Commands row above.
 
 ## What never goes in
 

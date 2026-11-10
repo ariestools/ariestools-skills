@@ -45,6 +45,7 @@ Since 9.2.0 the toolchain package ships two binaries:
 | `xyex tsc-validate [package]` | One-process type check with a shared source cache | Incompatible with the native compiler |
 | `xyex packman convert <pm>` / `packman clean` | Package-manager migration aids | `packman clean` deletes `node_modules` and lockfiles; it is not a build-artifact cleaner (use `xy clean`) |
 | `xyex sonar` | Quarantined Sonar check | Needs a local `sonar.eslintrc`; may be removed |
+| `xyex verify` | Whole-repository compile, then test, then check; stops at the first failure (since 10.3.0) | Skips ESLint, deplint, and publint; always runs `xy check`; not the [completion gate](../xy-development/workflow.md#definition-of-done) |
 
 React projects also get the stable `xy start` and the experimental `analyze` and `sitemap`; `start` wraps CRA `react-scripts` and does not apply to Vite or Next. `xyex eject` was removed in 10.2.2. `xy relint` is deprecated in favor of `xy lint --fresh`. Read experimental flags from `pnpm xyex <cmd> --help` rather than copying them.
 
@@ -78,7 +79,9 @@ Do not infer that a zero exit code means zero warnings unless `--strict` was act
 | `xy check` | Agent docs (AGENTS.md and docs convention, since 10.1.1; since 10.1.2 only with a root `AGENTS.md` or a declared `commands.agentLint`), Git, package-manager, publish, repo-layout, ESLint-config, and skill policy | Compile, source ESLint, deplint, node lint, tests |
 | `xy fix [package]` | Git lint, deplint, repo lint, publint, ESLint, and ESLint-config (`lint lint`) fixes | Packman, skills, and agent fixes (use `xy check --fix`), node lint, tests, compile |
 
-Run the gates required by the target repository or CI rather than treating one aggregate command as universal.
+For an ordinary code change, the agent completion gate is the [Definition of Done](../xy-development/workflow.md#definition-of-done): from the repository root, `pnpm xy build <package>` and `pnpm xy test <package-or-path>`. `xy build` already includes compile, publint, deplint, and ESLint. Add `pnpm xy check` when the change touches repository policy, `AGENTS.md`, `docs/`, skills, or package-manager configuration. `--strict` belongs to CI. Experimental `xyex verify` (since 10.3.0) is the whole-repository compile, test, and check sequence in the table above. It is not this gate.
+
+The table says what each command includes. It is not a list of commands to run on every task. Run a wider set when the repository's CI or `AGENTS.md` requires it. The sequence below is what those library workflows run.
 
 ### CI gates
 

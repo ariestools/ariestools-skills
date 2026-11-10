@@ -5,7 +5,7 @@
 We are strict and opinionated. In XY repos the compiler (`@ariestools/tsconfig`: `strict`, `noImplicitOverride`, `erasableSyntaxOnly`) and the shared ESLint config (`@ariestools/eslint-config-flat`, tier 3 with type checking by default) enforce much of what follows. Items are marked:
 
 - *(compile)* — `tsc` rejects it.
-- *(lint)* — the default lint config flags it. Errors fail `pnpm xy lint`; warnings fail `pnpm xy lint --strict` and the zero-warnings [Definition of Done](workflow.md#definition-of-done), so treat both as failures. `pnpm xy lint --fix` autofixes import order and type-import style.
+- *(lint)* — the default lint config flags it. Errors fail `pnpm xy build` and `pnpm xy lint`. Warnings fail `pnpm xy lint --strict` and a CI job that lints strict. The [Definition of Done](workflow.md#definition-of-done) uses `xy build` as the lint run and leaves `--strict` to CI. `pnpm xy lint --fix` autofixes import order and type-import style.
 - Unmarked — a convention or judgment call that no tool checks. These need the most care.
 
 A repo that lowers its lint tier or turns off type checking loses some of these rules; the conventions still apply. Code shape is linted too: keep functions small (complexity above 18, more than 32 statements, or nesting deeper than 6 are lint errors) and files under 512 lines of code; omit `public`; order class members by kind, then alphabetically. Full rule list: [xy-toolchain ESLint](../xy-toolchain/eslint.md). Compiler settings: [xy-toolchain TypeScript](../xy-toolchain/typescript.md).

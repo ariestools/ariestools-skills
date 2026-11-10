@@ -164,13 +164,11 @@ Do not assume the script named `build` must invoke `xy build`. Inspect the exist
 
 ## Verify the selected profile
 
-After configuration changes:
+Run this after a toolchain configuration change: a profile, compile target, ESLint config, package role, or export map. An ordinary source change uses the [Definition of Done](../xy-development/workflow.md#definition-of-done).
 
-1. Run the repository's normal build or compile command.
-2. Run `xy lint` and `xy deplint`; use `--strict` when warnings must fail.
-3. Run `xy publint` for every published library or CLI surface.
-4. Run the repository test script; remember that `xy build` does not include tests.
-5. Run `xy check` for repository and configuration policy.
-6. For published packages, inspect the packed artifact and test it from a clean consumer when export or dependency behavior changed.
+1. From the repository root, run `pnpm xy build <package>`. That covers compile, publint, deplint, and ESLint. Use `--strict` when this configuration change must fail on warnings.
+2. Run `pnpm xy test <package>`. `xy build` does not include tests.
+3. Run `pnpm xy check`. A configuration change is repository policy.
+4. For published packages, inspect the packed artifact and test it from a clean consumer when export or dependency behavior changed.
 
 Interpret failures through the selected profile. A peer-placement warning may mean a service or app was misclassified as a library; demoting runtime deps on a service or app may mean it was detected as `workspace-root` or its runtime graph is wrong; a Node-global error may mean a browser or neutral package inherited Node types; missing website output may mean the framework build was replaced by a library compiler.

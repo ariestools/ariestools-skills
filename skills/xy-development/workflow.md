@@ -20,13 +20,11 @@ Before executing commands in a repo, check these in order:
    - CLI flags differ between package-manager majors (pnpm 12 rejects some pnpm 10 flags), so check `<pm> <cmd> --help` for the pinned version before relying on a flag.
 
 3. **package.json scripts and CI** — read `scripts` in `package.json` before running anything:
-   - If `"build"` exists, use `pnpm build` — not raw `tsc` or `esbuild`
-   - If `"lint"` exists, use `pnpm lint` — not raw `eslint .`
-   - If `"test"` exists, use `pnpm test` — not raw `jest` or `vitest`
-   - If `"dev"` exists, use `pnpm dev` — not raw `ts-node` or `tsx`
+   - In a repository that uses `@ariestools/toolchain`, task completion is the [Definition of Done](#definition-of-done): `pnpm xy build <package>` and `pnpm xy test <package-or-path>` from the root. `xy` hands off to a same-named root script unless `--no-defer` is passed. When that script is a different pipeline, run the command the repository's `AGENTS.md` names.
+   - Elsewhere, if `"build"` exists, use `pnpm build` — not raw `tsc` or `esbuild`. If `"lint"` exists, use `pnpm lint` — not raw `eslint .`. If `"test"` exists, use `pnpm test` — not raw `jest` or `vitest`. If `"dev"` exists, use `pnpm dev` — not raw `ts-node` or `tsx`.
    - The scripts may include flags, configs, or pipelines that raw commands miss.
    - If the script you need is absent, look for a repo CLI among the root `devDependencies` (XY repos: `pnpm xy <command>` from the root; see [xy-toolchain](../xy-toolchain/toolchain.md#start-from-repository-truth)). A missing script never makes raw `tsc`, `eslint`, or `vitest` the answer.
-   - Check `.github/workflows/*` for the commands CI treats as the gate.
+   - Check `.github/workflows/*` for the commands CI treats as the gate. The local completion gate can be narrower than CI. Match CI when handing off a change CI will reject.
 
 4. **Monorepo awareness** — check if the repo uses workspaces:
    - Look for `workspaces` in `package.json`, `pnpm-workspace.yaml`, `nx.json`, or `lerna.json`
@@ -82,26 +80,43 @@ If the repo has a way to do it, use the repo's way. Ad-hoc commands are for expl
 
 ## Definition of Done
 
-These criteria verify implementation work; they do not make every routine deployment rerun full development qualification. For deployment-only changes or shipping already verified application source, use [Deployment conventions](deployment.md) and verify the changed route and its result. Preserve application/protocol invariants without adding release gates by default.
+These criteria verify implementation work. A routine deployment of already verified application source uses [Deployment conventions](deployment.md): verify the changed route and its result, and keep application and protocol invariants without adding release gates.
 
-A feature is not complete until **all of the following are true**. The gates are tool-neutral; run each through the repo's own command. In repos using `@ariestools/toolchain`, build, lint, dependency, and publish checks are `pnpm xy build --strict`, tests are `pnpm xy test` (`xy build` runs none), and repository policy is `pnpm xy check` — see xy-toolchain's [lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
+This section is the agent completion gate. Command lists elsewhere say what a command includes, what CI runs, and what to run after a toolchain configuration change. Finish the task with the commands here.
+
+A feature is not complete until **all of the following are true**. The gates are tool-neutral. Where the repository's `AGENTS.md` names the completion command, or names an exception (a root script that `xy build` defers to, a lint run that is not a gate, a required package scope), follow that.
+
+In a repository that uses `@ariestools/toolchain`, finish a code change from the repository root with:
+
+```sh
+pnpm xy build <package>
+pnpm xy test <package-or-path>
+```
+
+`xy build` runs compile, publint, deplint, and ESLint, and runs no tests. Scope `<package>` to each workspace package the change affects. Pass a spec path to `xy test` when the change is narrower than the package, and run the package's tests or the whole suite when the change touches shared code or that narrow run leaves a regression in doubt. `--strict` belongs to CI.
+
+A root `build` or `test` script receives `xy build` or `xy test` when one exists. A script that calls `xy build` or `xy test` is this gate. When the script is a different pipeline, run the command the repository's `AGENTS.md` names; `--no-defer` runs the built-in.
+
+Also run `pnpm xy check` when the change touches repository policy, `AGENTS.md`, `docs/`, skills, or package-manager configuration. [Lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates) lists what each command includes and excludes. After a toolchain configuration change, run [Verify the selected profile](../xy-toolchain/project-profiles.md#verify-the-selected-profile). That checklist is the configuration check. A source change uses the two commands above.
+
+Experimental `xyex verify` (since 10.3.0; `xy verify` prints the experimental warning) runs compile, then test, then check for the whole repository and stops at the first failure. It is not this gate: it skips the ESLint, deplint, and publint work inside `xy build`, and it always runs `xy check`. See [Lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
 
 ### 1. Builds Cleanly
-- The repo's build command (`pnpm build` or equivalent) succeeds with zero errors
+- The completion build succeeds with zero errors
 - No new TypeScript compiler errors introduced
-- If the project has multiple build targets, all of them pass
+- In a toolchain repository the command is `pnpm xy build <package>` for each package the change affects
 
 ### 2. Linter Passes
-- The repo's lint command (`pnpm lint` or equivalent) passes with zero errors and zero warnings
-- A zero exit code proves zero warnings only in strict / max-warnings-0 mode; otherwise read the warning count
+- Lint errors are zero. In a toolchain repository, `xy build` is that lint run
+- A zero exit code proves zero warnings only in strict / max-warnings-0 mode. When CI lints with `--strict`, warnings fail the hand-off; otherwise read the warning count and continue
 - Don't suppress lint rules to make it pass — fix the underlying issue
 - If a lint rule must be disabled, use an inline comment with a justification
 
 ### 3. Tests Pass
-- All existing tests pass — no regressions
+- Existing tests that cover the change pass — no regressions
 - New behavior has corresponding tests
 - Tests follow the principles in [testing.md](testing.md)
-- Run the repo's test command (`pnpm test` or equivalent), not a subset
+- In a toolchain repository the command is `pnpm xy test <package-or-path>`. Widen it when the change is shared or a narrow run leaves a regression in doubt
 
 ### 4. Dependencies Are Correct
 - New packages are added to the right place: `dependencies` for runtime, `devDependencies` for build/test-only
@@ -136,11 +151,11 @@ A feature is not complete until **all of the following are true**. The gates are
 
 The completion gate is **layered**. Before declaring any task complete, walk every layer that applies. (These are completion-gate layers, not the xy-development → xy-toolchain → ariestools-sdk skill stack.)
 
-1. **Layer 1 — Generic DoD** (this file): builds, lints, tests, dependencies, dev server, no placeholders, no regressions. Applies to every project. In `@ariestools/toolchain` repos, run it through the `xy` gates above and xy-toolchain's [profile verification](../xy-toolchain/project-profiles.md#verify-the-selected-profile).
+1. **Layer 1 — Generic DoD** (this file): builds, lints, tests, dependencies, dev server, no placeholders, no regressions. Applies to every project. In `@ariestools/toolchain` repos, the commands are the two above, plus `pnpm xy check` for the policy and document edits named there. [Profile verification](../xy-toolchain/project-profiles.md#verify-the-selected-profile) applies after a toolchain configuration change.
 2. **Layer 2 — Domain DoD** (when a domain skill pack is installed — e.g. dApp checklists in product-specific skill repos): extends Layer 1 with domain-specific gates. Applies only when the project is in that domain.
 3. **Layer 3 — Project-specific acceptance criteria**: the `## Acceptance criteria` section of the project's active PRD is also gating. The active PRD is a `PRD.md` at the working directory, or, in a product planned as a series of versions, the versioned PRD that the roadmap and `AGENTS.md` name as active (`docs/plans/MVP_PRD.md`, then `V2_PRD.md`, …). Generated at planning time per the next section.
 
-**The rule:** if any item across any applicable layer fails, the work is not done. Fix the failing item and re-walk the relevant layer. **Continue iterating until every applicable layer passes.** Do not stop on partial pass. Do not report complete with known-failing items rationalized as "out of scope" unless the criterion was explicitly marked optional or skipped with a reason in the layer's own conventions (e.g. dApp DoD sections tagged "if applicable").
+**The rule:** if an item in an applicable layer fails, the work is not done. Fix it and re-run the gate that reported it. A source change re-runs `xy build` and `xy test` for the packages it affects. A policy or document change also re-runs `xy check`. A UI change re-checks the browser. Re-run a layer the change cannot fail only when a shared surface makes the result uncertain. Do not report complete with known-failing items rationalized as "out of scope" unless the criterion was explicitly marked optional or skipped with a reason in the layer's own conventions (e.g. dApp DoD sections tagged "if applicable").
 
 This rule applies equally to new features, bug fixes, and refactors. It is the only definition of "done" that matters for agent-facing work.
 
