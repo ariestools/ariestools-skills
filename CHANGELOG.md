@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.12](https://github.com/ariestools/ariestools-skills/compare/v0.1.11...v0.1.12) (2026-11-10)
+
+
+### Features
+
+* **skills:** scope the agent completion gate to xy build and test ([#45](https://github.com/ariestools/ariestools-skills/issues/45)) ([4aac1ae](https://github.com/ariestools/ariestools-skills/commit/4aac1ae3b74610aae31579d85487141bdd88bc3e))
+* **skills:** scope the agent completion gate to xy build and test ([#45](https://github.com/ariestools/ariestools-skills/issues/45)) ([#46](https://github.com/ariestools/ariestools-skills/issues/46)) ([aa495e5](https://github.com/ariestools/ariestools-skills/commit/aa495e5031dd0f0da01f4c8e2ff999c9f7ceb56e))
+
+
+### Bug Fixes
+
+* **skills:** verify the toolchain skill against 10.3.0 ([e467a06](https://github.com/ariestools/ariestools-skills/commit/e467a068beecf5c82c7ab4a0eb5e4c5b29af5ec1))
+* **skills:** verify the toolchain skill against 10.3.0 ([#48](https://github.com/ariestools/ariestools-skills/issues/48)) ([77e37b5](https://github.com/ariestools/ariestools-skills/commit/77e37b5e165f29882a9715db5d23a6de006c3303))
+
 ## [0.1.11](https://github.com/ariestools/ariestools-skills/compare/v0.1.10...v0.1.11) (2026-11-04)
 
 
