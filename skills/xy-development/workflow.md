@@ -67,7 +67,7 @@ This is a decision review, not a new universal completion gate or permission req
 ### Credential Safety
 
 Never commit secrets or authentication tokens to the repository:
-- Registry credentials belong in the user-level `~/.npmrc` or as `${NPM_TOKEN}`-style environment references. A tracked project `.npmrc` may hold only non-secret settings — do not delete or untrack it, and never write a token into it.
+- Keep registry credentials outside the repository: user-level npm configuration, or a published config file that names an environment value without storing it. A tracked project `.npmrc` may hold only non-secret settings — do not delete or untrack it, and never write a token into it.
 - `.env`, `.env.*` — may contain API keys and secrets. Gitignore them, keeping the `!.env.example` exception for a committed template.
 - Never log, echo, or display auth tokens in command output.
 - When setting up a new project, verify `.gitignore` covers `.env` / `.env.*` and that no tracked file holds a token before the first commit.

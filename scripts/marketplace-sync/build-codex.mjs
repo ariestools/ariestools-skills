@@ -10,6 +10,7 @@ await runRenderer({
     { from: 'skills', to: `${PLUGIN_DIR}/skills` },
     { from: 'assets', to: `${PLUGIN_DIR}/assets` },
     { from: 'LICENSE', to: 'LICENSE' },
+    { from: 'scripts/marketplace-sync/plugin-README.md', to: `${PLUGIN_DIR}/README.md` },
   ],
   generate: ({ metadata }) => ({
     '.agents/plugins/marketplace.json': {

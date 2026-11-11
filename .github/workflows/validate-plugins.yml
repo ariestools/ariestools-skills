@@ -30,7 +30,15 @@ jobs:
           jq empty /tmp/render/claude/.claude-plugin/marketplace.json
           jq empty /tmp/render/claude/.claude-plugin/plugin.json
           jq -e '.name and .owner.name and (.plugins | type == "array")' /tmp/render/claude/.claude-plugin/marketplace.json > /dev/null
-          jq -e '.name and .version' /tmp/render/claude/.claude-plugin/plugin.json > /dev/null
+          jq -e '.name and .version and .icon == ".claude-plugin/icon.png"' /tmp/render/claude/.claude-plugin/plugin.json > /dev/null
+          test -f /tmp/render/claude/.claude-plugin/icon.png
+          test -f /tmp/render/claude/README.md
+          node --input-type=module -e "
+            import fs from 'node:fs'
+            const words = fs.readFileSync('/tmp/render/claude/README.md', 'utf8').trim().split(/\s+/).filter(Boolean)
+            if (words.length < 40) { console.error('claude README has ' + words.length + ' words'); process.exit(1) }
+          "
+          if find /tmp/render/claude -name '*.svg' | grep -q .; then echo '✗ claude tree still contains an SVG'; exit 1; fi
           echo "✓ Claude manifests valid"
 
       - name: Validate Codex marketplace manifest
