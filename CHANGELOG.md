@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.13](https://github.com/ariestools/ariestools-skills/compare/v0.1.12...v0.1.13) (2026-11-11)
+
+
+### Features
+
+* **skills:** make the Claude plugin pass directory validation ([57400c4](https://github.com/ariestools/ariestools-skills/commit/57400c4e71cf91906313a61f3f09972759b1492d))
+* **skills:** make the Claude plugin pass directory validation ([#51](https://github.com/ariestools/ariestools-skills/issues/51)) ([ef58eed](https://github.com/ariestools/ariestools-skills/commit/ef58eed4d909587cd5a72e0e55908aa3ae93566b))
+
 ## [0.1.12](https://github.com/ariestools/ariestools-skills/compare/v0.1.11...v0.1.12) (2026-11-10)
 
 
