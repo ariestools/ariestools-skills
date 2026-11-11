@@ -3,7 +3,7 @@ name: ariestools-sdk-react
 description: "Aries Tools React UI libraries — the @ariestools/sdk-react umbrella and its subpaths, the focused foundation, ui, app, analytics, crypto and feature packages, their peers (React 19, MUI 9, react-router 8, ethers, @ariestools/pixel, @ariestools/eth-address) and undeclared @ariestools/sdk import, the one-copy-per-context import rule, and house patterns (providers, useAsyncEffect, usePromise, error boundaries, user events, stories). Use when installing or importing @ariestools/sdk-react*, choosing the package that owns a component or hook, writing components in a repo on sdk-react, debugging an ignored sdk-react provider, or migrating from @xylabs/sdk-react, @xylabs/react-* or sdk-react-core."
 metadata:
   # x-release-please-start-version
-  version: "0.1.13"
+  version: "0.1.14"
   # x-release-please-end
 ---
 
