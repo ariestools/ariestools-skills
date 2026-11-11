@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.14](https://github.com/ariestools/ariestools-skills/compare/v0.1.13...v0.1.14) (2026-11-11)
+
+
+### Features
+
+* **skills:** add the Claude directory listing links ([f0e1a95](https://github.com/ariestools/ariestools-skills/commit/f0e1a95aa54837250de54308532705c28e7bcbed))
+* **skills:** add the Claude directory listing links ([#55](https://github.com/ariestools/ariestools-skills/issues/55)) ([0dadb4e](https://github.com/ariestools/ariestools-skills/commit/0dadb4e663ab25dc9fc5afaee1e6e7c1f877da2d))
+
 ## [0.1.13](https://github.com/ariestools/ariestools-skills/compare/v0.1.12...v0.1.13) (2026-11-11)
 
 

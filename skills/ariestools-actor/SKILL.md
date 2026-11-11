@@ -3,7 +3,7 @@ name: ariestools-actor
 description: "Aries Tools actor-kit and its host kits: @ariestools/actor, actor-model, actor-engine, provider and provider-model (plus the deprecated actor-system alias), @ariestools/cli-kit (-node, -yargs, -daemon) and @ariestools/browser-kit (-page, -worker, -service-worker, -plugin). Covers Actor, PeriodicActor and ProviderActor lifecycles, provider descriptors, monikers and bindings, compiling, launching and supervising an actor engine, cli-kit process shells and SYS_EXITS exit codes, and browser-kit realms. Use when writing actors or actor-engine providers, hosting them with cli-kit or browser-kit, or migrating from actor-system, @ariestools/actor-cli or the @xyo-network/actor-cli-kit shims."
 metadata:
   # x-release-please-start-version
-  version: "0.1.13"
+  version: "0.1.14"
   # x-release-please-end
 ---
 
