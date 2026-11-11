@@ -30,7 +30,7 @@ jobs:
           jq empty /tmp/render/claude/.claude-plugin/marketplace.json
           jq empty /tmp/render/claude/.claude-plugin/plugin.json
           jq -e '.name and .owner.name and (.plugins | type == "array")' /tmp/render/claude/.claude-plugin/marketplace.json > /dev/null
-          jq -e '.name and .version and .icon == ".claude-plugin/icon.png"' /tmp/render/claude/.claude-plugin/plugin.json > /dev/null
+          jq -e '.name and .version and .icon == ".claude-plugin/icon.png" and .documentationUrl and .supportUrl and .privacyPolicyUrl and .termsOfServiceUrl' /tmp/render/claude/.claude-plugin/plugin.json > /dev/null
           test -f /tmp/render/claude/.claude-plugin/icon.png
           test -f /tmp/render/claude/README.md
           node --input-type=module -e "
