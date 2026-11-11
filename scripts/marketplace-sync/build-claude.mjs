@@ -8,6 +8,7 @@ await runRenderer({
     { from: 'skills', to: 'skills' },
     { from: 'assets', to: 'assets' },
     { from: 'LICENSE', to: 'LICENSE' },
+    { from: 'assets/ariestools-icon.png', to: '.claude-plugin/icon.png' },
   ],
   generate: ({ metadata }) => {
     const pluginEntry = {
@@ -40,6 +41,7 @@ await runRenderer({
         repository: metadata.repository,
         license: metadata.license,
         keywords: metadata.keywords,
+        icon: './icon.png',
       },
     };
   },
