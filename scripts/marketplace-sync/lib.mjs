@@ -68,7 +68,7 @@ async function copyStaticTree(sourceRoot, outDir, copies) {
   }
 }
 
-export async function runRenderer({ name, managedPaths, copies, generate }) {
+export async function runRenderer({ name, managedPaths, copies, generate, finish }) {
   try {
     const args = parseArgs(process.argv.slice(2));
     const source = args.source ? path.resolve(args.source) : REPO_ROOT;
@@ -82,6 +82,7 @@ export async function runRenderer({ name, managedPaths, copies, generate }) {
     for (const [relPath, obj] of Object.entries(files)) {
       await writeJson(path.join(out, relPath), obj);
     }
+    if (finish) await finish({ out, metadata });
 
     console.log(`✓ Rendered ${name} marketplace tree`);
     console.log(`  source:    ${source}`);

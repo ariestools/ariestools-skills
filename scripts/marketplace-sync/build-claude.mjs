@@ -1,13 +1,18 @@
 #!/usr/bin/env node
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
 import { runRenderer } from './lib.mjs';
 
 await runRenderer({
   name: 'Claude',
-  managedPaths: ['skills', 'assets', 'LICENSE', '.claude-plugin'],
+  managedPaths: ['skills', 'assets', 'LICENSE', 'README.md', '.claude-plugin'],
   copies: [
     { from: 'skills', to: 'skills' },
     { from: 'assets', to: 'assets' },
     { from: 'LICENSE', to: 'LICENSE' },
+    { from: 'scripts/marketplace-sync/plugin-README.md', to: 'README.md' },
+    { from: 'assets/ariestools-icon.png', to: '.claude-plugin/icon.png' },
   ],
   generate: ({ metadata }) => {
     const pluginEntry = {
@@ -40,7 +45,13 @@ await runRenderer({
         repository: metadata.repository,
         license: metadata.license,
         keywords: metadata.keywords,
+        icon: '.claude-plugin/icon.png',
       },
     };
+  },
+  finish: async ({ out }) => {
+    const assetsDir = path.join(out, 'assets');
+    const names = await fs.readdir(assetsDir);
+    await Promise.all(names.filter((name) => name.endsWith('.svg')).map((name) => fs.rm(path.join(assetsDir, name))));
   },
 });
