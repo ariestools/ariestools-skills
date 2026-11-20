@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.15](https://github.com/ariestools/ariestools-skills/compare/v0.1.14...v0.1.15) (2026-11-20)
+
+
+### Features
+
+* **skills:** add repository hygiene and refresh guidance ([#60](https://github.com/ariestools/ariestools-skills/issues/60)) ([d882ee0](https://github.com/ariestools/ariestools-skills/commit/d882ee012f2f0f13820e5ca7fbc0952b1165427e))
+* **skills:** release repository hygiene workflow ([33361c2](https://github.com/ariestools/ariestools-skills/commit/33361c2ca64387313a6d23acaf16d4f9d6ecb062))
+* **skills:** release repository hygiene workflow ([#61](https://github.com/ariestools/ariestools-skills/issues/61)) ([33361c2](https://github.com/ariestools/ariestools-skills/commit/33361c2ca64387313a6d23acaf16d4f9d6ecb062))
+
 ## [0.1.14](https://github.com/ariestools/ariestools-skills/compare/v0.1.13...v0.1.14) (2026-11-11)
 
 
