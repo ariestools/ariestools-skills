@@ -89,7 +89,7 @@ Use `xy` at repository/workspace scope. Run it from the repository root, and tar
 | `xy fix [package]` | Run the standard fixable policy and source checks |
 | `xy deplint …` | Dependency policy analysis; `xy deplint pick` for interactive placement (see [commands.md](commands.md)) |
 | `xy agent …` | AGENTS.md and docs convention: `lint`, `init`, `audit`, `index`, `archive` (since 10.1.1); see [commands.md](commands.md) and the [xy-agent](../xy-agent/SKILL.md) skill |
-| `xyex work …` | Experimental repo-local work tracking with optional GitHub Issues dual-write/sync and multi-folder `--workspace` scope; flags and storage may change on a minor (see [commands.md](commands.md#skills-and-work-tracking)) |
+| `xy work …` | Stable since 11.0.2; GitHub-Issues-only work tracking since 10.3.1, including multi-folder `--workspace` scope and explicit legacy migration (see [commands.md](commands.md#skills-and-work-tracking)) |
 
 `xy build` does not run tests, license checks, security metadata checks, or every check in `xy check`. Run the required gates explicitly.
 
@@ -157,7 +157,7 @@ A scaffold from 10.1.1 or earlier needs more: raise `vitest` to the `^5` peer, s
 
 Whether scaffolded or set up by hand, a new TypeScript repository needs, in every topology:
 
-1. Pin Node 26 and pnpm 12 in root `devEngines` (`runtime` `>=26.0.0 <27.0.0`, `packageManager` `>=12.0.0 <13.0.0`, both `onFail: "error"`) and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)). Do not set the legacy `packageManager` field or `volta`. Since 10.3.0, `xy repo init` writes that `devEngines` block and omits `packageManager` and `volta`. A 10.1.2 pnpm monorepo scaffold has the workspace file; a single-package scaffold still needs it.
+1. Pin Node 26 and pnpm 12 in root `devEngines` (`runtime` `>=26.0.0 <27.0.0`, `packageManager` `>=12.21.0 <13.0.0`, both `onFail: "error"`) and create the root `pnpm-workspace.yaml` with the release-age settings ([Package manager](#package-manager)). Do not set the legacy `packageManager` field or `volta`. Since 10.3.0, `xy repo init` writes `devEngines` and omits `packageManager` and `volta`; 11.0.2 uses the pnpm floor above. A 10.1.2 pnpm monorepo scaffold has the workspace file; a single-package scaffold still needs it.
 2. Install `@ariestools/toolchain`, the correct config packages, ESLint, and TypeScript at the root ([Installation](#installation)).
 3. Prefer `@ariestools/vitest-config` at the root; a single-package repo passes an explicit `include` ([testing.md](testing.md)). For neutral packages that need common timers/abort globals, add `@ariestools/lib-neutral`.
 4. Set `"type": "module"`.
@@ -193,6 +193,12 @@ The retired toolchain packages are `@xylabs/toolchain`, `@xylabs/ts-scripts-comm
 4. Adopt pnpm (`packageManager` plus one lockfile). `pnpm xyex packman convert pnpm` is an experimental helper that converts the repository to pnpm and swaps the managed `@xylabs` toolchain packages for `@ariestools/toolchain`.
 
 Then run `pnpm xy skills lint --fix`. Since 9.2.0, `skills.migrated-source` is an error until xy-development and xy-toolchain are installed from ariestools-skills. Since 10.1.2 it also flags a copy installed from an xyo-skills redirect stub, even one with no skills-lock.json entry.
+
+### Upgrading to 11.x
+
+Re-check work tracking before upgrading: since 10.3.1, GitHub Issues replace local `.xy/work/` items and normal commands refuse an unmigrated store. Back up the store and preview `xy work migrate --dry-run`; a real migration writes issues and removes migrated files. See [work tracking](commands.md#xy-work). `work init` and `work sync` no longer exist. `work` and `verify` are stable from 11.0.2; prefer `xy` for them.
+
+11.0.0 replaces removed stylistic newline rules with `@stylistic/list-style`; from 11.0.1 its single-line cap is two items for arrays, objects, patterns, tuple types and named imports/exports. Review intentional formatting changes after a config update. `repo.dev-engines-lockfile` (since 10.3.1) also checks that the root pnpm floor and lockfile pnpm version/specifier agree; its fix can edit both files. These are toolchain policy changes, not permission to update an unrelated repository's runtime or tracking configuration.
 
 ### Upgrading 9.x to 10.x
 
@@ -238,7 +244,7 @@ If a package command unexpectedly recurses, inspect same-named package scripts a
 
 ## Version notes
 
-This skill is verified against `@ariestools/toolchain` 10.3.0; anything without a version marker exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0`; `pnpm xy --version` reports it only from 10.0.6. A top-level command the installed version lacks prints `Command not found`. From 10.1.2 it exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the table below, not only the exit code.
+This skill is verified against `@ariestools/toolchain` 11.0.2; anything without a version marker exists from 9.0.0. Find the installed version with `pnpm list @ariestools/toolchain --depth 0`; `pnpm xy --version` reports it only from 10.0.6. A top-level command the installed version lacks prints `Command not found`. From 10.1.2 it exits 1; through 10.1.1, where newer commands are the ones missing, it exits 0, even under `--strict`. A missing subcommand may be silently ignored (for example, `xy node <typo>` prints only its banner and exits 0) or read as a package target, so check the output and the table below, not only the exit code.
 
 | Since | Change |
 |---|---|
@@ -266,3 +272,7 @@ This skill is verified against `@ariestools/toolchain` 10.3.0; anything without 
 | 10.2.1 | Unicorn migration queues and their versioned public exports are removed: upstream unopinionated severities apply from tier 2, opinionated rules are errors from tier 3, and tiers 3/4 share Unicorn severities. `no-restricted-syntax` also flags `value.constructor.name`; use a stable identifier. |
 | 10.2.2 | Removed `compile.tsup`, compile `outDir`, the tsup compile type/function aliases, `createBuildConfig`, `defaultBuildConfig`, and `xyex eject`; use esbuild options and lowercase `outdir`. Multi-format arrays fail; selected-package bundling uses a resolver plugin composed with user plugins. Compile, clean and workspace containment follow real filesystem paths; local deplint plugins resolve from their declaring config and stay within its checkout. Compile no longer falls back to a `tsc` on `PATH`. `xy skills lint --offline` now skips upstream version checks, and `xy check --offline` forwards it only to skills lint. Work sync also requires the `xy-work` label before attaching, editing or closing a marked issue. Package-manager argument guards reject flag-like workspace names and invalid publish tags; registry lookups reject non-HTTPS URLs and package subpaths. `xy repo init` pins pnpm 12.15.0 and its generated CLI build workflow adds `xy check`. |
 | 10.3.0 | Experimental `xyex verify` (also `xy verify`, which warns): compile, then test, then check, for the whole repository, stopping at the first non-zero exit. `--fix` and `--offline` apply to the check step. It does not run ESLint, deplint, or publint, and it takes no package target. `--json` prints one `schemaVersion: 1` envelope on stdout (`command`, `durationMs`, `exitCode`, `success`, `errorCount`, `warningCount`, plus `data`, `errors`, and `warnings` when present) and sends human logs to stderr, including unknown-command and CLI-validation failures. `xy updo` refuses `--json`; `xy skills pick` refuses it unless `--skill` is passed. `xy repo init` writes root `devEngines` (Node `>=26.0.0 <27.0.0`, pnpm `>=12.0.0 <13.0.0`) and no longer writes `packageManager` or `volta` |
+| 10.3.1 | GitHub Issues become the only work store; local `.xy/work/` requires explicit migration, `work init`/`sync` are removed, lifecycle writes go directly to issues, and `list --all` includes closed issues. Adds `work migrate --dry-run` and explicit `--enable-github` for previously disabled GitHub. Adds `repo.dev-engines-lockfile` checking root pnpm range/specifier against the lockfile; pnpm scaffold floor rises to 12.16.0 |
+| 11.0.0 | Replaces removed stylistic newline rules with `@stylistic/list-style` after the stylistic/Unicorn dependency upgrade; raises `max-lines` from 512 to 1024 code lines |
+| 11.0.1 | Caps single-line arrays, objects, patterns, tuple types and named imports/exports at two items in `@stylistic/list-style` |
+| 11.0.2 | Promotes `work` and `verify` to stable; use `xy work` and `xy verify`. Current pnpm scaffold floor is `>=12.21.0 <13.0.0`; agent lint and the compile/test/check verify sequence retain their documented behavior. npm/npx helpers handle a repository requiring another package manager, without applying that bypass to publish/unpublish |

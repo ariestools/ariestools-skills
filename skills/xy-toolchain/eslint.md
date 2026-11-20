@@ -122,9 +122,10 @@ At tier 3 with type checking, these are errors:
 | `unicorn/prefer-export-from` | `export { x } from './x.ts'` instead of importing then exporting |
 | `no-restricted-imports` | Import the defining file, never an `index.ts` barrel (`./index.ts`, `../index.ts`, …); files under `src/` never import a `src/` path |
 | `workspaces/no-relative-imports`, `workspaces/require-dependency` | Reach another workspace package by its package name, and declare it in `package.json` |
-| `complexity` 18, `max-depth` 6, `max-statements` 32, `max-nested-callbacks` 6, `max-lines` 512 | Split functions and files (`max-lines` counts code lines only) |
+| `complexity` 18, `max-depth` 6, `max-statements` 32, `max-nested-callbacks` 6, `max-lines` 1024 (11.0.0+; 512 earlier) | Split functions and files (`max-lines` counts code lines only) |
 | `@typescript-eslint/member-ordering` | Fields, constructor, accessors, then methods; static before instance, public before private; alphabetical within each group |
 | `unicorn/filename-case` | camelCase, kebab-case or PascalCase file names |
+| `@stylistic/list-style` (11.x) | At most two items per single-line array, object, pattern, tuple type or named import/export; use multiline lists beyond that cap (11.0.1+) |
 
 Fix these too: `@typescript-eslint/consistent-type-imports` (separate `import type`), `simple-import-sort` import and export order, `@stylistic/max-len` 200, `@typescript-eslint/explicit-member-accessibility` (omit `public`), the `enum` ban in `no-restricted-syntax` (use a string-literal union or a `const` object), its ban on `value.constructor.name` since 10.2.1 (use an explicit stable identifier), and `import-x/no-cycle`. `pnpm xy lint --fix` sorts imports and splits type imports. Run `pnpm xy lint --rules` for the effective level of every rule.
 

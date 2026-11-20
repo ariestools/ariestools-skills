@@ -31,7 +31,7 @@ packages/<pkg>/CLAUDE.md   @AGENTS.md only · paired with the package AGENTS.md
 .agents/skills/            installed skills, managed by pnpm xy skills · plus repo-authored skills
 .claude/skills/            symlinks into .agents/skills/
 skills-lock.json           pinned skill sources · managed by pnpm xy skills
-.xy/work/items/            tracked work items (pnpm xyex work · experimental)
+.xy/work/                  legacy local work store (through 10.3.0); preserve until explicit migration
 ```
 
 Not every repository needs every tier. A single-package library may have `AGENTS.md` with its `CLAUDE.md` import, `README.md`, and `docs/decisions/` and nothing else. Add a tier when it has real content, never as a placeholder — an empty `papers/` directory is a lie about the repository's maturity.
@@ -42,7 +42,7 @@ Not every repository needs every tier. A single-package library may have `AGENTS
 
 **Two READMEs, two audiences.** The root `README.md` is for maintainers. In a monorepo the root package is private, so install, API and usage live in each `packages/<pkg>/README.md`, which is listed in that package's `files` and published with it. The stable `xy repo lint`, run by `xy check`, errors when a package README is missing or unlisted. A single-package repository keeps install and usage in its root README.
 
-**Tool-managed paths.** Installed skills — the ones pinned in `skills-lock.json` — are managed by `pnpm xy skills` and checked by `xy check`; never hand-edit them. [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking) covers `xy skills` and `xyex work`. In `.claude/rules/`, add only hand-authored rules. Legacy generated `xylabs-*.md` files there come from the retired `xy claude` command: never edit or extend them. `xy skills lint` and `xy check` warn on them (`skills.legacy-generated`), and their `--fix` deletes them with the rest of that command's output; leave running it to the owner.
+**Tool-managed paths.** Installed skills — the ones pinned in `skills-lock.json` — are managed by `pnpm xy skills` and checked by `xy check`; never hand-edit them. [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking) covers `xy skills` and `xy work`. In `.claude/rules/`, add only hand-authored rules. Legacy generated `xylabs-*.md` files there come from the retired `xy claude` command: never edit or extend them. `xy skills lint` and `xy check` warn on them (`skills.legacy-generated`), and their `--fix` deletes them with the rest of that command's output; leave running it to the owner.
 
 ## Which tier a document belongs to
 

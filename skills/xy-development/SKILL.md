@@ -1,6 +1,6 @@
 ---
 name: xy-development
-description: "Core development standards for TypeScript conventions, Git workflow, testing principles, behavior-preserving refactors, repository workflow, and the Definition of Done. Use when writing or reviewing TypeScript or organizing imports; writing tests; refactoring, moving code between packages, or auditing a monorepo's package structure; running a repo's build, lint, test, or dev commands; adding or upgrading dependencies; committing, branching, merging, releasing, or deploying; writing PRD acceptance criteria; or before declaring any task complete."
+description: "Core development standards for TypeScript conventions, Git workflow and safe branch/worktree/stash audits and cleanup, testing principles, behavior-preserving refactors, repository workflow, and the Definition of Done. Use when writing or reviewing TypeScript or organizing imports; writing tests; refactoring, moving code between packages, or auditing a monorepo's package structure; running a repo's build, lint, test, or dev commands; adding or upgrading dependencies; committing, branching, merging, releasing, or deploying; writing PRD acceptance criteria; or before declaring any task complete."
 metadata:
   # x-release-please-start-version
   version: "0.1.14"
@@ -24,6 +24,9 @@ Read when writing, reviewing, or refactoring TypeScript code, or organizing impo
 
 ### [Git Workflow](git.md)
 Read when committing, branching, pushing, merging or opening PRs, undoing a change, resolving a rejected push, or cutting a release. Covers conventional commits and PR titles, atomic commits, commit identity and repository hygiene, the history-rewrite policy (shared branches stay append-only; an unpushed topic branch changes only when the user asks), working in the checkout you were given, branching-model detection from `AGENTS.md` or `origin/develop`, merge methods, and releases.
+
+### [Repository Hygiene](repository-hygiene.md)
+Read when auditing or cleaning up branches, worktrees or stashes. Covers live merge/PR/deployment evidence, useful-work preservation, independently verified recovery bundles, guarded removal and recovery. At natural task boundaries, consider an occasional evidence-based audit suggestion; this never grants deletion authority. The optional helper has read-only audit and verified-backup modes only.
 
 ### [Deployment Conventions](deployment.md)
 Read when creating, changing, simplifying, or migrating deployment workflows or provider branch mappings. Covers `<environment>[-<component>]-<target>[-<build-mode>]` names, native Vercel versus CI prebuilt/image delivery, one automatic build/deploy path, explicit approval for naming exceptions, homelab scope, and compatibility across independently deployed components.

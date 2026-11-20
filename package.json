@@ -7,7 +7,8 @@
     "validate:skills": "node scripts/validate-skills.mjs skills",
     "validate:upstream": "node scripts/validate-skills.mjs skills --upstream",
     "sync:claude": "node scripts/marketplace-sync/build-claude.mjs",
-    "sync:codex": "node scripts/marketplace-sync/build-codex.mjs"
+    "sync:codex": "node scripts/marketplace-sync/build-codex.mjs",
+    "test:repository-hygiene": "node --test scripts/tests/repository-hygiene.test.mjs"
   },
   "engines": {
     "node": ">=24"
