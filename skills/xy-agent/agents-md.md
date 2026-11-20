@@ -93,7 +93,7 @@ Instruction files carry **durable facts and enforceable rules**. They do not car
 
 `agents.no-live-state` (warn) checks the root and each `packages/*/AGENTS.md` and matches patterns, not intent: a claim or assignment that names someone, an in-flight list, a branch name ([patterns](auditing.md#where-the-shipped-rules-differ)). Write durable branch conventions with placeholders (`feature/<name>`), and name nobody in a prohibition.
 
-Live state belongs in a `docs/` handoff document (which is dated, and archived when the effort ends) or in the work tracker, `pnpm xyex work` (experimental; see [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking)). The test: if this sentence will be false next week and nothing will notice, it does not belong here.
+Live state belongs in a `docs/` handoff document (which is dated, and archived when the effort ends) or in the work tracker, `pnpm xy work` (stable since 11.0.2; see [Skills and work tracking](../xy-toolchain/commands.md#skills-and-work-tracking)). The test: if this sentence will be false next week and nothing will notice, it does not belong here.
 
 Also keep out: anything derivable from the codebase itself (directory listings, dependency lists, architecture overviews an agent can read in ten seconds — link a human-facing `ARCHITECTURE.md` from the authority table instead). Keep pitfalls, rationale, and conventions that differ from tool defaults.
 

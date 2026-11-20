@@ -195,12 +195,12 @@ When you find a divergence, **write it into the `## Known divergences between do
 
 ## Turning findings into work
 
-Audit findings become `xy work` items. `work` is experimental, so use `pnpm xyex work …`. Follow the rules for machine-generated items in the [xy-toolchain work reference](../xy-toolchain/commands.md#skills-and-work-tracking): get consent before the first `work` command, deduplicate by anchor and tag, fill in the triage fields, and close the loop with `work sync`. For a documentation audit:
+When authorized, audit findings become GitHub-backed `xy work` items (stable from 11.0.2, GitHub-only from 10.3.1). Follow the [work reference](../xy-toolchain/commands.md#skills-and-work-tracking): use existing authorization or obtain it before posting/changing issues, deduplicate by anchor and tag, fill in triage fields, and close resolved issues with verification evidence. Read-only listing no longer creates a store; an unmigrated legacy store blocks normal commands. For a documentation audit:
 
 - Anchor each item to the document it is about (`--file docs/plans/X.md`) and tag every item `docs-audit`, so a rerun finds and updates its own items:
 
   ```bash
-  pnpm xyex work add debt "Reconcile docs/plans/X.md" --file docs/plans/X.md --tag docs-audit \
+  pnpm xy work add debt "Reconcile docs/plans/X.md" --file docs/plans/X.md --tag docs-audit \
     --area docs --impact 2 --urgency 2 --acceptance "<what done looks like>" --verify "pnpm xy agent lint"
   ```
 
@@ -208,7 +208,7 @@ Audit findings become `xy work` items. `work` is experimental, so use `pnpm xyex
 
 Batch findings by document rather than by check. One item saying "reconcile `docs/plans/X.md`: superseded, unarchived, two dead links" is actionable; three items about the same file are noise.
 
-`.xy/work/` is a durable **backlog**, not a live coordination plane. It is a tracked file store: each worktree sees its own snapshot, and concurrent writers make it a merge hotspot. Claims are advisory, not exclusive — `work claim` overwrites an already-claimed item — so do not use them to coordinate concurrent agents. An audit only adds or queues items.
+GitHub Issues are the durable **backlog**, not an exclusive coordination plane. Worktrees read the same remote state; claims still have no atomic lock or lease and can overwrite another claim. Do not use them to guarantee exclusive ownership between agents. Keep any legacy `.xy/work/` data until an explicitly authorized migration has safely moved it. An authorized audit adds or queues findings; it does not acquire exclusive claims.
 
 ## Suggesting maintenance without doing it
 
