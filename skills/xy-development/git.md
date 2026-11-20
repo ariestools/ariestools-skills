@@ -59,6 +59,8 @@ If you find yourself writing "and" in a commit message, consider splitting it in
 
 Use LF line endings and case-sensitive filenames; never commit tool caches or generated output. See [xy-toolchain › Repository policy](../xy-toolchain/commands.md#repository-policy) for the enforcing command.
 
+For branch, worktree and stash audits or cleanup, read [Repository hygiene](repository-hygiene.md). Preserve useful unmerged work, verify recovery before removal, and keep integration/deployment branches unless their retirement is explicitly in scope.
+
 ## Never Rewrite History
 
 Git history on shared branches is append-only. Repository instructions (CLAUDE.md, AGENTS.md) take precedence over this section.

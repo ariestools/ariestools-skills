@@ -78,6 +78,10 @@ If the repo has a way to do it, use the repo's way. Ad-hoc commands are for expl
 
 **This applies even when you just created the scripts yourself.** After scaffolding a new project, use the scripts you defined — don't bypass them with raw commands like `npx tsc -b` or `npx eslint .` for "quick checks". The scripts exist to run the correct pipeline; partial raw invocations can miss flags, configs, or pipeline steps and give misleading results.
 
+### Repository maintenance suggestions
+
+At natural stopping points, consider the occasional evidence-based audit suggestion in [Repository hygiene](repository-hygiene.md#when-to-suggest-it). Use existing orientation evidence or a known audit receipt; do not interrupt active work, scan every repository on every turn, or make cleanup a completion requirement. A suggestion or read-only audit does not authorize deletion.
+
 ## Definition of Done
 
 These criteria verify implementation work. A routine deployment of already verified application source uses [Deployment conventions](deployment.md): verify the changed route and its result, and keep application and protocol invariants without adding release gates.
