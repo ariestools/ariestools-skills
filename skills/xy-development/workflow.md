@@ -103,7 +103,7 @@ A root `build` or `test` script receives `xy build` or `xy test` when one exists
 
 Also run `pnpm xy check` when the change touches repository policy, `AGENTS.md`, `docs/`, skills, or package-manager configuration. [Lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates) lists what each command includes and excludes. After a toolchain configuration change, run [Verify the selected profile](../xy-toolchain/project-profiles.md#verify-the-selected-profile). That checklist is the configuration check. A source change uses the two commands above.
 
-Experimental `xyex verify` (since 10.3.0; `xy verify` prints the experimental warning) runs compile, then test, then check for the whole repository and stops at the first failure. It is not this gate: it skips the ESLint, deplint, and publint work inside `xy build`, and it always runs `xy check`. See [Lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
+`xy verify` (stable since 11.0.2; experimental `xyex verify` from 10.3.0 through 11.0.1) runs compile, then test, then check for the whole repository and stops at the first failure. It is not this gate: it skips the ESLint, deplint, and publint work inside `xy build`, and it always runs `xy check`. See [Lifecycle gates](../xy-toolchain/commands.md#lifecycle-gates).
 
 ### 1. Builds Cleanly
 - The completion build succeeds with zero errors

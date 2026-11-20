@@ -23,9 +23,10 @@ violate even where every other instruction is silent>.**
 2. [docs/<HANDOFF>.md](docs/<HANDOFF>.md) — where the active effort stood
    on <date>. Dated: check it against `git log` before trusting a specific
    claim.
-3. `pnpm xyex work list` — the open work items. <Keep this step only if
-   `.xy/work/config.json` is committed; elsewhere the command creates the
-   store.>
+3. `pnpm xy work list` — open GitHub-backed work items. <Keep this step only
+   when the repository uses this tracker, has authenticated GitHub access,
+   and has no unmigrated `.xy/work/` store. On toolchain <=10.3.0, even a
+   list could initialize local tracking; consult that version before use.>
 
 Then read only the authority for the task in hand, from the table below.
 Do not read the papers end to end to make a scoped change.
@@ -68,7 +69,7 @@ full explanation.>
 - <actions that remain with the owner: publish, deploy, spend, alias>
 ```
 
-`xy agent lint` finds the required sections by keyword. If you retitle one, keep its keyword (Orient, Authority, Repository map, Command, Fail), which matches on every toolchain version; [Required sections](agents-md.md#required-sections) lists the alternatives and the version that added each. Write every repository path as a Markdown link, never a code span or an `@path` import: the linter resolves links only, and an import would load its target into every session. Keep the authority table task-first, with the linked path in the column headed Authority, which is where `agents.authority-rows-resolve` reads it. Link every Authority cell to a target that contains `/` or ends in `.md` (a root `package.json` as `./package.json`): otherwise the rule takes the first such word anywhere in the row, and a task class such as "Build and CI/CD" warns as a missing file. `xy work` is experimental, hence `xyex`; usage is in the [xy-toolchain commands reference](../xy-toolchain/commands.md#skills-and-work-tracking). See [agents-md.md](agents-md.md) for what each section is for.
+`xy agent lint` finds the required sections by keyword. If you retitle one, keep its keyword (Orient, Authority, Repository map, Command, Fail), which matches on every toolchain version; [Required sections](agents-md.md#required-sections) lists the alternatives and the version that added each. Write every repository path as a Markdown link, never a code span or an `@path` import: the linter resolves links only, and an import would load its target into every session. Keep the authority table task-first, with the linked path in the column headed Authority, which is where `agents.authority-rows-resolve` reads it. Link every Authority cell to a target that contains `/` or ends in `.md` (a root `package.json` as `./package.json`): otherwise the rule takes the first such word anywhere in the row, and a task class such as "Build and CI/CD" warns as a missing file. `xy work` is stable from 11.0.2 and GitHub-Issues-only from 10.3.1; usage is in the [xy-toolchain commands reference](../xy-toolchain/commands.md#skills-and-work-tracking). See [agents-md.md](agents-md.md) for what each section is for.
 
 ## CLAUDE.md
 
