@@ -84,7 +84,7 @@ Other skills and the installed xyo-skills pack deep-link these, and those links 
 
 ## Development and releases
 
-- **Package manager:** pnpm 10 with Node >= 24, both pinned through Volta in `package.json`.
+- **Package manager:** pnpm `>=12.21.0 <13.0.0` in root `devEngines.packageManager` (`onFail: "error"`). Node is `devEngines.runtime` `>=26.0.0 <27.0.0` (`onFail: "error"`) and `engines.node` `>=24`.
 - **Branching:** Gitflow. `develop` is the integration branch; `main` receives releases.
 - **Commits and PR titles:** conventional (`feat:`, `fix:`, `docs:`, `chore:`). PRs into `main` must be titled `feat:` or `fix:`.
 - **Releases:** release-please runs on every push to `main`, bumps the version (`always-bump-patch`) in `version.txt`, `metadata.json` and each `SKILL.md`, then the `sync-marketplaces` job renders and pushes both mirrors. Secrets: `RELEASE_PLEASE_TOKEN`, `MARKETPLACE_SYNC_TOKEN`.
